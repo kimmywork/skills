@@ -1,3 +1,7 @@
 .agents/
 .pi/
 skills-lock.json
+.pi-subagents/
+tracks/
+reference-docs/
+.DS_Store

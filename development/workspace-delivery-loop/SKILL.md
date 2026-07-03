@@ -1,9 +1,11 @@
 ---
 name: workspace-delivery-loop
-description: 通用端到端开发流程（需求→计划→实现→验证→交付），含模块抽取/组件化、架构合规检查、schema-first 数据建模。
+description: Legacy/deprecated workspace delivery process. Prefer software-delivery-loop for new software delivery work.
 ---
 
 # Workspace Development Loop
+
+> **Legacy / Deprecated:** Prefer `software-delivery-loop` and its sub-skills for new work. This skill remains for historical comparison and projects that already depend on the old WDL structure.
 
 适用于多模块项目的中大型交付。强调"需求↔计划↔验证↔代码"可追溯，默认 TypeScript。
 

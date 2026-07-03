@@ -1,0 +1,41 @@
+{
+  "skill_name": "software-delivery-loop",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We need to add a small but user-visible filtering feature to an existing notes app. The user only described it as 'make tag search better'. Use the software delivery loop to decide what to do next.",
+      "expected_output": "Agent inspects existing docs/code first, treats the request as unclear, routes to requirement-discovery, asks focused questions only after context search, and proposes a compact feature-scoped track note rather than jumping into code.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "There is a failing regression test for a known bug and the failure points to a single parser function. The plan and acceptance criteria already exist under docs/track/parser-bug/. Continue the work autonomously if possible.",
+      "expected_output": "Agent reads existing track docs and .agents/loop-state.md if present, recognizes sufficient evidence for autonomous implementation-execution, fixes one vertical slice, runs verification, and records evidence without unnecessary user questions.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "We finished implementing docs/track/decision-workspace/plan-v1.md. Check whether it is ready to ship.",
+      "expected_output": "Agent routes to delivery-acceptance, performs two-axis review (Spec Fit and Code Fit), requires fresh verification evidence, writes or updates delivery-record-v1.md, and avoids claiming done without evidence.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "During implementation, we discovered the approved API contract is wrong and need a compatibility fallback to avoid breaking old clients.",
+      "expected_output": "Agent stops implementation-execution, records a change note, returns to solution-design or requirement-discovery for approval of contract and migration strategy, and does not hide drift with an unapproved shim.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "The project has no delivery docs yet. We want to start using this loop for a multi-project software change, but do not want heavy ceremony.",
+      "expected_output": "Agent uses cold-start guidance, proposes minimal .agents/loop-state.md, docs/track/, docs/knowledge/, docs/logs/ layout, asks before creating files, and creates only the smallest appropriate track note for the current task.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "The same loop keeps skipping verification and producing vague acceptance records. What should the agent do?",
+      "expected_output": "Agent identifies recurring loop failure, summarizes prior pattern, proposes concrete skill/template improvements, presents them as optional, and only applies them after user approval unless loop-state permits autonomous safe self-improvement.",
+      "files": []
+    }
+  ]
+}

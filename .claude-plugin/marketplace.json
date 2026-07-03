@@ -1,0 +1,19 @@
+{
+  "name": "kimmywork-skills",
+  "description": "Skills from Kimmy for work",
+  "owner": {
+    "name": "Kimmy Liu"
+  },
+  "plugins": [
+    {
+      "name": "software-delivery-loop",
+      "description": "A compact, agent-neutral skill family for software delivery",
+      "source": "./development/"
+    },
+    {
+      "name": "utility",
+      "description": "utility for daily work",
+      "source": "./utility/"
+    }
+  ]
+}

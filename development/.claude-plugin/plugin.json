@@ -1,0 +1,9 @@
+{
+  "name": "software-delivery-loop",
+  "description": "A compact, agent-neutral skill family for software delivery",
+  "version": "0.3.0",
+  "homepage": "https://github.com/kimmywork/skills",
+  "repository": "https://github.com/kimmywork/skills",
+  "keywords": ["development", "tdd", "discovery", "planning", "design"],
+  "skills": ["./"]
+}

@@ -1,6 +1,6 @@
 ---
 name: software-delivery-loop
-description: Use when software work needs end-to-end delivery, phase triage, or continuation from request to accepted outcome: requirements, design, implementation planning, coding, bugfixes, refactors, maintenance, validation, delivery records, autonomous loops, or existing track/PRD/plan work.
+description: "Use when software work needs end-to-end delivery, phase triage, or continuation from request to accepted outcome: requirements, design, implementation planning, coding, bugfixes, refactors, maintenance, validation, delivery records, autonomous loops, or existing track/PRD/plan work."
 license: MIT
 metadata:
   author: kenpusney

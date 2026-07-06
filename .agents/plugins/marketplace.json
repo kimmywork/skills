@@ -5,10 +5,22 @@
   },
   "plugins": [
     {
-      "name": "kimmywork-skills",
+      "name": "solution-delivery-loop",
       "source": {
         "source": "local",
-        "path": "."
+        "path": "./delivery"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "utility",
+      "source": {
+        "source": "local",
+        "path": "./utility"
       },
       "policy": {
         "installation": "AVAILABLE",

@@ -22,15 +22,18 @@ npx skills add kimmywork/skills --skill <skill-name> [<skill-name> ...]
 # Add the marketplace source
 claude plugin marketplace add kimmywork/skills
 
-# Install plugin
-claude plugin install kimmywork-skills@kimmywork-skills
+# Install plugins
+claude plugin install solution-delivery-loop@kimmywork-skills
+claude plugin install utility@kimmywork-skills
 ```
 
 ---
 
 ## Skills
 
-### Solution Delivery (8 skills)
+### Solution Delivery Loop (8 skills)
+
+A compact, agent-neutral skill family for solution delivery:
 
 `Sense → Shape → Design → Build → Verify → Record → Continue/Stop`
 
@@ -63,7 +66,7 @@ claude plugin install kimmywork-skills@kimmywork-skills
 ### Utility (2 skills)
 
 #### `cloudconvert`
-> Convert non-text documents (PDF, DOC/DOCX, EPUB) to Markdown via CloudConvert CLI.
+> Convert non-text documents (PDF, DOC/DOCX, EPUB) to Markdown via CloudConvert CLI. Saves processing tokens by feeding agents clean Markdown instead of raw document formats.
 
 #### `style-extraction`
-> Extract a structured writing style profile from an author's sample texts. Quantifiable features + executable rules + positive/negative examples. Supports English and Chinese.
+> Extract a structured writing style profile from an author's sample texts. Quantifiable features + executable rules + positive/negative examples. Supports both English and Chinese source texts.

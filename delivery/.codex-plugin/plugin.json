@@ -1,0 +1,33 @@
+{
+    "name": "solution-delivery-loop",
+    "version": "1.0.0",
+    "description": "A compact, agent-neutral skill family for solution delivery",
+    "author": {
+        "name": "Kimmy Liu"
+    },
+    "homepage": "https://github.com/kimmywork/skills",
+    "repository": "https://github.com/kimmywork/skills",
+    "license": "MIT",
+    "keywords": [
+        "delivery",
+        "discovery",
+        "planning",
+        "design",
+        "research",
+        "investigation"
+    ],
+    "skills": "skills",
+    "interface": {
+        "displayName": "Solution Delivery Loop",
+        "shortDescription": "End-to-end solution delivery skill family",
+        "longDescription": "A compact, agent-neutral skill family for solution delivery. Covers the full lifecycle from request triage through requirements, design, implementation, verification, and acceptance. 8 skills: solution-delivery-loop, requirement-discovery, solution-design, implementation-execution, delivery-acceptance, review-feedback, process-distillation, structured-investigation.",
+        "developerName": "Kimmy Liu",
+        "category": "Productivity",
+        "capabilities": ["Interactive", "Write"],
+        "defaultPrompt": [
+            "Implement this feature end-to-end from requirements to verified delivery",
+            "Review this completed work and decide whether it's ready to ship",
+            "Investigate this bug report and trace the root cause through the codebase"
+        ]
+    }
+}

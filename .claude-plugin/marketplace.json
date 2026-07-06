@@ -6,9 +6,9 @@
   },
   "plugins": [
     {
-      "name": "software-delivery-loop",
-      "description": "A compact, agent-neutral skill family for software delivery",
-      "source": "./development/"
+      "name": "solution-delivery-loop",
+      "description": "A compact, agent-neutral skill family for solution delivery",
+      "source": "./delivery/"
     },
     {
       "name": "utility",

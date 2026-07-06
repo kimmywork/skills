@@ -17,7 +17,7 @@ Use when changing a term or name across the skill family. Prevents the common fa
 - [ ] Check each file category:
   - SKILL.md files (all `delivery/*/SKILL.md`)
   - Reference files (`delivery/*/references/*.md`)
-  - README files (`delivery/*/README.md`, `delivery/*/README.zh.md`)
+  - README files (`delivery/*/README.md`)
   - Template files (`delivery/*/references/*template*.md`)
   - Config/JSON files (`delivery/.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`)
 - [ ] Classify any remaining hits: intentional (e.g., comparison table) / false positive / needs fix.

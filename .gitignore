@@ -1,4 +1,4 @@
-.agents/
+#.agents/
 .pi/
 skills-lock.json
 .pi-subagents/

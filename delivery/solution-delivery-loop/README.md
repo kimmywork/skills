@@ -1,7 +1,5 @@
 # Solution Delivery Loop
 
-English | [中文](README.zh.md)
-
 A compact, agent-neutral skill family for solution delivery. Inspired by [Addy Osmani's Loop Engineering](https://addyosmani.com/blog/loop-engineering/) — the five primitives (automations, worktrees, skills, connectors, sub-agents) plus state. SDL focuses on the **skills** and **state** primitives while staying agent-neutral and independent of any specific tool or runtime.
 
 ```text

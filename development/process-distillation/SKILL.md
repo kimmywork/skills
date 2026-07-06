@@ -4,7 +4,7 @@ description: Extract durable improvements from a completed phase cycle — execu
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.1.0"
+  version: "0.4.0"
 ---
 
 # Process Distillation

@@ -4,7 +4,7 @@ description: Use when reviewing completed software work, checking whether a feat
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.2.0"
+  version: "0.4.0"
 ---
 
 # Delivery Acceptance

@@ -4,7 +4,7 @@ description: Use when clear software requirements, a PRD, track note, bug report
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.2.0"
+  version: "0.4.0"
 ---
 
 # Solution Design

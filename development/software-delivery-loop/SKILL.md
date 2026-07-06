@@ -4,7 +4,7 @@ description: "Use when software work needs end-to-end delivery, phase triage, or
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.3.0"
+  version: "0.4.0"
 ---
 
 # Software Delivery Loop

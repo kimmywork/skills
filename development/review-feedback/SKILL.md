@@ -4,7 +4,7 @@ description: Independent review of phase/workflow outputs. Inspects current-phas
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.1.0"
+  version: "0.4.0"
 ---
 
 # Review & Feedback

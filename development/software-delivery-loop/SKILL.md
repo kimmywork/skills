@@ -61,6 +61,8 @@ Prefer feature-scoped track folders:
 
 Every behavior-changing feature, bugfix, or delivery-relevant maintenance task needs a track note. PRDs are for broad, user-facing, multi-module, ambiguous, or long-lived work.
 
+Optionally track phase/version progress with `references/progress-template.md` — captures completed items, blockers, decisions, and next action. Useful for multi-slice or multi-session work.
+
 Use `docs/knowledge` for cross-feature knowledge: ADRs, architecture notes, domain terms, reusable contracts, durable decisions. Use `docs/logs/YYYY-MM-DD.md` for operational work logs. Docs can be stale; when docs, code, and tests disagree, verify the truth and write the accurate result back to docs.
 
 ## Loop improvement

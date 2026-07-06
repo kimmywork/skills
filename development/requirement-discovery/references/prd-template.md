@@ -2,6 +2,13 @@
 
 Use for broad, user-facing, multi-module, ambiguous, or long-lived work.
 
+**Section selection guide**:
+- P0 (always include): Elevator Pitch, Background/Problem, Scope, Non-Goals, Requirements, Risks/Rollback.
+- P1 (include for broad work): User Persona, Contracts/Data Model, Constraints, Open Questions.
+- P2 (include for complex multi-stakeholder work): Business/Value Canvas, User Journey, User Story Map, Metadata.
+
+Omit P2 sections for simple features. Omit P1 sections when the compact track note is sufficient.
+
 ~~~~markdown
 # PRD v<N>: <Product / Feature>
 

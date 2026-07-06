@@ -9,6 +9,13 @@ Use per vertical slice.
 - [ ] Module landing and contracts are clear.
 - [ ] Verification command/manual check is known.
 
+## Readiness gate
+
+- [ ] Scope is clear and non-goals are respected.
+- [ ] Acceptance criteria are binary (pass/fail).
+- [ ] Verification command is known and runnable.
+- [ ] Dependencies and blocked items are resolved or documented.
+
 ## TDD / Verification
 
 - [ ] Behavior change has a failing test first, when practical.
@@ -41,3 +48,4 @@ Use per vertical slice.
 - [ ] Evidence recorded in track/log/delivery record.
 - [ ] Loop state updated if present.
 - [ ] Docs corrected if stale or contradicted by code/tests.
+- [ ] Change note written if scope, design, contract, data model, acceptance, or planned module landing drifted.

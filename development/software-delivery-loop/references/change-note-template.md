@@ -44,4 +44,14 @@ sense | shape | design | build | verify | record
 ## Verification Update
 
 - <new/changed verification>
+
+## Scope Reduction
+
+Use when approved scope is reduced or deferred. Document what was cut, why, and when it may be revisited.
+
+- Original scope items removed:
+- Reason:
+- Impact on later phases:
+- Deferred decisions:
+- Revisit trigger:
 ~~~~

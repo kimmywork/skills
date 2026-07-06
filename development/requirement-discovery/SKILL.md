@@ -19,6 +19,10 @@ Shape software intent before design or coding.
 4. Ask one focused question at a time only when context cannot answer it.
 5. Propose 2–3 approaches when choices matter; recommend one with trade-offs.
 6. Write or update the smallest durable track artifact.
+7. Preserve research raw material and final results under `docs/track/<feature>/research/`:
+   - Interview notes, persona docs, discussion summaries
+   - Data analysis, competitive research, user feedback
+   - Any context too detailed for the PRD/track note
 
 ## Output scale
 

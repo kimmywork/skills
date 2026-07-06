@@ -51,6 +51,12 @@
 
 <how to reverse or safely migrate>
 
+## Deployment
+
+- Development / standalone:
+- Demo / single-machine:
+- Production / cluster:
+
 ## Open Design Questions
 
 - [ ] <question>

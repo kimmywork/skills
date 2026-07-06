@@ -9,6 +9,7 @@ Use before claiming work is complete.
 - [ ] Non-goals were not implemented accidentally.
 - [ ] No unapproved user-facing behavior was added.
 - [ ] Open questions are resolved or marked as blocking/follow-up.
+- [ ] Change notes exist for any drift from original scope, design, acceptance, contract, data model, or verification. Template: `software-delivery-loop/references/change-note-template.md`.
 
 ## Code Fit
 

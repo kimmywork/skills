@@ -19,7 +19,7 @@ Before any completion claim:
 2. Identify required evidence: tests, build, lint, manual scenario, screenshot, logs, review.
 3. Run fresh verification or inspect fresh evidence.
 4. Compare results against acceptance criteria.
-5. Record the outcome in the delivery record. Use `references/delivery-record-template.md` and `references/acceptance-checklist.md`.
+5. Record the outcome in the delivery record. For complex work (multi-slice, cross-cutting, high-risk), use `references/delivery-record-template.md` and `references/acceptance-checklist.md`. For simple work, record as 3–5 bullet points (what changed, evidence, deferred items) appended to the track note.
 
 ## Two-axis review
 
@@ -35,6 +35,10 @@ Use a checker/reviewer subagent when available for risky or multi-file changes. 
 - `docs/track/<feature-name>/delivery-record-v1.md`
 - `docs/track/<project-name>/<feature-name>/delivery-record-v1.md`
 - Simple work: append `Delivery Record` to the feature/bugfix track note.
+
+**Delivery record scale**:
+- Complex work (multi-slice, cross-cutting, high-risk): use the full `references/delivery-record-template.md`.
+- Simple work: 3–5 bullet points covering what changed, what evidence exists, what is deferred or blocked. Append to the track note.
 
 ## Final decision
 

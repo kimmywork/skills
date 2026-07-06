@@ -43,7 +43,16 @@ If unavailable, perform a fresh review pass yourself and state that review was s
 
 ## Change control
 
-Stop and write a change note before continuing when approved scope, architecture, contract, data model, acceptance criteria, or planned module landing changes. Do not hide drift with compatibility shims unless explicitly accepted as a migration strategy.
+Stop and write a change note before continuing when any of these occur:
+- A test expectation changes because behavior differs from the PRD/plan, not because the test is wrong.
+- You need to add a field, column, parameter, route, or component not in the plan.
+- You skip or weaken a non-goal from the requirements.
+- A verification command from the plan no longer makes sense or produces unrelated output.
+- Approved scope, architecture, contract, data model, acceptance criteria, or planned module landing changes.
+
+Template: `software-delivery-loop/references/change-note-template.md`.
+
+Do not hide drift with compatibility shims unless explicitly accepted as a migration strategy.
 
 ## Related skills
 

@@ -18,8 +18,11 @@ Turn approved intent into a designed, executable delivery plan.
 3. State design principles for this work: simplicity, locality, contract stability, UX constraints, risk posture.
 4. Compare 2–3 approaches when choices matter; recommend one with trade-offs.
 5. Map architecture/module landing before tasks: files, packages, contracts, schemas, routes, UI surfaces, tests.
-6. Plan vertical slices. Each slice must be reviewable and independently verifiable.
-7. Write/update the solution and plan in the feature track folder. Use `references/solution-design-template.md` and `references/plan-template.md`.
+6. Challenge the design:
+   - Check for: over-engineering, technology sprawl, unrealistic targets, missing deployment modes, excessive scope.
+   - If the design can be simplified without losing required behavior, simplify.
+7. Plan vertical slices. Each slice must be reviewable and independently verifiable.
+8. Write/update the solution and plan in the feature track folder. Use `references/solution-design-template.md` and `references/plan-template.md`.
 
 ## Plan content
 

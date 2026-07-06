@@ -58,3 +58,11 @@ Use EARS or Given/When/Then for detailed requirements and acceptance. See `refer
 - Accepting broad scope without non-goals
 - Writing a PRD when a compact track note is enough
 - Asking the user questions before reading available docs/code
+
+## After this phase
+
+Output inspected by `review-feedback` (cumulative with prior phases). Resolution:
+- Fix in place: correct issues, re-review.
+- Roll back: return to earliest affected phase, correct there, re-execute forward.
+
+After resolved, `process-distillation` may follow (auto under `full-autonomy`).

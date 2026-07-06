@@ -28,6 +28,22 @@ Start from user, scenario, and real need. Creativity is welcome; delivery requir
 
 If docs/code can answer a question, read first. Ask the user only after context search leaves real ambiguity. Ask one focused question at a time.
 
+## Review and feedback loop
+
+After each phase output, invoke `review-feedback` before next phase. Cumulative review: `review-feedback` inspects all prior artifacts + current output.
+
+| Review at | Inspects | Rollback to |
+|---|---|---|
+| solution-design | PRD + design | requirement-discovery |
+| implementation-execution | PRD + design + implementation | requirement-discovery |
+| delivery-acceptance | all prior + delivery record | requirement-discovery |
+
+Resolution:
+- Fix in place: correct current phase output, re-review.
+- Roll back: return to earliest affected phase, correct there, re-execute forward.
+
+After resolved, `process-distillation` may follow (auto under `full-autonomy`). New skill creation always requires user approval.
+
 ## Autonomy policy
 
 Autonomous execution is allowed when evidence is sufficient and user input is not needed. `.agents/loop-state.md` may define whether the loop can run fully autonomously for this workspace. Autonomy does not waive track notes, verification, delivery records, or change notes.
@@ -49,14 +65,7 @@ Use `docs/knowledge` for cross-feature knowledge: ADRs, architecture notes, doma
 
 ## Loop improvement
 
-If a phase is repeatedly blocked, skipped, misunderstood, or produces recurring failures:
-
-1. Summarize the pattern from past runs.
-2. Draft concrete skill/template improvements.
-3. Present optional improvements to the user.
-4. Apply them only after approval.
-
-Self-improvement is ask-first unless `.agents/loop-state.md` sets Autonomy to `full-autonomy`. Under `full-autonomy`, apply safe skill/template refinements and record the change.
+Repeated issues in a phase → use `process-distillation`. Self-improvement is ask-first unless `full-autonomy`. Under `full-autonomy`, auto-triggers after each resolved review-feedback cycle. New skill creation always requires user approval.
 
 ## Stop conditions
 

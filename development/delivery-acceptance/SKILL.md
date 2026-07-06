@@ -51,3 +51,11 @@ Do not commit, push, merge, release, or mark done unless project/user convention
 - Previous: use `implementation-execution` when implementation or verification is incomplete.
 - Return to `solution-design` when acceptance reveals design/contract drift.
 - Return to `requirement-discovery` when acceptance reveals software scope or behavior ambiguity.
+
+## After this phase
+
+Output inspected by `review-feedback` (cumulative with all prior phases: PRD, design, implementation, delivery record). Resolution:
+- Fix in place: correct issues, re-review.
+- Roll back: return to earliest affected phase, correct there, re-execute forward.
+
+After resolved, `process-distillation` may follow (auto under `full-autonomy`).

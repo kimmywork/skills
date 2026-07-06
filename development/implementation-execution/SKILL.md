@@ -50,3 +50,11 @@ Stop and write a change note before continuing when approved scope, architecture
 - Previous: use `solution-design` when the solution or plan is missing.
 - Next: use `delivery-acceptance` before claiming done or shipping.
 - Return to `requirement-discovery` when implementation reveals unclear software intent, behavior, or acceptance.
+
+## After this phase
+
+After all slices complete, output inspected by `review-feedback` (cumulative with prior phases: PRD + design + implementation). Resolution:
+- Fix in place: correct issues, re-review.
+- Roll back: return to earliest affected phase, correct there, re-execute forward.
+
+After resolved, `process-distillation` may follow (auto under `full-autonomy`).

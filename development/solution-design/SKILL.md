@@ -49,3 +49,11 @@ Turn approved intent into a designed, executable delivery plan.
 - Previous: use `requirement-discovery` when intent, users, scope, or acceptance are unclear.
 - Next: use `implementation-execution` when the plan is executable.
 - Return here when implementation changes architecture, contracts, or verification.
+
+## After this phase
+
+Output inspected by `review-feedback` (cumulative with prior phases: PRD + design + plan). Resolution:
+- Fix in place: correct issues, re-review.
+- Roll back: return to earliest affected phase (may be `requirement-discovery`), correct there, re-execute forward.
+
+After resolved, `process-distillation` may follow (auto under `full-autonomy`).

@@ -1,0 +1,12 @@
+{
+  "name": "kimmywork-skills",
+  "description": "AI agent skills for solution delivery and daily productivity",
+  "version": "1.0.0",
+  "author": {
+    "name": "Kimmy Liu"
+  },
+  "homepage": "https://github.com/kimmywork/skills",
+  "repository": "https://github.com/kimmywork/skills",
+  "keywords": ["delivery", "discovery", "planning", "design", "research", "investigation", "utils", "document", "markdown", "conversion", "style"],
+  "skills": ["./skills/"]
+}

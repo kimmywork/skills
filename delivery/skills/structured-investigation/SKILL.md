@@ -4,7 +4,7 @@ description: Use when a question requires investigation, research, source tracin
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.4.0"
+  version: "0.4.1"
 ---
 
 # Structured Investigation

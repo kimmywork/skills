@@ -4,7 +4,7 @@ description: Use when reviewing completed work, checking whether a feature/bugfi
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.5.0"
+  version: "0.5.1"
 ---
 
 # Delivery Acceptance

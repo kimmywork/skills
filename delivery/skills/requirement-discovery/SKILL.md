@@ -4,7 +4,7 @@ description: Use when a request, feature idea, bug report, refactor, workflow ch
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.5.0"
+  version: "0.5.1"
 ---
 
 # Requirement Discovery

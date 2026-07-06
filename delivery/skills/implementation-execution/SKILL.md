@@ -4,7 +4,7 @@ description: Use when executing a plan, implementing a feature, fixing a bug, re
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.6.0"
+  version: "0.6.1"
 ---
 
 # Implementation Execution

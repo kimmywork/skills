@@ -4,7 +4,7 @@ description: "Use when work needs end-to-end delivery, phase triage, or continua
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.6.0"
+  version: "0.6.1"
 ---
 
 # Solution Delivery Loop

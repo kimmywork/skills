@@ -4,7 +4,7 @@ description: Use when recurring phase friction, repeated review feedback, or res
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.5.0"
+  version: "0.5.1"
 ---
 
 # Process Distillation

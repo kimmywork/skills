@@ -4,7 +4,7 @@ description: Use when any phase artifact has been produced and needs independent
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.6.0"
+  version: "0.6.1"
 ---
 
 # Review & Feedback

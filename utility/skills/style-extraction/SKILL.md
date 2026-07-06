@@ -3,7 +3,7 @@ name: style-extraction
 description: "Extract a structured writing style profile from an author's sample texts. Use when the user wants to analyze writing style, clone an author's voice, create a style guide from existing texts, or prepare a style reference for AI writing. Trigger on mentions of 'style extraction', 'writing style', 'author voice', 'style profile', 'style guide', or when user provides text samples and asks to identify writing patterns."
 metadata:
   author: "Kimmy Liu"
-  version: "1.0"
+  version: "1.1"
 ---
 
 # Style Extraction

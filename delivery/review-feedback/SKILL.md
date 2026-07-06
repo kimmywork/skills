@@ -34,7 +34,10 @@ metadata:
    - All fix-in-place → deliver to current phase producer, wait for fixes, re-review.
    - Any roll-back → deliver report and recommend returning to earliest affected phase.
 
-6. **Close**: all issues resolved or deferred with user approval → mark passed. Next phase proceeds.
+6. **Close**:
+   - All issues resolved or deferred with user approval → mark passed. Next phase proceeds.
+   - If no critical or major issues remain, all prior issues are closed, and only minor polish items are open → mark as stable. Further reviews at this point are optional, triggered only by new changes.
+   - If critical or major issues remain → mark as fail. Re-review after fixes.
 
 ## Subagents
 

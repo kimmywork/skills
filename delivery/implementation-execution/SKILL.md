@@ -50,6 +50,7 @@ Stop and write a change note before continuing when any of these occur:
 - You need to add scope, fields, or steps not in the approved plan.
 - You skip or weaken a requirement or non-goal.
 - The verification method no longer applies.
+- Terminology or naming used in the increment conflicts with the approved conventions.
 
 Software-specific signals (see `references/software-mode.md`):
 - A test expectation changes because behavior differs from the plan, not because the test is wrong.

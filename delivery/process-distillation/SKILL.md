@@ -28,14 +28,23 @@ metadata:
 
 3. **Evaluate options**: small fix / new reference / new atomic skill / no change.
 
-4. **Apply under constraints** (see AGENTS.md):
+   **Decision gate**: If the gap can be resolved by changing 1–5 lines in an existing skill, prefer a small fix. Only create a new skill when the sub-process is clearly bounded, reusable across contexts, and has its own independent triggering signal. New skill creation always requires user approval regardless of autonomy mode.
+
+4. **Self-review and verify claims**:
+   - Every claim in the distillation report must cite file evidence (line number, section, or grep result).
+   - Before applying a terminology rename, inventory all affected files: `grep -rn "<old-term>" ./ --include="*.md" --include="*.json"`
+   - After applying changes, re-grep to confirm zero remaining hits.
+   - Use `references/rename-checklist.md` for cross-family renames.
+   - Classify any remaining hits: intentional / false positive / needs fix.
+
+5. **Apply under constraints** (see AGENTS.md):
    - Agent neutral, size controlled, scope limited, atomic, user-centric, English.
-   - **SKILL.md is for the agent**: precise instructions, no verbose rationale. Every unnecessary line wastes context.
+   - **SKILL.md is for the agent**: precise instructions, no verbose rationale.
    - When creating new skills, pass these constraints into the new skill's instructions.
 
-5. **Output**: distillation report using `references/distillation-template.md`.
+6. **Output**: distillation report using `references/distillation-template.md`.
 
-6. **Approval**:
+7. **Approval**:
    - Default: user approval per proposed change.
    - `full-autonomy` mode: auto-approve safe improvements. New skill creation always requires user approval.
 

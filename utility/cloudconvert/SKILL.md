@@ -3,7 +3,7 @@ name: cloudconvert
 description: "Convert non-text documents (PDF, DOC/DOCX, EPUB) to Markdown via CloudConvert CLI to save processing tokens. Skip .txt/.md/.json/.csv which are already agent-readable."
 metadata:
   author: "Kimmy Liu"
-  version: "0.1"
+  version: "1.0"
 ---
 
 # CloudConvert Document Conversion

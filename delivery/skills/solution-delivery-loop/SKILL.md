@@ -4,7 +4,7 @@ description: "Use when work needs end-to-end delivery, phase triage, or continua
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.6.1"
+  version: "0.7.0"
 ---
 
 # Solution Delivery Loop
@@ -22,21 +22,43 @@ metadata:
 | Migrate | solution-design (from mapping table) | requirement-discovery |
 | Enhance | requirement-discovery or solution-design | — |
 
+## Loop state
+
+`.agents/loop-state.md` declares workspace structure:
+
+```yaml
+projects:
+  - id: <project-id>
+    name: <display name>
+    track_root: <path>         # default: docs/track
+active_project: <project-id>
+autonomy: full | supervised    # default: supervised
+```
+
+Single-project may omit `projects`. Multi-project must declare all projects.
+
 ## First move
 
-1. Inspect existing context: `.agents/loop-state.md`, track docs, requirements, plans, delivery records, `docs/knowledge`, `docs/logs`.
-2. Right-size inspection: read enough to resolve the current phase; stop when more context won't change the next action.
-3. Route to the next phase — process first, then execute:
-   - unclear need, users, behavior, or scope → `requirement-discovery`
-   - clear requirements needing solution/plan → `solution-design`
-   - executable plan or evidence-backed small fix → `implementation-execution`
-   - implementation done, completion claim, or review → `delivery-acceptance`
+1. Inspect `.agents/loop-state.md`, track docs, requirements, plans, delivery records, `docs/knowledge`, `docs/logs`.
+2. Right-size: stop when more context won't change the next action.
+3. Route: unclear need → `requirement-discovery`; clear requirements → `solution-design`; executable plan → `implementation-execution`; done → `delivery-acceptance`.
 
-Read docs/code first. Ask the user only after context search leaves real ambiguity. Ask one focused question at a time.
+## Process gates
 
-## Review and feedback loop
+> **Iron Law**: NO PHASE SKIPPING. Each gate must pass before the next phase begins.
 
-After each phase output, invoke `review-feedback` before next phase. Cumulative review: `review-feedback` inspects all prior artifacts + current output.
+| Gate | Before | Must have | Check |
+|---|---|---|---|
+| Track doc | any editing | `requirements-v1.md` with `status: in_progress` | file exists with frontmatter |
+| Design review | implementation | `solution-design-v1.md` + review-feedback passed | feedback report shows no critical/major |
+| Impl review | delivery-acceptance | implementation complete + review-feedback passed | feedback report shows no critical/major |
+| Acceptance | claiming done | delivery-record with fresh verification evidence | all acceptance criteria verified |
+
+"Start implementing" or "go ahead" means scope is confirmed — still create track doc first, then proceed through the full cycle. Never skip to coding.
+
+## Review and feedback
+
+Invoke `review-feedback` after each phase. Cumulative: inspects all prior artifacts + current output.
 
 | Review at | Inspects | Rollback to |
 |---|---|---|
@@ -44,30 +66,16 @@ After each phase output, invoke `review-feedback` before next phase. Cumulative 
 | implementation-execution | Requirements + design + implementation | requirement-discovery |
 | delivery-acceptance | all prior + delivery record | requirement-discovery |
 
-After resolved, write a change note if scope/contract/design changed. See `process-distillation` skill for improvement cycles.
+Write change note if scope/contract/design changed.
 
-## Autonomy policy
+## Autonomy and continuity
 
-Autonomous execution is allowed when evidence is sufficient. `.agents/loop-state.md` may define full-autonomy for this workspace. Autonomy does not waive track notes, verification, delivery records, or change notes.
-
-Use subagents when available: explorer, maker, checker, reviewer. For risky changes, separate maker and checker.
-
-## Session continuity
-
-When resuming in a new session:
-1. Read `.agents/loop-state.md` (if exists), latest delivery record, and track docs.
-2. Determine: active phase, last verification result, next goal.
-3. If no loop-state exists, infer from track documents.
-4. Confirm before proceeding: current phase, pending increments, open blockers.
+`.agents/loop-state.md` may define full-autonomy. Autonomy does not waive track notes, verification, delivery records. Use subagents when available. On resume: read loop-state, latest delivery record, track docs. No loop-state → infer from track docs.
 
 ## Track documentation
 
-Prefer feature-scoped track folders under `docs/track/<feature-name>/`:
-- `requirements-v1.md`, `solution-design-v1.md`, `plan-v1.md`, `delivery-record-v1.md`
-- Simple work: `docs/track/features/<name>.md` or `docs/track/bugfix/<name>.md`
-
-Every behavior-changing work needs a track note. Distinguish internal working docs (under `research/` or `drafts/`) from deliverables (track root). Use `docs/knowledge` for cross-feature knowledge. Use `docs/logs/YYYY-MM-DD.md` for work logs. Docs can be stale; when docs and reality disagree, verify the truth and write it back to docs.
+All track docs use `<YYYY-MM-DD-NN>-<name>` naming, YAML frontmatter, and nested scope-map structure. See `references/track-document-structure.md` for schema, paths, and nesting rules. Parser: `scripts/track_parser.py`.
 
 ## Loop improvement
 
-Repeated issues in a phase → use `process-distillation`. New skill creation always requires user approval.
+Repeated issues → `process-distillation`. New skill creation requires user approval.

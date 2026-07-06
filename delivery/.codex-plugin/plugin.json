@@ -1,6 +1,6 @@
 {
     "name": "solution-delivery-loop",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "A compact, agent-neutral skill family for solution delivery",
     "author": {
         "name": "Kimmy Liu"

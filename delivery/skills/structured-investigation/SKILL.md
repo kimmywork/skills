@@ -84,7 +84,7 @@ No directory structure, no work log, no multi-perspective review needed.
 
 - **requirement-discovery**: Call this skill when deep investigation is needed to clarify requirements. Results feed into `docs/track/<feature>/research/`.
 - **solution-design**: Call this skill when technical feasibility needs investigation before design decisions.
-- **delivery-acceptance**: Investigation findings are verified using `references/format-investigation.md` criteria.
+- **delivery-acceptance**: Investigation findings are verified using `../delivery-acceptance/references/format-investigation.md` criteria.
 
 ## Quality Criteria
 

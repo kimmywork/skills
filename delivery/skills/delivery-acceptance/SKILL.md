@@ -4,7 +4,7 @@ description: Use when reviewing completed work, checking whether a feature/bugfi
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.5.1"
+  version: "0.6.0"
 ---
 
 # Delivery Acceptance
@@ -18,14 +18,15 @@ Acceptance is evidence, not confidence.
 Before any completion claim:
 
 1. Read source requirements: requirements doc, solution/plan, change notes, loop state.
-2. Identify required evidence — depends on deliverable type:
+2. If `scope_type: parent`, verify all stages in scope-map are "done" before claiming parent delivered.
+3. Identify required evidence — depends on deliverable type:
    - Code: tests, build output, lint, typecheck, manual QA
    - Report/analysis: source citations, cross-references, factual review
    - Plan/proposal: feasibility check, requirement coverage, risk assessment
    - Investigation: confidence tags, source quality, methodology documentation
-3. Run fresh verification or inspect fresh evidence.
-4. Compare results against acceptance criteria.
-5. Record the outcome in the delivery record. For complex work, use `references/delivery-record-template.md` and `references/acceptance-checklist.md`. For simple work, record as 3–5 bullet points.
+4. Run fresh verification or inspect fresh evidence.
+5. Compare results against acceptance criteria.
+6. Record the outcome in the delivery record. For complex work, use `references/delivery-record-template.md` and `references/acceptance-checklist.md`. For simple work, record as 3–5 bullet points.
 
 ## Two-axis review
 
@@ -40,15 +41,11 @@ Check both axes separately, using format-specific criteria from `references/`:
 
 Use a checker/reviewer subagent when available for risky or cross-cutting changes. If unavailable, perform a fresh self-review pass and record that limitation.
 
-## Delivery record paths
+## Delivery record
 
-- `docs/track/<feature-name>/delivery-record-v1.md`
-- `docs/track/<project-name>/<feature-name>/delivery-record-v1.md`
-- Simple work: append `Delivery Record` to the feature/bugfix track note.
-
-**Delivery record scale**:
-- Complex work (multi-slice, cross-cutting, high-risk): use the full `references/delivery-record-template.md`.
-- Simple work: 3–5 bullet points covering what changed, what evidence exists, what is deferred or blocked. Append to the track note.
+- Path: `delivery-record-v1.md` in the track folder (see `../solution-delivery-loop/references/track-document-structure.md` for paths).
+- Complex work: use `references/delivery-record-template.md`.
+- Simple work: 3–5 bullet points appended to the track note.
 
 ## Final decision
 

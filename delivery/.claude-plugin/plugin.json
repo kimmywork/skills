@@ -1,7 +1,7 @@
 {
   "name": "solution-delivery-loop",
   "description": "A compact, agent-neutral skill family for solution delivery",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "homepage": "https://github.com/kimmywork/skills",
   "repository": "https://github.com/kimmywork/skills",
   "keywords": ["delivery", "discovery", "planning", "design", "research"],

@@ -4,7 +4,7 @@ description: Use when reviewing completed work, checking whether a feature/bugfi
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # Delivery Acceptance
@@ -60,12 +60,6 @@ Use a checker/reviewer subagent when available for risky or cross-cutting change
 
 Do not commit, push, merge, release, or mark done unless project/user convention allows it and verification evidence supports it.
 
-## Related skills
-
-- Previous: use `implementation-execution` when implementation or verification is incomplete.
-- Return to `solution-design` when acceptance reveals design/contract drift.
-- Return to `requirement-discovery` when acceptance reveals scope or behavior ambiguity.
-
 ## Anti-patterns
 
 - Expressing satisfaction before verification ("Great!", "Perfect!", "Done!").
@@ -73,10 +67,10 @@ Do not commit, push, merge, release, or mark done unless project/user convention
 - Skipping change note checks for drifted scope or design.
 - Using the full delivery record template when 3-5 bullet points suffice.
 
-## After this phase
+## Related
 
-Output inspected by `review-feedback` (cumulative with all prior phases). Resolution:
-- Fix in place: correct issues, re-review.
-- Roll back: return to earliest affected phase, correct there, re-execute forward.
+- Previous: `implementation-execution` when implementation is incomplete.
+- Return to `solution-design` when acceptance reveals design/contract drift.
+- Return to `requirement-discovery` when acceptance reveals scope ambiguity.
 
-After resolved, `process-distillation` may follow (auto under `full-autonomy`).
+See `solution-delivery-loop` for review-feedback resolution protocol.

@@ -4,46 +4,44 @@ description: Use when any phase artifact has been produced and needs independent
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.4.0"
+  version: "0.6.0"
 ---
 
 # Review & Feedback
 
 ## Process
 
-1. **Load context**: current phase output + all prior phase outputs + existing review feedback + relevant criteria.
-   Standalone use (no parent workflow): ask user what artifact to review, against what criteria, with what prior context.
+1. **Load context**: current phase output + all prior phase outputs + existing review feedback + relevant criteria. Standalone use (no parent workflow): ask user what artifact to review, against what criteria, with what prior context.
 
-2. **Review independently**: check completeness, correctness, consistency, clarity, verifiability, scope adherence.
+2. **Review independently**: completeness, correctness, consistency, clarity, verifiability, scope adherence.
 
 3. **Tag each issue**:
 
    ```
-   Origin phase: <phase that produced the flawed artifact>
+   Origin phase: <phase>
    Severity: critical | major | minor
    Type: missing | incorrect | inconsistent | unclear | scope
    Description: <what is wrong>
-   Evidence: <reference to artifact>
-   Suggested fix: <concrete next action>
+   Evidence: <reference>
+   Suggested fix: <next action>
    Resolution: fix-in-place | roll-back
    ```
 
 4. **Output**: structured feedback report using `references/feedback-template.md`.
 
-5. **Route**:
-   - All fix-in-place → deliver to current phase producer, wait for fixes, re-review.
-   - Any roll-back → deliver report and recommend returning to earliest affected phase.
+5. **Route**: all fix-in-place → deliver to producer, wait for fixes, re-review. Any roll-back → recommend returning to earliest affected phase.
 
-6. **Close**:
-   - All issues resolved or deferred with user approval → mark passed. Next phase proceeds.
-   - If no critical or major issues remain, all prior issues are closed, and only minor polish items are open → mark as stable. Further reviews at this point are optional, triggered only by new changes.
-   - If critical or major issues remain → mark as fail. Re-review after fixes.
+6. **Close**: all issues resolved or deferred with user approval → passed. If no critical or major issues remain and only minor polish items are open → stable (further reviews optional). Critical/major remain → fail, re-review after fixes.
+
+For multi-part deliverables, perform distinct review passes:
+1. **Accuracy**: verify facts, citations, claims against primary sources.
+2. **Validity**: check logic, argument structure, causal chains. Watch for strawman arguments.
+3. **Consistency**: verify cross-reference integrity, no contradictions, fixes didn't introduce new breaks.
 
 ## Subagents
 
-Available: use reviewer subagent (read-only) to inspect artifacts and produce report. Pass only the artifacts + review criteria — never the full execution history. Producer handles fixes, reviewer re-checks.
-Unavailable: self-perform, record limitation.
+Available: use reviewer subagent (read-only). Pass only artifacts + criteria — never full execution history. Unavailable: self-perform, record limitation.
 
 ## Related
 
-Typically follows any phase skill (`requirement-discovery`, `solution-design`, `implementation-execution`, `delivery-acceptance`). After resolved, `process-distillation` may follow.
+Typically follows any phase skill. See `solution-delivery-loop` for resolution protocol.

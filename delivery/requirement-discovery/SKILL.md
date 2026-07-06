@@ -4,7 +4,7 @@ description: Use when a request, feature idea, bug report, refactor, workflow ch
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # Requirement Discovery
@@ -51,23 +51,17 @@ Use EARS or Given/When/Then for detailed requirements and acceptance. See `refer
 - Risks / rollback
 - Open questions
 
-## Related skills
-
-- Next: use `solution-design` after users, scope, non-goals, requirements, and acceptance are clear.
-- Return here when later phases reveal unclear intent, scope, users, or acceptance.
-
 ## Anti-patterns
 
 - Starting from architecture before user/scenario
-- Treating “better UX” or “cleaner code” as acceptance criteria
+- Treating "better UX" or "cleaner code" as acceptance criteria
 - Accepting broad scope without non-goals
 - Writing a full requirements doc when a compact track note is enough
 - Asking the user questions before reading available docs/code
 
-## After this phase
+## Related
 
-Output inspected by `review-feedback` (cumulative with prior phases). Resolution:
-- Fix in place: correct issues, re-review.
-- Roll back: return to earliest affected phase, correct there, re-execute forward.
+- Next: `solution-design` after users, scope, non-goals, requirements, and acceptance are clear.
+- Return here when later phases reveal unclear intent, scope, users, or acceptance.
 
-After resolved, `process-distillation` may follow (auto under `full-autonomy`).
+See `solution-delivery-loop` for review-feedback resolution protocol.

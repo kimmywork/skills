@@ -4,29 +4,35 @@ description: "Use when work needs end-to-end delivery, phase triage, or continua
 license: MIT
 metadata:
   author: kenpusney
-  version: "0.4.0"
+  version: "0.6.0"
 ---
 
 # Solution Delivery Loop
 
-Run an inspectable delivery loop:
-
 `Sense → Shape → Design → Build → Verify → Record → Continue/Stop`
 
-Start from user, scenario, and real need. Creativity is welcome; delivery requires commitments, evidence, and acceptance results.
+## Work type triage
+
+| Work type | Entry point | Skip |
+|---|---|---|
+| New work | requirement-discovery | — |
+| Investigation | structured-investigation or requirement-discovery | — |
+| Fix | implementation-execution or requirement-discovery | solution-design for trivial fixes |
+| Restructure | solution-design (from current-state analysis) | requirement-discovery |
+| Migrate | solution-design (from mapping table) | requirement-discovery |
+| Enhance | requirement-discovery or solution-design | — |
 
 ## First move
 
-1. Inspect existing context: `.agents/loop-state.md`, track docs, requirements/PRDs, plans, delivery records, `docs/knowledge`, `docs/logs`, and relevant source artifacts (code, data, prior docs).
-2. Right-size inspection: read enough to resolve the current phase and risk; stop when more context is unlikely to change the next action.
-3. If no loop state exists, mention that `.agents/loop-state.md` can help workspace-level continuity, but do not force it.
-4. Route to the next phase — process first, then execute:
-   - unclear need, users, behavior, or scope → use `requirement-discovery`
-   - clear requirements needing solution/plan → use `solution-design`
-   - executable plan or evidence-backed small fix with clear verification → use `implementation-execution`
-   - implementation done, completion claim, release, or review → use `delivery-acceptance`
+1. Inspect existing context: `.agents/loop-state.md`, track docs, requirements, plans, delivery records, `docs/knowledge`, `docs/logs`.
+2. Right-size inspection: read enough to resolve the current phase; stop when more context won't change the next action.
+3. Route to the next phase — process first, then execute:
+   - unclear need, users, behavior, or scope → `requirement-discovery`
+   - clear requirements needing solution/plan → `solution-design`
+   - executable plan or evidence-backed small fix → `implementation-execution`
+   - implementation done, completion claim, or review → `delivery-acceptance`
 
-If docs/code can answer a question, read first. Ask the user only after context search leaves real ambiguity. Ask one focused question at a time.
+Read docs/code first. Ask the user only after context search leaves real ambiguity. Ask one focused question at a time.
 
 ## Review and feedback loop
 
@@ -38,37 +44,30 @@ After each phase output, invoke `review-feedback` before next phase. Cumulative 
 | implementation-execution | Requirements + design + implementation | requirement-discovery |
 | delivery-acceptance | all prior + delivery record | requirement-discovery |
 
-Resolution:
-- Fix in place: correct current phase output, re-review.
-- Roll back: return to earliest affected phase, correct there, re-execute forward.
-
-After resolved, `process-distillation` may follow (auto under `full-autonomy`). New skill creation always requires user approval.
+After resolved, write a change note if scope/contract/design changed. See `process-distillation` skill for improvement cycles.
 
 ## Autonomy policy
 
-Autonomous execution is allowed when evidence is sufficient and user input is not needed. `.agents/loop-state.md` may define whether the loop can run fully autonomously for this workspace. Autonomy does not waive track notes, verification, delivery records, or change notes.
+Autonomous execution is allowed when evidence is sufficient. `.agents/loop-state.md` may define full-autonomy for this workspace. Autonomy does not waive track notes, verification, delivery records, or change notes.
 
-Use subagents when available and valuable: explorer, maker, checker, reviewer. For risky or multi-file changes, separate maker and checker. If unavailable, perform a fresh review pass yourself and record the limitation.
+Use subagents when available: explorer, maker, checker, reviewer. For risky changes, separate maker and checker.
+
+## Session continuity
+
+When resuming in a new session:
+1. Read `.agents/loop-state.md` (if exists), latest delivery record, and track docs.
+2. Determine: active phase, last verification result, next goal.
+3. If no loop-state exists, infer from track documents.
+4. Confirm before proceeding: current phase, pending increments, open blockers.
 
 ## Track documentation
 
-Prefer feature-scoped track folders:
+Prefer feature-scoped track folders under `docs/track/<feature-name>/`:
+- `requirements-v1.md`, `solution-design-v1.md`, `plan-v1.md`, `delivery-record-v1.md`
+- Simple work: `docs/track/features/<name>.md` or `docs/track/bugfix/<name>.md`
 
-- Single project: `docs/track/<feature-name>/requirements-v1.md`, `solution-design-v1.md`, `plan-v1.md`, `delivery-record-v1.md`
-- Multi-project: `docs/track/<project-name>/<feature-name>/...`
-- Simple feature: `docs/track/features/<feature-name>.md`
-- Simple bugfix: `docs/track/bugfix/<bug-description>.md`
-
-Every behavior-changing feature, bugfix, or delivery-relevant maintenance task needs a track note. Requirements docs are for broad, user-facing, multi-module, ambiguous, or long-lived work.
-
-Optionally track phase/version progress with `references/progress-template.md` — captures completed items, blockers, decisions, and next action. Useful for multi-slice or multi-session work.
-
-Use `docs/knowledge` for cross-feature knowledge: ADRs, architecture notes, domain terms, reusable contracts, durable decisions. Use `docs/logs/YYYY-MM-DD.md` for operational work logs. Docs can be stale; when docs, code, and tests disagree, verify the truth and write the accurate result back to docs.
+Every behavior-changing work needs a track note. Distinguish internal working docs (under `research/` or `drafts/`) from deliverables (track root). Use `docs/knowledge` for cross-feature knowledge. Use `docs/logs/YYYY-MM-DD.md` for work logs. Docs can be stale; when docs and reality disagree, verify the truth and write it back to docs.
 
 ## Loop improvement
 
-Repeated issues in a phase → use `process-distillation`. Self-improvement is ask-first unless `full-autonomy`. Under `full-autonomy`, auto-triggers after each resolved review-feedback cycle. New skill creation always requires user approval.
-
-## Stop conditions
-
-Pause and return to discovery/design when scope, acceptance, contract, architecture, or verification becomes unclear or changes. Record drift as a change note before continuing.
+Repeated issues in a phase → use `process-distillation`. New skill creation always requires user approval.

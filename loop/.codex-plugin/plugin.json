@@ -1,0 +1,13 @@
+{
+    "name": "loop",
+    "version": "0.0.1",
+    "description": "A loop creating kit.",
+    "author": {
+        "name": "Kimmy Liu"
+    },
+    "homepage": "https://github.com/kimmywork/skills",
+    "repository": "https://github.com/kimmywork/skills",
+    "license": "MIT",
+    "keywords": ["loop", "skill", "workflow", "compose"],
+    "skills": "skills"
+}

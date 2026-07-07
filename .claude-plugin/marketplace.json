@@ -11,6 +11,11 @@
       "source": "./delivery/"
     },
     {
+      "name": "drafting-loop",
+      "description": "Universal work orchestration for drafting, delivery, research, review, and verified outcomes",
+      "source": "./drafting/"
+    },
+    {
       "name": "utility",
       "description": "utility for daily work",
       "source": "./utility/"

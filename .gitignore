@@ -8,5 +8,6 @@ reference-skills/
 # Loop state files
 workflows/.state/
 __py-cache__
+__pycache__/
 
 *.pyc

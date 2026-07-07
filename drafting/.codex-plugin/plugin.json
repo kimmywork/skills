@@ -1,0 +1,38 @@
+{
+  "name": "drafting-loop",
+  "version": "1.0.0",
+  "description": "Universal work orchestration for all kinds of knowledge work",
+  "author": {
+    "name": "Kimmy Liu"
+  },
+  "homepage": "https://github.com/kimmywork/skills",
+  "repository": "https://github.com/kimmywork/skills",
+  "license": "MIT",
+  "keywords": [
+    "drafting",
+    "orchestration",
+    "work-loop",
+    "crafting",
+    "composing",
+    "evaluating",
+    "investigating",
+    "creating"
+  ],
+  "skills": "skills",
+  "interface": {
+    "displayName": "Drafting Loop",
+    "shortDescription": "Universal work orchestration for all knowledge work",
+    "longDescription": "A single orchestration layer for crafting, composing, evaluating, investigating, and creating work from intent through evidence-based acceptance.",
+    "developerName": "Kimmy Liu",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Draft and deliver this work end-to-end from requirements to verified delivery",
+      "Review this completed work and decide whether it is ready to ship",
+      "Investigate this question and produce a research report"
+    ]
+  }
+}

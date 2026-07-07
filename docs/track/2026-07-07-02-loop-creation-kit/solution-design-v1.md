@@ -1,14 +1,14 @@
 ---
-status: draft
+status: accepted
 created: 2026-07-07
-version: 1
+version: 2
 ---
 
-# Solution Design v1: Loop Creation Kit
+# Solution Design v2: Loop Creation Kit
 
 ## Source Requirements
 
-- Requirements doc: `docs/track/2026-07-07-02-loop-creation-kit/requirements-v1.md`
+- Requirements doc: `docs/track/2026-07-07-02-loop-creation-kit/requirements-v2.md`
 - Requirement IDs: REQ-001 through REQ-019
 
 ## Design Principles
@@ -45,8 +45,11 @@ Two skills in the `@loop/` plugin bundle:
 1. Parse user's description for vague terms ("check things", "handle it", "make sure")
 2. Ask one focused question at a time to resolve ambiguity
 3. Probe specifically for: trigger conditions, step boundaries, success criteria, edge cases (0 items, errors), what NOT to do
-4. After 2-3 rounds, produce a draft and present for confirmation
-5. On confirmation, write to `workflows/<name>.md`
+4. Use a baseline checklist (see `references/grilling-checklist.md`) to ensure coverage; also watch for domain-specific gaps beyond the checklist
+5. After 2-3 rounds, produce a draft and present for confirmation
+6. On confirmation, write to `workflows/<name>.md`
+
+**Slug rules**: `name` is lowercased, spaces → hyphens, special characters stripped, max 64 characters.
 
 **Output validation**:
 - `name` field exists and matches filename
@@ -59,23 +62,27 @@ Two skills in the `@loop/` plugin bundle:
 **Architecture**: Skill with embedded script.
 
 **Execution flow**:
-1. Agent invokes `loopy` skill (manually or via cron/systemd calling the script)
+1. Agent invokes `loopy` skill (manually or via periodic scheduling mechanisms)
 2. Script reads all `workflows/*.md` files, parses front-matter
 3. For each workflow: determine if due
    - Schedule-only: compare last run timestamp against cron schedule
    - Trigger-only: execute trigger command, check if output is non-empty and exit code is 0
    - Both present (AND): workflow is due only when schedule is due AND trigger produces output
-4. Script outputs JSON dispatch list
-5. Agent iterates over due workflows, executing each sequentially with full context
-6. Agent writes run record to state directory after each workflow
+4. For each due workflow: check if currently running (latest state file has `status: "scheduled"` and no `completed_at`). If running → write `status: "skipped"` state file, skip dispatch. If not → create state file with `status: "scheduled"`, include in dispatch list.
+5. Script outputs JSON dispatch list
+6. Agent iterates over due workflows, executing each sequentially with full context
+7. Agent updates state file to final status (`success`/`failed`/`partial`) with `completed_at`
 
 **Script responsibilities** (deterministic, no LLM):
 - Parse YAML front-matter from markdown files
-- Parse cron expressions and compute next run time
-- Execute trigger commands with timeout
-- Read state directory for last run timestamp
+- Parse cron expressions and compute next run time (via `croniter`)
+- Execute trigger commands with timeout (`/bin/sh -c`, 30s default, inherits parent env)
+- Read state directory for latest run status
+- Detect collision: if latest state file is `status: "scheduled"` without `completed_at`, workflow is in progress
 - Compute NNN sequence number for new state file
-- Output structured JSON dispatch list
+- Save trigger stdout to `.state/<name>/trigger-<date>.txt`
+- Output structured JSON dispatch list (per-workflow error isolation)
+- Write complete dispatch log to `.state/dispatch/<YYYY-MM-DD-NNN>.json`
 
 **Agent responsibilities** (judgment-based):
 - Interpret workflow body and execute steps
@@ -94,13 +101,16 @@ loop/
 │   └── plugin.json              # Plugin manifest
 └── skills/
     ├── loopify/
-    │   └── SKILL.md             # Workflow creation skill
+    │   ├── SKILL.md             # Workflow creation skill
+    │   └── references/
+    │       └── grilling-checklist.md  # Baseline checklist for clarity probes
     └── loopy/
         ├── SKILL.md             # Workflow execution skill
         ├── scripts/
-        │   └── loopy.py         # Scheduling/dispatch script (Python)
+        │   └── loopy.py         # Scheduling/dispatch script (Python, requires croniter)
         └── references/
-            └── workflow-format.md  # Workflow spec reference
+            ├── workflow-format.md  # Workflow spec reference
+            └── setup.md           # Dependencies, environment setup, cron example
 ```
 
 ## Interfaces & Contracts
@@ -123,23 +133,45 @@ loop/
 
 **Path**: `workflows/.state/<name>/<YYYY-MM-DD-NNN>.json`
 
-**NNN sequence**: Zero-padded daily counter. First run of the day = `001`, second = `002`, etc.
+**Required fields**: `workflow`, `run_id`, `started_at`, `completed_at` (null when `status=scheduled`), `status` (`scheduled | success | failed | partial | skipped`), `items_processed` (null when `status=scheduled`)
 
-**Required fields**: `workflow`, `run_id`, `started_at`, `completed_at`, `status`, `items_processed`
+**Optional fields**: `trigger_output_file` (path to trigger output temp file, or null), `skip_reason` (required when `status=skipped`), `failure` (with `step`, `error`, `partial_results`)
 
-**Optional fields**: `trigger_output`, `skip_reason` (required when `status=skipped`), `failure` (with `step`, `error`, `partial_results`)
+**NNN sequence**: Zero-padded daily counter. Script lists state files for today, takes max NNN + 1, pads to 3 digits. No file → `001`. Write is atomic: write to temp file, then `os.rename()` to final path.
 
 ### Script I/O contract
 
 **Input**: None (reads from `workflows/` directory and `workflows/.state/`)
 
-**Output** (JSON to stdout):
+**Output** (JSON to stdout, always exit 0 on success; exit 1 on script-level errors with stderr):
 ```json
 {
-  "due": [{"name": "...", "trigger_output": "...", "state_dir": "..."}],
-  "not_due": [{"name": "...", "reason": "..."}]
+  "due": [
+    {
+      "name": "<workflow name>",
+      "trigger_output_file": "workflows/.state/<name>/trigger-YYYY-MM-DD-NNN.txt",
+      "state_file": "workflows/.state/<name>/YYYY-MM-DD-NNN.json"
+    }
+  ],
+  "script_errors": [
+    {
+      "name": "<workflow name>",
+      "reason": "trigger command failed / YAML parse error / timeout",
+      "state_file": "workflows/.state/<name>/YYYY-MM-DD-NNN.json"
+    }
+  ],
+  "not_due": [
+    {
+      "name": "<workflow name>",
+      "reason": "<schedule not due / trigger empty / trigger failed>"
+    }
+  ]
 }
 ```
+
+`due` and `script_errors` arrays are always present (may be empty). `trigger_output_file` is absent when no trigger is configured.
+
+**Dispatch log**: Same structure written to `workflows/.state/dispatch/<YYYY-MM-DD-NNN>.json` for every invocation.
 
 **Flags**:
 - `--run <name>`: Force-run specific workflow
@@ -171,23 +203,31 @@ Agent: writes workflows/stale-pr-check.md
 ### Execution flow (loopy)
 
 ```
-loopy script runs (via cron or manual invocation)
+loopy script runs (via agent skill invocation)
   ↓
 Script parses all workflows/*.md
   ↓
 For each workflow:
-  ├── Schedule-based: check last state file timestamp + cron
+  ├── Schedule-based: check latest state file + cron
   └── Trigger-based: execute command, check output
   ↓
+For each due workflow:
+  ├── Latest state file has status "scheduled" without completed_at?
+  │   ├── Yes → write status "skipped", skip dispatch
+  │   └── No  → create state file with status "scheduled", include in dispatch
+  ↓
 Script outputs JSON dispatch list
+  ↓
+Script writes complete dispatch log to .state/dispatch/<date>.json
   ↓
 Agent receives dispatch list + project context
   ↓
 For each due workflow (sequentially):
   ├── Read workflow body
+  ├── Read trigger output from trigger_output_file (if present)
   ├── Read state directory (if workflow needs history)
   ├── Execute steps
-  ├── Write run record to state file
+  ├── Update state file: status, completed_at, items_processed
   └── Move to next workflow
 ```
 
@@ -200,7 +240,7 @@ For each due workflow (sequentially):
 | REQ-003 (file location) | Verify file exists at correct path with matching name |
 | REQ-004 (schedule parsing) | Create 3 test workflows (due, not due, triggered); verify script output |
 | REQ-005 (agent context) | Verify agent receives body + state path + project context |
-| REQ-006 (state files) | Execute workflow; verify state file exists with correct format and NNN |
+| REQ-006 (state files) | Create workflow that fires; verify state file starts with `status: "scheduled"` and no `completed_at`; after agent completes, verify status changed to `success`/`failed`/`partial` with `completed_at` filled. |
 | REQ-007 (schedule check) | Create workflow with 8h interval; verify due/not-due at different times |
 | REQ-008 (trigger fire) | Create trigger workflow; verify fires when command has output |
 | REQ-009 (trigger skip) | Create trigger workflow; verify skips when command has no output |
@@ -213,7 +253,7 @@ For each due workflow (sequentially):
 | REQ-016 (--dry-run) | Run `loopy --dry-run`; verify no execution occurs |
 | REQ-017 (state access) | Create workflow that reads prior runs; verify agent accesses history |
 | REQ-018 (failure handling) | Create workflow that fails at step 3; verify state records failure and next run retries |
-| REQ-019 (concurrent skip) | Set workflow A to run at 09:00; manually start it; trigger schedule again at 09:05; verify skip state file created with `status: "skipped"` |
+| REQ-019 (concurrent skip) | Set workflow A to run at 09:00; script creates state file with `status: "scheduled"`. Trigger schedule again at 09:05; script detects missing `completed_at`, creates new file with `status: "skipped"`. Verify A not in dispatch list. |
 
 ## Rollback / Revision Strategy
 
@@ -226,7 +266,9 @@ For each due workflow (sequentially):
 
 - **Development**: Install plugin from local path. Skills available immediately.
 - **Distribution**: Package as plugin bundle. Users install via plugin manager.
-- **Scheduling**: Users configure their own cron/systemd/GitHub Actions to invoke `loopy`. The skill documents example crontab entries.
+- **Scheduling**: Users configure their own cron/systemd/GitHub Actions to invoke the agent with the `loopy` skill. The skill documents example crontab entries.
+- **Marketplace registration**: Add `loop` plugin entry to both `.agents/plugins/marketplace.json` and `.claude-plugin/marketplace.json`.
+- **Gitignore**: Add `workflows/.state/` to `.gitignore`.
 
 ## Resolved Design Questions
 
@@ -235,3 +277,8 @@ For each due workflow (sequentially):
 | RDQ-001 | Script language? | Python | Better JSON/YAML/cron parsing; maintainability over minimalism |
 | RDQ-002 | Body conventions? | Free-form | Agent interprets if content is clear; no structural requirements beyond trigger rule |
 | RDQ-003 | Concurrent run handling? | Skip + record `skipped` state | Avoid resource contention; state file records the skip for visibility |
+| RDQ-004 | Collision detection? | State file `status: "scheduled"` is the lock | Script creates atomically; missing `completed_at` means in progress |
+| RDQ-005 | Trigger output format? | File path, not inline | Full stdout to `.state/<name>/trigger-<date>.txt`; keeps dispatch JSON lean |
+| RDQ-006 | Error isolation? | Per-workflow `script_errors` array | One workflow's trigger/YAML failure doesn't block others |
+| RDQ-007 | Cron parser dependency? | `croniter` via pip | Stdlib has no cron parser; documented in `references/setup.md` |
+| RDQ-008 | Trigger execution context? | Hard-coded contract | `/bin/sh -c`, project root cwd, 30s timeout, inherits env |

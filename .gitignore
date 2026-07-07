@@ -5,3 +5,8 @@ skills-lock.json
 tracks/
 reference-skills/
 .DS_Store
+# Loop state files
+workflows/.state/
+__py-cache__
+
+*.pyc

@@ -1,12 +1,9 @@
 {
-    "name": "loop",
-    "description": "A loop creating kit.",
-    "version": "0.0.1",
-    "author": {
-        "name": "Kimmy Liu"
-    },
-    "homepage": "https://github.com/kimmywork/skills",
-    "repository": "https://github.com/kimmywork/skills",
-    "keywords": ["loop", "skill", "workflow", "compose"],
-    "skills": ["./skills/"]
+  "name": "loop",
+  "description": "Loop Creation Kit: automated workflow creation and execution skills",
+  "version": "1.0.0",
+  "homepage": "https://github.com/kimmywork/skills",
+  "repository": "https://github.com/kimmywork/skills",
+  "keywords": ["loop", "automation", "workflow", "scheduling"],
+  "skills": ["./skills/"]
 }

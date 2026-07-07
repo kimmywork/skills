@@ -1,11 +1,11 @@
 ---
-status: draft
+status: accepted
 scope_type: standalone
 created: 2026-07-07
-version: 1
+version: 2
 ---
 
-# Requirements v1: Loop Creation Kit
+# Requirements v2: Loop Creation Kit
 
 ## 0. Metadata
 
@@ -64,6 +64,8 @@ For developers who have recurring tasks (CI triage, security scans, daily summar
 - `loopy` skill: workflow scheduling and execution via embedded script
 - Workflow markdown format with front-matter (name, schedule/trigger, description)
 - Per-run state files for audit trail and deduplication
+- Dispatch logging: every `loopy` invocation recorded to `workflows/.state/dispatch/`
+- State file as lock: script creates `status: "scheduled"`, agent writes final status; collision detected by presence of incomplete state file
 - Schedule-based triggers (cron expressions, 5-field)
 - Event-based triggers (shell command output)
 - AND semantics when both schedule and trigger are present
@@ -98,10 +100,10 @@ For developers who have recurring tasks (CI triage, security scans, daily summar
 | REQ-003 | When `loopify` writes a workflow, the file shall be at `<project-root>/workflows/<name>.md` with `name` in front-matter matching the filename. | Given workflow name "daily-triage", when written, then file is `workflows/daily-triage.md` and front-matter has `name: daily-triage`. | File exists, front-matter parses correctly | P0 | — |
 | REQ-004 | When `loopy` runs, the embedded script shall parse all workflow front-matter and determine which are due based on schedule or trigger. | Given 3 workflows (1 due, 1 not due, 1 triggered with output), when script runs, then output JSON lists only the due and triggered workflows. | Script output matches expected dispatch list | P0 | — |
 | REQ-005 | When `loopy` determines a workflow is due, the agent shall execute it with the workflow body, state directory path, and project context. | Given a due workflow, when agent executes, then it receives body + state path + project context. | Agent receives correct context objects | P0 | — |
-| REQ-006 | When a workflow run completes, the agent shall write a run record to `workflows/.state/<name>/<YYYY-MM-DD-NNN>.json`. | Given a completed run, when agent writes state, then file exists with status, timestamp, and items processed. | State file exists, JSON parses, NNN is correct sequence | P0 | — |
+| REQ-006 | When a workflow run is scheduled, the script shall write a run record to `workflows/.state/<name>/<YYYY-MM-DD-NNN>.json` with `status: "scheduled"`. On completion, the agent shall update the status. | Given a scheduled run, when script creates state file, then file exists with `status: "scheduled"`, no `completed_at`. When agent completes, status is `success`/`failed`/`partial` with `completed_at`. | State file transitions through correct statuses | P0 | — |
 | REQ-007 | When checking schedule, the script shall use the latest state file's timestamp to determine last run time. | Given a workflow with `schedule: '0 9 * * *'` and last run at 2026-07-06 09:00, when checked at 2026-07-07 08:59, then workflow is not due; when checked at 2026-07-07 09:00, then workflow is due. | Schedule calculation matches expected | P0 | — |
 | REQ-008 | When a trigger command produces non-empty output, the workflow shall fire. | Given trigger `gh pr list --state open`, when 3 PRs exist, then workflow fires with trigger output in context. | Trigger output appears in agent context | P0 | — |
-| REQ-009 | When a trigger command produces empty output or non-zero exit, the workflow shall not fire. | Given trigger with 0 results, when checked, then workflow is skipped. | Workflow not in dispatch list | P0 | — |
+| REQ-009 | When a trigger command produces empty output or non-zero exit, the workflow shall not fire. The script shall record the outcome in `workflows/.state/dispatch/<YYYY-MM-DD-NNN>.json` but not create a per-workflow state file. | Given trigger with 0 results, when checked, then workflow is not in dispatch list, but dispatch log records it with reason. | Workflow not in dispatch list; dispatch log contains entry with reason | P0 | — |
 | REQ-010 | `loopy` shall execute due workflows sequentially, not in parallel. | Given 3 due workflows, when executed, then each completes before the next starts. | Execution order is sequential | P0 | — |
 | REQ-011 | A workflow body shall support both step-by-step instructions and goal-oriented descriptions. | Given a workflow with goal description only, when agent executes, then it figures out steps autonomously. | Agent completes goal without explicit steps | P0 | — |
 | REQ-012 | A workflow body shall include a success condition that the agent can verify. | Given a workflow, when body includes success condition, then agent checks it before marking run complete. | Agent verifies success condition | P0 | — |
@@ -111,7 +113,7 @@ For developers who have recurring tasks (CI triage, security scans, daily summar
 | REQ-016 | `loopy` shall provide `--dry-run` flag to show what would run without executing. | Given `loopy --dry-run`, when invoked, then output shows due workflows but nothing executes. | No state files created, no agent invocations | P2 | — |
 | REQ-017 | The executing agent may access prior run state to make decisions (e.g. dedup, comparison, retry). | Given a workflow that needs history, when agent reads state dir, then it can access any prior run file. | Agent reads historical state files | P0 | REQ-006 |
 | REQ-018 | When a workflow run fails, the agent shall write failure details to the state file and decide on retry/skip/restart for the next run. | Given step 3 of 5 fails, when agent writes state, then failure details are recorded. On next run, agent reads state and decides. | State file contains failure info; agent makes retry decision | P0 | REQ-006 |
-| REQ-019 | When a workflow is still running when the next schedule fires, the script shall skip it and record a `skipped` run state with reason. | Given workflow A running at 09:00, when 09:05 schedule fires again, then workflow A is skipped and a state file with `status: "skipped"` is created. | State file exists with skip_reason | P0 | REQ-006 |
+| REQ-019 | When a workflow is still running when the next schedule fires, the script shall check the latest state file: if `status: "scheduled"` and no `completed_at`, the workflow is in progress. The script shall create a new state file with `status: "skipped"` and `skip_reason`, and not put it in the dispatch list. | Given workflow A running at 09:00 (state file has `status: "scheduled"`, no `completed_at`), when 09:05 schedule fires again, then a new state file with `status: "skipped"` is created, and workflow A is not in dispatch list. | State file exists with skip_reason; dispatch list does not contain workflow A | P0 | REQ-006 |
 
 ## 9. Contracts / Data Model
 
@@ -136,10 +138,10 @@ trigger: "<shell command>"  # Optional, command whose output triggers execution
   "workflow": "<name>",
   "run_id": "<YYYY-MM-DD-NNN>",
   "started_at": "<ISO-8601>",
-  "completed_at": "<ISO-8601>",
-  "status": "success | failed | partial | skipped",
-  "items_processed": <int>,
-  "trigger_output": "<string or null>",
+  "completed_at": "<ISO-8601 or null>",
+  "status": "scheduled | success | failed | partial | skipped",
+  "items_processed": <int or null>,
+  "trigger_output_file": "<path to trigger output file or null>",
   "skip_reason": "<string, only when status=skipped>",
   "failure": {
     "step": "<step identifier>",
@@ -149,15 +151,24 @@ trigger: "<shell command>"  # Optional, command whose output triggers execution
 }
 ```
 
-### Script Dispatch Output
+### Dispatch Output (shared schema)
+
+Both the stdout output and the dispatch log share this structure. The only difference: the dispatch log has an `invoked_at` timestamp at the root level. `due` and `script_errors` arrays are always present (may be empty). `trigger_output_file` is absent when no trigger is configured. One workflow's error does not block others.
 
 ```json
 {
   "due": [
     {
       "name": "<workflow name>",
-      "trigger_output": "<output or null>",
-      "state_dir": "workflows/.state/<name>"
+      "trigger_output_file": "workflows/.state/<name>/trigger-YYYY-MM-DD-NNN.txt",
+      "state_file": "workflows/.state/<name>/YYYY-MM-DD-NNN.json"
+    }
+  ],
+  "script_errors": [
+    {
+      "name": "<workflow name>",
+      "reason": "trigger command failed / YAML parse error / timeout",
+      "state_file": "workflows/.state/<name>/YYYY-MM-DD-NNN.json"
     }
   ],
   "not_due": [
@@ -169,10 +180,13 @@ trigger: "<shell command>"  # Optional, command whose output triggers execution
 }
 ```
 
+- **stdout version**: Script writes this JSON directly to stdout. No `invoked_at`.
+- **dispatch log version**: Script writes to `workflows/.state/dispatch/<YYYY-MM-DD-NNN>.json` with an added `invoked_at` field at root level.
+
 ## 10. Constraints
 
 - Performance / scale: A single `loopy` invocation handles tens of workflows, not thousands. Each workflow runs in seconds to minutes.
-- Platform / compatibility: Must work on Linux/macOS. Script is Python with minimal dependencies (no external packages beyond stdlib). Must work with both `codex` and `claude` agent CLIs (or any future agent).
+- Platform / compatibility: Must work on Linux/macOS. Script is Python with `croniter` dependency (documented in `references/setup.md`). Must work with both `codex` and `claude` agent CLIs (or any future agent).
 - Agent neutrality: No assumption about which agent CLI is available. The executing agent decides its own invocation mechanism (fork, subagent, direct execution).
 
 ## 11. Risks / Rollback
@@ -192,6 +206,9 @@ trigger: "<shell command>"  # Optional, command whose output triggers execution
 | RQ-001 | Script language: bash or Python? | Python | Better JSON/cron parsing; maintainability over minimalism |
 | RQ-002 | Workflow body conventions? | Free-form | No structural requirements beyond trigger rule; agent interprets if content is clear |
 | RQ-003 | Workflow still running when next schedule fires? | Skip, record `skipped` run state | Avoid resource contention; state file records the skip for visibility |
+| RQ-004 | Collision detection mechanism? | State file as lock | Script creates `status: \"scheduled\"` atomically; if latest state file lacks `completed_at`, workflow is in progress |
+| RQ-005 | Trigger output format? | File path in dispatch list | Full stdout saved to `.state/<name>/trigger-<date>.txt`; dispatch list only carries the path |
+| RQ-006 | Error isolation between workflows? | Per-workflow `script_errors` array | One workflow's trigger/YAML failure doesn't block others |
 
 ## 13. Discussion Log
 

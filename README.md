@@ -25,6 +25,7 @@ claude plugin marketplace add kimmywork/skills
 # Install plugins
 claude plugin install solution-delivery-loop@kimmywork-skills
 claude plugin install utility@kimmywork-skills
+claude plugin install loop@kimmywork-skills
 ```
 
 ---
@@ -63,10 +64,25 @@ A compact, agent-neutral skill family for solution delivery:
 
 ---
 
-### Utility (2 skills)
+### Loop (2 skills)
+
+Create and execute recurring automated workflows.
+
+#### `loopify`
+> Create a workflow spec from natural language. Grills for clarity, drafts the spec, writes `workflows/<name>.md` on user confirmation.
+
+#### `loopy`
+> Execute scheduled or triggered workflows. Scans due workflows, runs each sequentially with full state tracking, failure handling, and atomic state updates.
+
+---
+
+### Utility (3 skills)
 
 #### `cloudconvert`
 > Convert non-text documents (PDF, DOC/DOCX, EPUB) to Markdown via CloudConvert CLI. Saves processing tokens by feeding agents clean Markdown instead of raw document formats.
+
+#### `rationale`
+> Decode agent-optimized artifacts (skill rules, code changes, design decisions) into human-comprehensible explanations. Trigger on "explain", "why", "rationale", or when reviewing dense agent outputs.
 
 #### `style-extraction`
 > Extract a structured writing style profile from an author's sample texts. Quantifiable features + executable rules + positive/negative examples. Supports both English and Chinese source texts.

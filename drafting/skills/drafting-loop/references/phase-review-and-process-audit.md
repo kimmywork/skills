@@ -8,7 +8,7 @@ For each phase from Clarify through Record:
 
 1. Freeze the phase artifact.
 2. Load the phase input, current output, prior handoff, open issues, and relevant criteria.
-3. Run `quality-review` using cumulative context.
+3. Run `inspect` using cumulative context.
 4. Classify issues as fix-in-place, rollback, or defer.
 5. Fix and re-review until no critical or major issue remains, or rollback to the earliest affected phase.
 6. Only then present the checkpoint for user transition.

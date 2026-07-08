@@ -27,7 +27,7 @@
 
 - Any phase -> Record without Verify evidence.
 - Shape -> Build for Crafting without Design approval.
-- Build -> Record without quality-review or explicit user risk acceptance.
+- Build -> Record without inspect or explicit user risk acceptance.
 - Any phase -> ContinueStop while critical open questions remain unnamed.
 - Any scope expansion without a change note.
 - Any phase advancing with unresolved critical/major phase-review issues.

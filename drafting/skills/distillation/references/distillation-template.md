@@ -14,7 +14,7 @@ Classify the process gap before proposing a change.
 | Repeated improvisation | Did the executor reinvent the same helper or procedure? | Extract a template, script, or reference. |
 | Atomic extraction | Is there a clear bounded sub-process worth its own skill? | Propose a new skill only with user approval. |
 | Context overhead | Is the skill too large or loading irrelevant detail? | Move detail to references or narrow trigger. |
-| Trigger misfire | Did description/routing cause wrong skill activation or missed activation? | Adjust description or intent-routing. |
+| Trigger misfire | Did description/routing cause wrong skill activation or missed activation? | Adjust description or triage. |
 | Scope boundary | Does the fix belong outside this plugin bundle? | Do not add; record limitation. |
 | User-specific preference | Is this only one user's taste, not reusable process? | Do not change framework; record preference elsewhere. |
 

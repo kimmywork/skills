@@ -5,7 +5,7 @@ Use this table when a loop stalls, quality drops, or a gate fails.
 | Scenario | Trigger | Recovery | Return phase |
 |---|---|---|---|
 | Intent will not converge | more than 5 clarification turns | Offer 3 candidate scopes and ask user to choose. | Clarify |
-| Cross-phase confusion | materials span requirements, design, draft, review | Use intent-routing and ask full loop vs resume vs review. | Clarify |
+| Cross-phase confusion | materials span requirements, design, draft, review | Use triage and ask full loop vs resume vs review. | Clarify |
 | Scope expands during build | new requirement, artifact, field, or audience appears | Stop, write change note, ask for approval. | Shape |
 | Design infeasible | blueprint marks a choice Redesigned | Return with alternatives and constraints. | Shape |
 | Contract drift | interface, schema, data model, section contract changes | Inventory dependents and revise blueprint. | Design |

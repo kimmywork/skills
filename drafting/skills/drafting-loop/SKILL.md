@@ -26,11 +26,11 @@ Use this as the top-level control layer when the user wants managed progress acr
 Sense -> Clarify -> Shape -> Design -> Build -> Verify -> Record -> Continue/Stop.
 
 1. **Sense**: detect work kind, materials, current phase, risks, and whether the user needs a single task or a managed loop.
-2. **Clarify**: use `../intent-routing/SKILL.md` only when the path, resume point, or workflow choice is genuinely ambiguous.
+2. **Clarify**: use `../triage/SKILL.md` only when the path, resume point, or workflow choice is genuinely ambiguous.
 3. **Shape**: use `../scope-shaping/SKILL.md` unless a complete scope already exists.
 4. **Design**: use `../blueprinting/SKILL.md` when execution needs a plan; fast-pass only when recorded.
 5. **Build**: use `../plan-execution/SKILL.md`, `../deep-research/SKILL.md`, `../audit-trail/SKILL.md`, or `../style-calibration/SKILL.md` according to kind.
-6. **Verify**: use `../quality-review/SKILL.md`; add `../fact-verification/SKILL.md`, `../compliance-gate/SKILL.md`, or `../cross-validation/SKILL.md` when relevant.
+6. **Verify**: use `../inspect/SKILL.md`; add `../fact-verification/SKILL.md`, `../compliance-gate/SKILL.md`, or `../cross-validation/SKILL.md` when relevant.
 7. **Record**: use `../acceptance-gate/SKILL.md`.
 8. **Continue/Stop**: use `../distillation/SKILL.md` when repeated friction or process learning appears.
 

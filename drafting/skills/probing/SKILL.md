@@ -1,9 +1,9 @@
 ---
-name: guided-inquiry
+name: probing
 description: Use dialogue to surface the real target, narrow competing directions, and frame hard decisions when the user cannot yet state what they want clearly enough to scope, plan, or execute.
 ---
 
-# Guided Inquiry
+# Probing
 
 Use dialogue to converge on a workable target, decision, or brief when the user needs thinking help before formal scoping.
 

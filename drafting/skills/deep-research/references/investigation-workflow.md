@@ -29,7 +29,7 @@ Use for research, root cause analysis, source tracing, system mapping, due dilig
 10. Separate findings, interpretations, and speculation.
 11. Label confidence.
 12. Document contradictions, unknowns, and next searches.
-13. Run quality-review before acceptance.
+13. Run inspect before acceptance.
 
 ## Interaction checkpoints
 

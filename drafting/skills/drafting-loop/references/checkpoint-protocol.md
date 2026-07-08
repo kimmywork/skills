@@ -8,7 +8,7 @@ Checkpoints keep long work honest without making every turn heavy. A checkpoint 
 |---|---|---|
 | FULL | First checkpoint, major transition, quality concern, after 4 slim continues | kind, phase, deliverables, evidence, flagged issues, choices |
 | SLIM | User has continued through non-critical phases twice | one-line status, next phase, continue/pause prompt |
-| MANDATORY | scope change, blueprint approval, quality-review verdict, acceptance-gate, compliance override | explicit decision request; do not proceed until user answers |
+| MANDATORY | scope change, blueprint approval, inspect verdict, acceptance-gate, compliance override | explicit decision request; do not proceed until user answers |
 
 ## FULL template
 

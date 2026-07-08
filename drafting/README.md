@@ -26,13 +26,13 @@ The bundle is agent-neutral, reference-driven, and designed for progressive disc
 | Skill | Purpose |
 |---|---|
 | `drafting-loop` | Top-level orchestrator: phases, routing, checkpoints, state, handoffs. |
-| `intent-routing` | Detect kind, phase, ambiguity, and correct workflow entry. |
-| `guided-inquiry` | Socratic clarification for vague or exploratory work. |
+| `triage` | Detect kind, phase, ambiguity, and correct workflow entry. |
+| `probing` | Socratic clarification for vague or exploratory work. |
 | `scope-shaping` | Convert intent into scope, criteria, and verification plan. |
 | `blueprinting` | Turn scope into executable design, contracts, increments, and checks. |
 | `plan-execution` | Execute approved plans and record increment evidence. |
 | `audit-trail` | Run evaluation/audit work as the deliverable. |
-| `quality-review` | Review artifacts, route fixes/rollback, support two-stage review. |
+| `inspect` | Review artifacts, route fixes/rollback, support two-stage review. |
 | `fact-verification` | Verify claims against evidence and source chains. |
 | `deep-research` | Investigate questions with source quality and confidence labels. |
 | `style-calibration` | Extract, validate, and apply writing style profiles. |

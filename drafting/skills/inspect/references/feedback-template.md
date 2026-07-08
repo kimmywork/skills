@@ -1,7 +1,7 @@
 # Feedback Template
 
 ```markdown
-# Quality Review
+# Inspect
 
 Verdict: PASS | CONDITIONAL | REVISION | FAIL | STABLE
 Kind:

@@ -1,9 +1,9 @@
 ---
-name: quality-review
+name: inspect
 description: Independent review of an existing draft, build, or deliverable to find issues, judge readiness, and guide revision. Use when the user wants feedback, a quality gate, an adversarial pass, or a "is this good enough?" check; prefer formal audit work when the review itself must be the deliverable, and acceptance work when the main question is whether it can be shipped or closed.
 ---
 
-# Quality Review
+# Inspect
 
 Review the deliverable against scope, prior artifacts, and evidence.
 

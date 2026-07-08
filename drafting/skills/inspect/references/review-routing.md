@@ -1,6 +1,6 @@
 # Review Routing
 
-Quality review is cumulative: inspect the current artifact plus prior phase outputs that define its obligations.
+Inspection is cumulative: inspect the current artifact plus prior phase outputs that define its obligations.
 
 ## Passes for multi-part deliverables
 

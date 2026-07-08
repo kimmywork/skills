@@ -11,7 +11,7 @@ Use another perspective to reduce blind spots. Advisory feedback does not block 
 
 - `references/cross-validation-protocol.md`
 - `../drafting-loop/references/ground-truth-isolation.md`
-- `../quality-review/SKILL.md`
+- `../inspect/SKILL.md`
 
 ## When to use
 

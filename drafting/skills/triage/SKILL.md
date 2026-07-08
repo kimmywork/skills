@@ -1,9 +1,9 @@
 ---
-name: intent-routing
+name: triage
 description: Diagnose the right workflow, stage, or resume point when the user has mixed artifacts, an unclear next step, or needs help choosing how to proceed. Use when the main problem is path selection, not target definition or task execution.
 ---
 
-# Intent Routing
+# Triage
 
 Diagnose the task before committing to a path.
 

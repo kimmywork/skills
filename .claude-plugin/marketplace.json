@@ -6,11 +6,6 @@
   },
   "plugins": [
     {
-      "name": "solution-delivery-loop",
-      "description": "A compact, agent-neutral skill family for solution delivery",
-      "source": "./delivery/"
-    },
-    {
       "name": "drafting-loop",
       "description": "Universal work orchestration for drafting, delivery, research, review, and verified outcomes",
       "source": "./drafting/"

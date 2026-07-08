@@ -5,18 +5,6 @@
   },
   "plugins": [
     {
-      "name": "solution-delivery-loop",
-      "source": {
-        "source": "local",
-        "path": "./delivery"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
       "name": "drafting-loop",
       "source": {
         "source": "local",

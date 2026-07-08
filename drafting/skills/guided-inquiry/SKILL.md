@@ -1,11 +1,11 @@
 ---
 name: guided-inquiry
-description: Socratic clarification for vague, high-stakes, exploratory, creative, or poorly bounded work. Use when the user needs help thinking, cannot define the target, or Shape would otherwise invent requirements.
+description: Use dialogue to surface the real target, narrow competing directions, and frame hard decisions when the user cannot yet state what they want clearly enough to scope, plan, or execute.
 ---
 
 # Guided Inquiry
 
-Use dialogue to converge on a usable scope without over-questioning.
+Use dialogue to converge on a workable target, decision, or brief when the user needs thinking help before formal scoping.
 
 ## Five layers
 
@@ -18,14 +18,19 @@ Use dialogue to converge on a usable scope without over-questioning.
 ## Rules
 
 - Ask at most 3 questions per turn.
+- If a blocking fact can be recovered from materials or the workspace, inspect it instead of asking.
 - Prefer multiple-choice options when the user is stuck.
-- Do not force all five layers if the scope becomes clear early.
-- After 5 rounds without convergence, propose 3 candidate scopes and ask the user to choose.
+- Do not force all five layers if the target becomes clear early.
+- Resolve upstream decisions before exploring dependent branches.
+- For tightly coupled or high-stakes decisions, ask one question at a time and resolve dependencies before branching further.
+- If the user is choosing among directions, compare options instead of continuing pure questioning.
+- Do not turn tentative discussion into scope, planning, or execution until the target is stable enough for shared understanding.
+- After 5 rounds without convergence, propose 3 candidate directions and ask the user to choose.
 - Capture assumptions explicitly; do not bury them in prose.
 
 ## Output
 
-When ready, produce a compact Shape handoff:
+When ready, produce one of: a clarified objective, candidate directions, or a compact scope seed.
 
 ```yaml
 guided_scope:
@@ -40,7 +45,7 @@ guided_scope:
   open_questions: []
 ```
 
-Then hand off to `../scope-shaping/SKILL.md` or directly to `../blueprinting/SKILL.md` if scope is already complete.
+The result should be ready for shaping, planning, or direct execution, depending on completeness.
 
 ## Language
 

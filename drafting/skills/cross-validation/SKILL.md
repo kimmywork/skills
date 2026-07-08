@@ -1,6 +1,6 @@
 ---
 name: cross-validation
-description: Optional second-perspective verification for high-stakes or uncertain work. Use when the user asks for independent validation, cross-checking, multiple perspectives, adversarial review, or when quality-review finds uncertainty that needs another lens.
+description: Obtain a second perspective on a claim, design, review, or conclusion to reduce blind spots and resolve uncertainty. Use when the user wants an independent check, adversarial review, multiple perspectives, or more confidence before acting.
 ---
 
 # Cross Validation
@@ -18,11 +18,11 @@ Use another perspective to reduce blind spots. Advisory feedback does not block 
 - High-stakes factual, compliance, safety, or architecture decisions.
 - Conflicting evidence.
 - User requests second opinion.
-- Quality-review verdict is CONDITIONAL due to uncertainty.
+- A review or conclusion is technically acceptable but still uncertain.
 
 ## Workflow
 
-1. Freeze the artifact, review question, and criteria.
+1. Freeze the artifact, decision, or conclusion under question.
 2. Select validation mode and perspectives from `references/cross-validation-protocol.md`.
 3. Keep each perspective focused on evidence-backed findings.
 4. Compare consensus, divergence, unique findings, false positives, and unresolved risks.

@@ -1,3 +1,8 @@
+---
+agent: "mimocode"
+model: "mimo-v2.5-flash"
+---
+
 /skill-creator 整理 @style-extraction.md 里的内容，总结成一个全新的skill，放在 utility 下面。统一升级 utility plugin（@utility/.claude-plugin/plugin.json ) 和下面 SKILL 的版本。
 
 ---

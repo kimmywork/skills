@@ -1,6 +1,6 @@
 ---
 name: acceptance-gate
-description: Evidence-based delivery acceptance for any completed work. Use when deciding whether to ship, hand off, close a task, record verification, accept conditional delivery, roll back, or ask the user for final review.
+description: "Make an evidence-based delivery decision for completed or near-complete work: delivered, partial, blocked, needs-review, or rolled-back. Use when the user wants to know whether work can be shipped, handed off, closed, or accepted; if the main need is issue-finding or formal assessment, do that first."
 ---
 
 # Acceptance Gate
@@ -16,9 +16,8 @@ Acceptance is a record of evidence, not a feeling that work is done.
 
 ## Preconditions
 
-- Build output exists.
-- Quality review is PASS or CONDITIONAL, or user explicitly requests acceptance of risk.
-- Verification evidence is fresh enough for the claim being made.
+- A build, draft, report, review result, or other candidate deliverable exists.
+- Evidence may be complete or incomplete, but missing review or missing evidence must be recorded as a blocker or conditional risk rather than waved away.
 
 ## Workflow
 
@@ -28,8 +27,9 @@ Acceptance is a record of evidence, not a feeling that work is done.
 4. Mark status: pass, fail, deferred, blocked, not-applicable.
 5. Check scope changes, contract drift, review routing, and unresolved risks.
 6. Decide verdict: delivered, partial, blocked, needs-review, or rolled-back.
-7. Write a delivery record.
-8. Ask for user approval when verdict is partial, risky, subjective, or requires override.
+7. If evidence is insufficient, state what additional review, verification, or decision input is needed.
+8. Write a delivery record.
+9. Ask for user approval when verdict is partial, risky, subjective, or requires override.
 
 ## Rules
 

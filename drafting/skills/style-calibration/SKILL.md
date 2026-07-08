@@ -1,6 +1,6 @@
 ---
 name: style-calibration
-description: Extract, validate, and apply a writing style profile from samples. Use when the user provides writing samples, asks to match voice, calibrate style, preserve author voice, build a style guide, or adapt composing/creating output to a known style.
+description: Extract, validate, compare, and apply a writing style profile from samples. Use when the user wants to match voice, preserve authorial habits, build a style guide, diagnose style mismatch, or rewrite content into a target style.
 ---
 
 # Style Calibration
@@ -28,16 +28,21 @@ Use style as a soft production guide, not a reason to violate truth, domain stan
 
 Use hold-out or cross-genre calibration when samples permit. Revise overfit or missing profile rules.
 
+### Compare
+
+Identify stable similarities, decisive differences, and likely transfer risks between two styles or between a draft and a target voice.
+
 ### Apply
 
 1. User instructions, domain rules, factuality, and compliance outrank style.
 2. Preserve safe style dimensions: rhythm, transitions, modifier density, hedging, register, punctuation habits.
 3. Treat risky dimensions carefully: persona, unsupported claims, excessive informality, identity imitation.
 4. Log conflicts once and choose the higher-priority rule.
+5. When rewriting, preserve content intent and mark any style-versus-truth conflict.
 
 ## Output
 
-Use `references/output-template.md` for profiles. Attach the profile to the Shape or Design handoff and consume it during Build for Composing or Creating.
+Use `references/output-template.md` for profiles or calibration notes. The result may support a style guide, rewrite, or later drafting work.
 
 ## Language
 

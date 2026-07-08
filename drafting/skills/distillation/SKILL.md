@@ -1,11 +1,11 @@
 ---
 name: distillation
-description: Convert repeated execution friction, review feedback, coverage gaps, false guidance, missing guardrails, trigger errors, or successful reusable patterns into process, template, or skill improvements. Use after phase-review cycles, process audits, delivery, or repeated loops.
+description: Turn repeated friction, failures, review feedback, or successful patterns into durable workflow, template, script, or skill improvements. Use for retrospectives, lessons learned, process refinement, and converting execution evidence into reusable guidance.
 ---
 
 # Distillation
 
-Improve the framework only from concrete evidence.
+Improve reusable workflow guidance only from concrete evidence.
 
 ## Load
 
@@ -17,21 +17,23 @@ Improve the framework only from concrete evidence.
 ## Triggers
 
 - Same review issue repeats.
-- A phase-review rollback exposes missing guidance.
-- A process audit finds a coverage gap, false guidance, missing guardrail, repeated improvisation, context overhead, trigger misfire, or atomic extraction candidate.
+- A rollback or failure exposes missing guidance.
+- A process audit or retrospective finds a coverage gap, false guidance, missing guardrail, repeated improvisation, context overhead, trigger misfire, or atomic extraction candidate.
 - A template was missing or misleading.
 - User feedback reveals reusable process friction.
+- A successful pattern is stable enough to promote into durable guidance.
 
 ## Workflow
 
-1. Collect evidence from the run: artifacts, review issues, fixes, decisions, and user feedback.
+1. Collect evidence from the run, review, retro, or recurring workflow: artifacts, issues, fixes, decisions, and feedback.
 2. Classify the gap using `references/distillation-template.md` dimensions.
 3. Identify the general pattern; ignore one-off weak signals.
-4. Decide whether to change a skill, reference, template, script, routing description, propose a new skill, or make no change.
-5. Check duplication and bundle scope.
-6. Draft the smallest durable improvement.
-7. Verify cross-references, language, and SKILL.md line limit.
-8. Record why the improvement should help future runs.
+4. Decide whether to change a skill, reference, template, script, SOP/checklist, routing description, propose a new skill, or make no change.
+5. Check not only local fit but also cross-skill overlap, duplication, naming conflict, boundary conflict, and trigger confusion.
+6. Check duplication and bundle scope.
+7. Draft the smallest durable improvement.
+8. Verify cross-references, language, and SKILL.md line limit.
+9. Record why the improvement should help future runs.
 
 ## Output
 

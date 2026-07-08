@@ -1,6 +1,6 @@
 ---
 name: blueprinting
-description: Turn a complete scope into an executable blueprint: architecture, methodology, outline, review protocol, increments, contracts, and verification mapping. Use before Build when choices, sequencing, interfaces, or validation are non-trivial.
+description: Design an executable approach, architecture, methodology, outline, or staged plan before implementation or delivery. Use when the user wants to think through choices, sequencing, interfaces, dependencies, or validation before doing the work.
 ---
 
 # Blueprinting
@@ -16,11 +16,11 @@ Design the path before execution.
 
 ## Preconditions
 
-A Shape artifact exists or the user has supplied equivalent scope. If not, use `../scope-shaping/SKILL.md` first.
+A scope artifact exists, or the user has supplied enough intent and constraints to infer one. If key decisions are still unknowable, name the gaps and proceed with assumptions or decision points instead of pretending the scope is complete.
 
 ## Workflow
 
-1. Restate scope and acceptance criteria.
+1. Restate scope, constraints, and acceptance criteria.
 2. Identify design decisions, contracts, dependencies, and constraints.
 3. Pre-screen feasibility: Feasible, Moderate, or Redesigned.
 4. Propose the smallest viable approach.
@@ -28,7 +28,7 @@ A Shape artifact exists or the user has supplied equivalent scope. If not, use `
 6. Record chosen, rejected, and deferred alternatives.
 7. Slice into independently verifiable increments and draw dependencies.
 8. Map each increment to acceptance criteria and checks.
-9. Ask for MANDATORY user approval when blueprint affects scope, architecture, methodology, or cost.
+9. Mark assumptions, decisions needed, and approval points when scope, architecture, methodology, or cost would materially change.
 
 ## Kind-specific blueprint
 

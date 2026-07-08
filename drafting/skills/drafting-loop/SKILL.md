@@ -1,11 +1,11 @@
 ---
 name: drafting-loop
-description: Universal work-loop orchestrator for end-to-end knowledge work. Use whenever the user wants a feature, fix, report, review, investigation, creative artifact, delivery loop, workflow continuation, or any multi-step outcome from unclear intent through verified delivery. Prefer this skill for broad requests even when the user does not say "drafting loop".
+description: Orchestrate complex multi-step knowledge work from unclear intent through verified delivery. Use when the user wants end-to-end management across clarification, planning, execution, review, and acceptance, especially when they do not want to choose the next step themselves.
 ---
 
 # Drafting Loop
 
-Use this as the top-level control layer. It coordinates skills; it does not hide uncertainty or skip gates.
+Use this as the top-level control layer when the user wants managed progress across multiple stages. It coordinates skills; direct entry into a leaf skill is still valid when the immediate task is already clear.
 
 ## Load first
 
@@ -25,8 +25,8 @@ Use this as the top-level control layer. It coordinates skills; it does not hide
 
 Sense -> Clarify -> Shape -> Design -> Build -> Verify -> Record -> Continue/Stop.
 
-1. **Sense**: detect work kind, materials, current phase, risks.
-2. **Clarify**: use `../intent-routing/SKILL.md` when routing or phase is ambiguous.
+1. **Sense**: detect work kind, materials, current phase, risks, and whether the user needs a single task or a managed loop.
+2. **Clarify**: use `../intent-routing/SKILL.md` only when the path, resume point, or workflow choice is genuinely ambiguous.
 3. **Shape**: use `../scope-shaping/SKILL.md` unless a complete scope already exists.
 4. **Design**: use `../blueprinting/SKILL.md` when execution needs a plan; fast-pass only when recorded.
 5. **Build**: use `../plan-execution/SKILL.md`, `../deep-research/SKILL.md`, `../audit-trail/SKILL.md`, or `../style-calibration/SKILL.md` according to kind.
@@ -38,7 +38,7 @@ Sense -> Clarify -> Shape -> Design -> Build -> Verify -> Record -> Continue/Sto
 
 - **Crafting**: build/fix/implement/configure systems or artifacts.
 - **Composing**: write/synthesize documents, reports, docs, proposals, slides.
-- **Evaluating**: review/audit/check/assess/fact-check existing work.
+- **Evaluating**: review/audit/check/assess existing work.
 - **Investigating**: research/trace/analyze/map/root-cause questions.
 - **Creating**: ideate/imagine/design fiction, brands, concepts, experiences.
 

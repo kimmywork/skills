@@ -1,6 +1,6 @@
 ---
 name: audit-trail
-description: Execute evaluation work as the deliverable: audits, reviews, compliance checks, contract checks, PR/design assessments, evidence inspections, and rubric-based assessment of existing artifacts. Use during Build for Evaluating kind.
+description: Produce a formal audit or assessment report on an existing artifact using stated or inferred criteria, evidence tracing, and scoped findings. Use when the review itself is the deliverable; prefer revision-oriented review when the main goal is to improve a draft, and final acceptance work when the main goal is ship/close decisions.
 ---
 
 # Audit Trail
@@ -17,14 +17,15 @@ Run an evaluation with traceable evidence.
 ## Workflow
 
 1. Identify artifact, scope, criteria, and severity definitions.
-2. Divide large artifacts into sections or review units.
-3. Extract claims that need verification or calculation.
-4. Verify claims and convert refuted/inconclusive claims into issues.
-5. Inspect each section for requested issue types and root-cause links.
-6. Record location, evidence, impact, and recommended action for every finding.
-7. Distinguish defects, risks, suggestions, and questions.
-8. Produce a verdict only for the approved scope.
-9. Hand off to quality-review for meta-review if high-stakes.
+2. If criteria are missing or incomplete, infer a provisional review frame and label what was user-supplied versus inferred.
+3. Divide large artifacts into sections or review units.
+4. Extract claims that need verification or calculation.
+5. Verify claims and convert refuted/inconclusive claims into issues.
+6. Inspect each section for requested issue types and root-cause links.
+7. Record location, evidence, impact, and recommended action for every finding.
+8. Distinguish defects, risks, suggestions, questions, and unaudited areas.
+9. Produce a verdict only for the approved scope.
+10. Note whether further validation, compliance checking, or delivery decision work is still needed.
 
 ## Finding schema
 

@@ -1,6 +1,6 @@
 ---
 name: quality-review
-description: Independent quality review for any draft deliverable before acceptance. Use after Build, after revisions, for review feedback, quality gates, adversarial checks, rollback routing, and deciding whether work needs revision before delivery.
+description: Independent review of an existing draft, build, or deliverable to find issues, judge readiness, and guide revision. Use when the user wants feedback, a quality gate, an adversarial pass, or a "is this good enough?" check; prefer formal audit work when the review itself must be the deliverable, and acceptance work when the main question is whether it can be shipped or closed.
 ---
 
 # Quality Review
@@ -19,13 +19,14 @@ Review the deliverable against scope, prior artifacts, and evidence.
 ## Workflow
 
 1. Freeze the deliverable under review.
-2. Load current artifact, source scope, blueprint, prior feedback, and relevant criteria.
-3. Review cumulatively: current output plus prior phase obligations.
-4. For multi-part deliverables, run Accuracy, Validity, and Consistency passes.
-5. Tag each issue with origin phase, severity, type, evidence, suggested fix, and resolution.
-6. Route fix-in-place issues to producer; route rollback issues to earliest affected phase.
-7. Use two-stage review for high-stakes work or substantial revisions.
-8. Set verdict: PASS, CONDITIONAL, REVISION, FAIL, or STABLE.
+2. Load the current artifact, relevant criteria, source scope/brief, prior feedback, and known constraints. If criteria are missing, establish a temporary review lens and label it as inferred.
+3. Choose review depth: quick, full, adversarial, or regression.
+4. Review cumulatively: current output plus prior obligations that define what good looks like.
+5. For multi-part deliverables, run Accuracy, Validity, and Consistency passes.
+6. Tag each issue with origin stage, severity, type, evidence, suggested fix, and resolution path.
+7. Distinguish fix-in-place issues from earlier-stage issues; point back to the earliest affected stage when needed.
+8. Use two-stage review for high-stakes work or substantial revisions.
+9. Set verdict: PASS, CONDITIONAL, REVISION, FAIL, or STABLE.
 
 ## Kind-specific checks
 

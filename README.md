@@ -1,6 +1,6 @@
 # kimmywork/skills
 
-A collection of AI agent skills for software delivery and daily productivity.
+A collection of AI agent skills for knowledge work, workflow automation, and daily productivity.
 
 ## Installation
 
@@ -23,44 +23,72 @@ npx skills add kimmywork/skills --skill <skill-name> [<skill-name> ...]
 claude plugin marketplace add kimmywork/skills
 
 # Install plugins
-claude plugin install solution-delivery-loop@kimmywork-skills
-claude plugin install utility@kimmywork-skills
+claude plugin install drafting-loop@kimmywork-skills
 claude plugin install loop@kimmywork-skills
+claude plugin install utility@kimmywork-skills
 ```
 
 ---
 
 ## Skills
 
-### Solution Delivery Loop (8 skills)
+### Drafting Loop (16 skills)
 
-A compact, agent-neutral skill family for solution delivery:
+Universal work orchestration for crafting, composing, evaluating, investigating, and creating.
 
-`Sense → Shape → Design → Build → Verify → Record → Continue/Stop`
+```text
+Sense → Clarify → Shape → Design → Build → Verify → Record → Continue/Stop
+```
 
-#### `solution-delivery-loop`
-> Entry point and phase router. Triage requests, route to the right phase skill, and coordinate end-to-end delivery from request to accepted outcome.
+A compact, agent-neutral skill family that upgrades the older delivery workflow into a general-purpose work loop. Short `SKILL.md` files with detailed references for progressive disclosure.
 
-#### `requirement-discovery`
-> Shape ambiguous requests into clear requirements. Define users, scenarios, scope, non-goals, acceptance criteria, and verification expectations before any design or implementation begins.
+#### `drafting-loop`
+> Top-level orchestrator: phases, routing, checkpoints, state transitions, and handoffs across all work kinds.
 
-#### `solution-design`
-> Produce solution design with trade-off analysis, contract-first decisions, implementation slicing, and verification planning.
+#### `triage`
+> Detect work kind, phase, ambiguity level, and correct workflow entry point from mixed artifacts and unclear next steps.
 
-#### `implementation-execution`
-> Execute plans with TDD-driven vertical-slice implementation. Implement features, fix bugs, refactor, or perform maintenance with integrated verification.
+#### `probing`
+> Socratic clarification for vague or exploratory work. Surface the real target, narrow competing directions, and frame hard decisions.
 
-#### `delivery-acceptance`
-> Evidence-based review of completed work. Evaluate Spec Fit and Code Fit, record verification evidence, and decide whether to ship, continue, roll back, or ask for user review.
+#### `scope-shaping`
+> Convert existing intent, notes, requirements, or partial materials into an executable scope, brief, criteria set, or research question.
 
-#### `review-feedback`
-> Independent cumulative review of phase artifacts. Completeness, correctness, consistency, clarity, and scope adherence checks.
+#### `blueprinting`
+> Design an executable approach, architecture, methodology, outline, or staged plan before implementation or delivery.
 
-#### `process-distillation`
-> Extract process improvements from repeated friction or resolved review cycles.
+#### `plan-execution`
+> Execute a defined task, plan, or constrained deliverable while preserving scope, evidence, and change awareness.
 
-#### `structured-investigation`
-> Universal investigation methodology for research, tracing, root cause analysis, and deriving truth from primary sources.
+#### `acceptance-gate`
+> Evidence-based delivery decision: delivered, partial, blocked, needs-review, or rolled-back.
+
+#### `inspect`
+> Independent review of existing artifacts to find issues, judge readiness, and guide revision.
+
+#### `audit-trail`
+> Formal audit or assessment report on an existing artifact using stated or inferred criteria, evidence tracing, and scoped findings.
+
+#### `fact-verification`
+> Check factual claims, citations, quotations, numbers, and source alignment against evidence.
+
+#### `deep-research`
+> Investigate questions through source-based research, tracing, synthesis, and uncertainty management.
+
+#### `challenge`
+> Stress-test plans, designs, drafts, or conclusions by exposing hidden assumptions, edge cases, failure modes, and unresolved trade-offs.
+
+#### `cross-validation`
+> Obtain a second perspective on a claim, design, review, or conclusion to reduce blind spots and resolve uncertainty.
+
+#### `compliance-gate`
+> Assess compliance, constraint fit, disclosures, and override risk for policy, legal, audit, safety, or integrity work.
+
+#### `style-calibration`
+> Extract, validate, compare, and apply a writing style profile from samples. Voice matching, style diagnosis, and style-guided rewriting.
+
+#### `distillation`
+> Turn repeated friction, failures, review feedback, or successful patterns into durable workflow, template, script, or skill improvements.
 
 ---
 
@@ -76,13 +104,10 @@ Create and execute recurring automated workflows.
 
 ---
 
-### Utility (3 skills)
+### Utility (2 skills)
 
 #### `cloudconvert`
 > Convert non-text documents (PDF, DOC/DOCX, EPUB) to Markdown via CloudConvert CLI. Saves processing tokens by feeding agents clean Markdown instead of raw document formats.
 
 #### `rationale`
 > Decode agent-optimized artifacts (skill rules, code changes, design decisions) into human-comprehensible explanations. Trigger on "explain", "why", "rationale", or when reviewing dense agent outputs.
-
-#### `style-extraction`
-> Extract a structured writing style profile from an author's sample texts. Quantifiable features + executable rules + positive/negative examples. Supports both English and Chinese source texts.

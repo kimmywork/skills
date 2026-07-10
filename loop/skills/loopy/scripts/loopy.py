@@ -1,18 +1,10 @@
 #!/usr/bin/env python3
-"""
-loopy.py — Workflow scheduling and dispatch script.
+"""Validate, schedule, and record agent-executed workflows."""
 
-Part of the Loop Creation Kit (@loop/ plugin).
-
-Determines which workflows are due (by schedule or trigger),
-detects concurrent runs via state file status, and outputs
-a structured JSON dispatch list for the agent to execute.
-
-Dependencies: PyYAML (stdlib), croniter (pip)
-"""
+from __future__ import annotations
 
 import argparse
-import datetime
+import datetime as dt
 import glob
 import json
 import os
@@ -20,568 +12,594 @@ import re
 import subprocess
 import sys
 import tempfile
+import uuid
+from pathlib import Path
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-import croniter
 import yaml
+from croniter import croniter
+
+STATE_REL = Path("workflows/.state")
+DISPATCH_REL = STATE_REL / "dispatch"
+TRIGGER_TIMEOUT_DEFAULT = 30
+LEASE_SECONDS_DEFAULT = 86400
+SHELL = "/bin/sh"
+STATE_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})-(\d+)\.json$")
+SUCCESS_RE = re.compile(r"^#{1,6}\s+Success condition\s*$", re.IGNORECASE | re.MULTILINE)
 
 
-# --- Constants ---
-
-WORKFLOWS_DIR = "workflows"
-STATE_DIR = os.path.join(WORKFLOWS_DIR, ".state")
-DISPATCH_DIR = os.path.join(STATE_DIR, "dispatch")
-TRIGGER_TIMEOUT_DEFAULT = 30  # seconds
-TRIGGER_SHELL = "/bin/sh"
-TRIGGER_TIMEOUT_ENV_VAR = "LOOPY_TRIGGER_TIMEOUT"
+def now_utc() -> dt.datetime:
+    return dt.datetime.now(dt.timezone.utc)
 
 
-# --- Helpers ---
-
-def project_root():
-    """Return the intended project root. Script runs from project root."""
-    return os.getcwd()
+def now_iso() -> str:
+    return now_utc().isoformat()
 
 
-def parse_frontmatter(filepath):
-    """Parse YAML front-matter and body from a markdown file.
-
-    Returns (frontmatter_dict, body_text) or raises on error.
-    """
-    with open(filepath, "r") as f:
-        content = f.read()
-
-    # Match content between first two `---` markers
-    m = re.match(r"^---\s*\n(.*?)\n---\s*\n(.*)", content, re.DOTALL)
-    if not m:
-        raise ValueError(f"Missing or malformed front-matter: {filepath}")
-
-    fm = yaml.safe_load(m.group(1))
-    if not isinstance(fm, dict):
-        raise ValueError(f"Front-matter is not a dict: {filepath}")
-
-    body = m.group(2).strip()
-    return fm, body
+def atomic_write(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_name = tempfile.mkstemp(dir=path.parent, prefix=".tmp_")
+    tmp = Path(tmp_name)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(content)
+        os.replace(tmp, path)
+    except Exception:
+        tmp.unlink(missing_ok=True)
+        raise
 
 
-def slugify(name):
-    """Convert a workflow name to a filesystem-safe slug."""
-    slug = name.lower()
-    slug = re.sub(r"[^a-z0-9-]", "-", slug)
-    slug = re.sub(r"-+", "-", slug)
-    slug = slug.strip("-")
-    return slug[:64]
+def atomic_json(path: Path, data: dict) -> None:
+    atomic_write(path, json.dumps(data, indent=2) + "\n")
 
 
-def today_prefix():
-    return datetime.date.today().isoformat()  # YYYY-MM-DD
+def read_json(path: Path) -> dict | None:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else None
+    except (OSError, json.JSONDecodeError):
+        return None
 
 
-def now_iso():
-    return datetime.datetime.now(datetime.timezone.utc).isoformat()
+def slugify(name: str) -> str:
+    slug = re.sub(r"[^a-z0-9-]", "-", name.lower())
+    return re.sub(r"-+", "-", slug).strip("-")[:64]
 
 
-def read_all_workflows():
-    """Return list of (filepath, fm, body) for all valid workflow files."""
-    pattern = os.path.join(WORKFLOWS_DIR, "*.md")
-    files = sorted(glob.glob(pattern))
-    results = []
-    for fp in files:
-        try:
-            fm, body = parse_frontmatter(fp)
-            results.append((fp, fm, body))
-        except (ValueError, yaml.YAMLError, OSError) as e:
-            results.append((fp, {"_error": str(e)}, ""))
-    return results
+def parse_frontmatter(path: Path) -> tuple[dict, str]:
+    content = path.read_text(encoding="utf-8")
+    match = re.match(r"^---\s*\n(.*?)\n---\s*\n(.*)", content, re.DOTALL)
+    if not match:
+        raise ValueError("missing or malformed YAML frontmatter")
+    frontmatter = yaml.safe_load(match.group(1))
+    if not isinstance(frontmatter, dict):
+        raise ValueError("frontmatter must be a mapping")
+    return frontmatter, match.group(2).strip()
 
 
-def get_state_dir(name):
-    return os.path.join(STATE_DIR, name)
+def validate_workflow(path: Path) -> dict:
+    record = {"path": path, "name": path.stem, "frontmatter": {}, "body": "", "errors": []}
+    try:
+        fm, body = parse_frontmatter(path)
+    except (OSError, ValueError, yaml.YAMLError) as exc:
+        record["errors"].append(str(exc))
+        return record
+
+    record["frontmatter"] = fm
+    record["body"] = body
+    name = fm.get("name")
+    if not isinstance(name, str) or not name.strip():
+        record["errors"].append("name must be a non-empty string")
+    else:
+        record["name"] = name
+        expected = slugify(name)
+        if not expected:
+            record["errors"].append("name does not produce a valid slug")
+        elif path.stem != expected:
+            record["errors"].append(f"filename '{path.stem}' does not match name slug '{expected}'")
+
+    schedule = fm.get("schedule")
+    trigger = fm.get("trigger")
+    if not schedule and not trigger:
+        record["errors"].append("at least one of schedule or trigger is required")
+    if schedule is not None:
+        if not isinstance(schedule, str) or len(schedule.split()) != 5 or not croniter.is_valid(schedule):
+            record["errors"].append("schedule must be a valid five-field cron expression")
+        timezone = fm.get("timezone")
+        if not isinstance(timezone, str) or not timezone:
+            record["errors"].append("scheduled workflows require an IANA timezone")
+        else:
+            try:
+                ZoneInfo(timezone)
+            except ZoneInfoNotFoundError:
+                record["errors"].append(f"unknown timezone '{timezone}'")
+    if trigger is not None and (not isinstance(trigger, str) or not trigger.strip()):
+        record["errors"].append("trigger must be a non-empty shell command")
+
+    permissions = fm.get("permissions")
+    if not isinstance(permissions, list) or not permissions or not all(isinstance(x, str) and x for x in permissions):
+        record["errors"].append("permissions must be a non-empty list of authorized capabilities")
+
+    concurrency = fm.get("concurrency", "forbid")
+    if concurrency != "forbid":
+        record["errors"].append("concurrency currently supports only 'forbid'")
+
+    for field in ("max_items", "retry_limit", "timeout_minutes"):
+        value = fm.get(field)
+        if value is not None and (not isinstance(value, int) or value < 0):
+            record["errors"].append(f"{field} must be a non-negative integer")
+    if fm.get("timeout_minutes") == 0:
+        record["errors"].append("timeout_minutes must be greater than zero")
+
+    if not body:
+        record["errors"].append("workflow body is empty")
+    elif not SUCCESS_RE.search(body):
+        record["errors"].append("body must contain a '## Success condition' heading")
+    return record
 
 
-def get_latest_state_file(name):
-    """Return (filepath, data) for the most recent state file, or (None, None)."""
-    sdir = get_state_dir(name)
-    if not os.path.isdir(sdir):
-        return None, None
+def load_workflows(root: Path) -> list[dict]:
+    return [validate_workflow(Path(path)) for path in sorted(glob.glob(str(root / "workflows/*.md")))]
 
-    # List files matching YYYY-MM-DD-NNN.json, take latest by name
-    files = [f for f in os.listdir(sdir) if re.match(r"\d{4}-\d{2}-\d{2}-\d{3}\.json$", f)]
+
+def state_dir(root: Path, name: str) -> Path:
+    return root / STATE_REL / slugify(name)
+
+
+def state_sort_key(path: Path) -> tuple[str, int]:
+    match = STATE_RE.match(path.name)
+    return (match.group(1), int(match.group(2))) if match else ("", -1)
+
+
+def state_files(root: Path, name: str) -> list[Path]:
+    directory = state_dir(root, name)
+    return sorted((p for p in directory.glob("*.json") if STATE_RE.match(p.name)), key=state_sort_key)
+
+
+def latest_state(root: Path, name: str) -> tuple[Path | None, dict | None]:
+    files = state_files(root, name)
     if not files:
         return None, None
+    path = files[-1]
+    return path, read_json(path)
 
-    latest = sorted(files)[-1]
-    path = os.path.join(sdir, latest)
+
+def next_run_id(root: Path, name: str) -> str:
+    today = dt.date.today().isoformat()
+    numbers = [state_sort_key(path)[1] for path in state_files(root, name) if state_sort_key(path)[0] == today]
+    return f"{today}-{(max(numbers, default=0) + 1):03d}"
+
+
+def parse_timestamp(value: str | None) -> dt.datetime | None:
+    if not value:
+        return None
     try:
-        with open(path) as f:
-            data = json.load(f)
-        return path, data
-    except (json.JSONDecodeError, IOError):
-        return path, None
+        parsed = dt.datetime.fromisoformat(value)
+        return parsed if parsed.tzinfo else parsed.replace(tzinfo=dt.timezone.utc)
+    except ValueError:
+        return None
 
 
-def next_nnn(name):
-    """Compute next NNN sequence number for today."""
-    sdir = get_state_dir(name)
-    prefix = today_prefix() + "-"
-    if not os.path.isdir(sdir):
-        return 1
+def schedule_due(root: Path, workflow: dict) -> bool:
+    fm = workflow["frontmatter"]
+    schedule = fm.get("schedule")
+    if not schedule:
+        return True
+    _, latest = latest_state(root, workflow["name"])
+    last = parse_timestamp(latest.get("completed_at") if latest else None)
+    if last is None:
+        last = parse_timestamp(latest.get("started_at") if latest else None)
+    if last is None:
+        return True
+    timezone = ZoneInfo(fm["timezone"])
+    local_last = last.astimezone(timezone)
+    next_run = croniter(schedule, local_last).get_next(dt.datetime)
+    if next_run.tzinfo is None:
+        next_run = next_run.replace(tzinfo=timezone)
+    return dt.datetime.now(timezone) >= next_run
 
-    max_n = 0
-    for f in os.listdir(sdir):
-        if f.startswith(prefix) and f.endswith(".json"):
-            parts = f[len(prefix):-5]  # strip prefix and .json
-            if parts.isdigit():
-                max_n = max(max_n, int(parts))
-    return max_n + 1
+
+def env_positive_int(name: str, default: int) -> int:
+    try:
+        value = int(os.environ.get(name, str(default)))
+        return value if value > 0 else default
+    except ValueError:
+        return default
 
 
-def create_state_file(name, trigger_output_file=None):
-    """Create a state file with status 'scheduled' for a due workflow.
+def execute_trigger(root: Path, workflow: dict) -> dict:
+    trigger = workflow["frontmatter"].get("trigger")
+    if not trigger:
+        return {"status": "absent", "output": None, "reason": None}
+    timeout = env_positive_int("LOOPY_TRIGGER_TIMEOUT", TRIGGER_TIMEOUT_DEFAULT)
+    try:
+        result = subprocess.run(
+            trigger,
+            shell=True,
+            executable=SHELL,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            cwd=root,
+        )
+    except subprocess.TimeoutExpired:
+        return {"status": "error", "output": None, "reason": f"trigger timed out after {timeout}s"}
+    except Exception as exc:
+        return {"status": "error", "output": None, "reason": f"trigger failed: {exc}"}
+    if result.returncode != 0:
+        reason = f"trigger exit code {result.returncode}"
+        if result.stderr.strip():
+            reason += f": {result.stderr.strip()}"
+        return {"status": "not_fired", "output": None, "reason": reason}
+    output = result.stdout.strip()
+    if not output:
+        return {"status": "not_fired", "output": None, "reason": "trigger produced empty output"}
+    return {"status": "fired", "output": output, "reason": None}
 
-    Returns path to the created state file.
-    """
-    sdir = get_state_dir(name)
-    os.makedirs(sdir, exist_ok=True)
 
-    nnn = next_nnn(name)
-    run_id = f"{today_prefix()}-{nnn:03d}"
-    filename = f"{run_id}.json"
-    path = os.path.join(sdir, filename)
+def lock_path(root: Path, name: str) -> Path:
+    return state_dir(root, name) / ".lock"
 
+
+def lease_seconds(workflow: dict) -> int:
+    minutes = workflow["frontmatter"].get("timeout_minutes")
+    if isinstance(minutes, int) and minutes > 0:
+        return max(minutes * 60, 60)
+    return env_positive_int("LOOPY_LEASE_SECONDS", LEASE_SECONDS_DEFAULT)
+
+
+def acquire_lock(root: Path, workflow: dict) -> tuple[dict | None, dict | None]:
+    path = lock_path(root, workflow["name"])
+    path.parent.mkdir(parents=True, exist_ok=True)
+    token = uuid.uuid4().hex
+    acquired = now_utc()
+    lock = {
+        "workflow": workflow["name"],
+        "token": token,
+        "acquired_at": acquired.isoformat(),
+        "expires_at": (acquired + dt.timedelta(seconds=lease_seconds(workflow))).isoformat(),
+        "state_file": None,
+    }
+    try:
+        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError:
+        existing = read_json(path) or {"workflow": workflow["name"], "invalid": True}
+        expires = parse_timestamp(existing.get("expires_at"))
+        existing["stale"] = expires is None or now_utc() >= expires
+        return None, existing
+    with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+        json.dump(lock, handle, indent=2)
+        handle.write("\n")
+    return lock, None
+
+
+def release_lock(root: Path, name: str, token: str | None = None, state_file: str | None = None) -> bool:
+    path = lock_path(root, name)
+    current = read_json(path)
+    if current is None:
+        return False
+    if token is not None and current.get("token") != token:
+        return False
+    if state_file is not None and current.get("state_file") != state_file:
+        return False
+    path.unlink(missing_ok=True)
+    return True
+
+
+def create_run(root: Path, workflow: dict, lock: dict, trigger_output: str | None) -> tuple[Path, Path | None]:
+    directory = state_dir(root, workflow["name"])
+    run_id = next_run_id(root, workflow["name"])
+    path = directory / f"{run_id}.json"
+    trigger_path = directory / f"trigger-{run_id}.txt" if trigger_output is not None else None
+    if trigger_path is not None:
+        atomic_write(trigger_path, trigger_output + "\n")
     state = {
-        "workflow": name,
+        "workflow": workflow["name"],
         "run_id": run_id,
         "started_at": now_iso(),
         "completed_at": None,
         "status": "scheduled",
         "items_processed": None,
-        "trigger_output_file": trigger_output_file,
+        "trigger_output_file": str(trigger_path.resolve()) if trigger_path else None,
+        "lease_expires_at": lock["expires_at"],
+        "limits": {
+            "max_items": workflow["frontmatter"].get("max_items"),
+            "retry_limit": workflow["frontmatter"].get("retry_limit"),
+        },
     }
+    atomic_json(path, state)
+    lock["state_file"] = str(path.resolve())
+    atomic_json(lock_path(root, workflow["name"]), lock)
+    return path.resolve(), trigger_path.resolve() if trigger_path else None
 
-    # Atomic write: temp file then rename
-    fd, tmp = tempfile.mkstemp(dir=sdir, prefix=".tmp_")
+
+def dispatch_one(root: Path, workflow: dict, force: bool = False) -> dict:
+    name = workflow["name"]
+    if not force and workflow["frontmatter"].get("schedule") and not schedule_due(root, workflow):
+        return {"type": "not_due", "name": name, "reason": "schedule not due"}
+
+    lock, existing = acquire_lock(root, workflow)
+    if lock is None:
+        if existing and existing.get("stale"):
+            return {"type": "error", "name": name, "reason": "stale workflow lease; run the recover command before dispatching"}
+        return {"type": "not_due", "name": name, "reason": "workflow is already in progress"}
+
     try:
-        with os.fdopen(fd, "w") as f:
-            json.dump(state, f, indent=2)
-        os.rename(tmp, path)
+        trigger_output = None
+        if not force and workflow["frontmatter"].get("trigger"):
+            trigger = execute_trigger(root, workflow)
+            if trigger["status"] == "error":
+                release_lock(root, name, token=lock["token"])
+                return {"type": "error", "name": name, "reason": trigger["reason"]}
+            if trigger["status"] != "fired":
+                release_lock(root, name, token=lock["token"])
+                return {"type": "not_due", "name": name, "reason": trigger["reason"]}
+            trigger_output = trigger["output"]
+        state, trigger_path = create_run(root, workflow, lock, trigger_output)
+        return {
+            "type": "due",
+            "name": name,
+            "state_file": str(state),
+            "trigger_output_file": str(trigger_path) if trigger_path else None,
+        }
     except Exception:
-        if os.path.exists(tmp):
-            os.unlink(tmp)
+        release_lock(root, name, token=lock["token"])
         raise
 
+
+def write_dispatch_log(root: Path, dispatch: dict) -> Path:
+    directory = root / DISPATCH_REL
+    directory.mkdir(parents=True, exist_ok=True)
+    today = dt.date.today().isoformat()
+    numbers = []
+    for path in directory.glob(f"{today}-*.json"):
+        match = STATE_RE.match(path.name)
+        if match:
+            numbers.append(int(match.group(2)))
+    path = directory / f"{today}-{(max(numbers, default=0) + 1):03d}.json"
+    atomic_json(path, {"invoked_at": now_iso(), **dispatch})
     return path
 
 
-def create_skipped_state_file(name, reason):
-    """Create a state file with status 'skipped'."""
-    sdir = get_state_dir(name)
-    os.makedirs(sdir, exist_ok=True)
-
-    nnn = next_nnn(name)
-    run_id = f"{today_prefix()}-{nnn:03d}"
-    filename = f"{run_id}.json"
-    path = os.path.join(sdir, filename)
-
-    state = {
-        "workflow": name,
-        "run_id": run_id,
-        "started_at": now_iso(),
-        "completed_at": now_iso(),
-        "status": "skipped",
-        "items_processed": 0,
-        "trigger_output_file": None,
-        "skip_reason": reason,
-    }
-
-    fd, tmp = tempfile.mkstemp(dir=sdir, prefix=".tmp_")
+def ensure_state_path(root: Path, value: str) -> Path:
+    path = Path(value)
+    if not path.is_absolute():
+        path = root / path
+    path = path.resolve()
+    allowed = (root / STATE_REL).resolve()
     try:
-        with os.fdopen(fd, "w") as f:
-            json.dump(state, f, indent=2)
-        os.rename(tmp, path)
-    except Exception:
-        if os.path.exists(tmp):
-            os.unlink(tmp)
-        raise
-
+        path.relative_to(allowed)
+    except ValueError as exc:
+        raise ValueError("state file must be under the project workflows/.state directory") from exc
     return path
 
 
-def evaluate_schedule(fm, latest_state_path, latest_state):
-    """Check if a workflow is due based on its schedule.
-
-    Returns True/False.
-    """
-    schedule = fm.get("schedule")
-    if not schedule:
-        # No schedule — will rely on trigger alone
-        return True
-
-    # Determine last run time from latest state file
-    if latest_state and latest_state.get("completed_at"):
-        last_run = datetime.datetime.fromisoformat(latest_state["completed_at"])
-    elif latest_state and latest_state.get("started_at"):
-        last_run = datetime.datetime.fromisoformat(latest_state["started_at"])
-    else:
-        # Never run — always due
-        return True
-
-    try:
-        cron = croniter.croniter(schedule, last_run)
-        next_run = cron.get_next(datetime.datetime)
-        now = datetime.datetime.now(datetime.timezone.utc)
-        # Handle timezone-aware v.s. naive
-        if next_run.tzinfo is None and now.tzinfo is not None:
-            next_run = next_run.replace(tzinfo=now.tzinfo)
-        elif next_run.tzinfo is not None and now.tzinfo is None:
-            next_run = next_run.replace(tzinfo=None)
-        return now >= next_run
-    except (ValueError, KeyError):
-        return False
+def update_run(root: Path, state_value: str, status: str, items: int | None, failure: dict | None = None) -> dict:
+    path = ensure_state_path(root, state_value)
+    state = read_json(path)
+    if state is None:
+        raise ValueError(f"invalid or missing state file: {path}")
+    if state.get("status") != "scheduled" or state.get("completed_at"):
+        raise ValueError("only an active scheduled run can be finalized")
+    if items is not None and items < 0:
+        raise ValueError("items processed cannot be negative")
+    max_items = state.get("limits", {}).get("max_items")
+    if max_items is not None and items is not None and items > max_items:
+        raise ValueError(f"items processed exceeds workflow max_items ({max_items})")
+    state["status"] = status
+    state["completed_at"] = now_iso()
+    state["items_processed"] = items
+    state.pop("lease_expires_at", None)
+    if failure:
+        state["failure"] = failure
+    atomic_json(path, state)
+    released = release_lock(root, state["workflow"], state_file=str(path))
+    return {"state_file": str(path), "status": status, "lock_released": released}
 
 
-def execute_trigger(fm):
-    """Execute a trigger command.
-
-    Returns (output, error_reason, empty_reason):
-      output: stdout text (or None if no trigger / error / empty)
-      error_reason: string if command failed to execute (timeout, crash);
-                    None if trigger ran normally (fired, empty, or non-zero exit)
-      empty_reason: string if trigger ran but produced no event
-                    (empty stdout or non-zero exit); None if fired or error
-    """
-    trigger = fm.get("trigger")
-    if not trigger:
-        return None, None, None
-
-    timeout_s = TRIGGER_TIMEOUT_DEFAULT
-    env_val = os.environ.get(TRIGGER_TIMEOUT_ENV_VAR)
-    if env_val:
-        try:
-            timeout_s = int(env_val)
-        except ValueError:
-            pass
-
-    try:
-        r = subprocess.run(
-            trigger,
-            shell=True,
-            executable=TRIGGER_SHELL,
-            capture_output=True,
-            text=True,
-            timeout=timeout_s,
-            cwd=project_root(),
-        )
-    except subprocess.TimeoutExpired:
-        return None, f"trigger command timed out after {timeout_s}s", None
-    except Exception as e:
-        return None, f"trigger command failed: {e}", None
-
-    if r.returncode != 0:
-        stderr = r.stderr.strip()
-        reason = f"trigger exit code {r.returncode}"
-        if stderr:
-            reason += f": {stderr}"
-        return None, None, reason  # normal non-due
-
-    output = r.stdout.strip()
-    if not output:
-        return None, None, "trigger produced empty output"  # normal non-due
-
-    return output, None, None  # fired
+def heartbeat(root: Path, state_value: str, seconds: int) -> dict:
+    path = ensure_state_path(root, state_value)
+    state = read_json(path)
+    if state is None or state.get("status") != "scheduled":
+        raise ValueError("heartbeat requires an active scheduled state")
+    lock_file = lock_path(root, state["workflow"])
+    lock = read_json(lock_file)
+    if lock is None or lock.get("state_file") != str(path):
+        raise ValueError("active lock does not match the state file")
+    expires = now_utc() + dt.timedelta(seconds=seconds)
+    lock["expires_at"] = expires.isoformat()
+    state["lease_expires_at"] = expires.isoformat()
+    atomic_json(path, state)
+    atomic_json(lock_file, lock)
+    return {"state_file": str(path), "lease_expires_at": expires.isoformat()}
 
 
-def save_trigger_output(name, trigger_output_file, text):
-    """Save trigger output to a temp file. Returns the file path."""
-    sdir = get_state_dir(name)
-    os.makedirs(sdir, exist_ok=True)
-
-    path = os.path.join(sdir, trigger_output_file)
-    fd, tmp = tempfile.mkstemp(dir=sdir, prefix=".tmp_")
-    try:
-        with os.fdopen(fd, "w") as f:
-            f.write(text)
-        os.rename(tmp, path)
-    except Exception:
-        if os.path.exists(tmp):
-            os.unlink(tmp)
-        raise
-    return path
-
-
-def process_workflow(fp, fm, body, force_name, dry_run):
-    """Process one workflow. Returns a dispatch entry dict or None."""
-    name = fm.get("name")
-    if not name:
-        return {
-            "type": "error",
-            "name": os.path.basename(fp),
-            "reason": "missing 'name' in front-matter",
-        }
-
-    # Verify name matches filename slug
-    expected_slug = slugify(name)
-    actual_slug = os.path.splitext(os.path.basename(fp))[0]
-    if actual_slug != expected_slug:
-        return {
-            "type": "error",
-            "name": name,
-            "reason": f"filename '{actual_slug}' doesn't match name slug '{expected_slug}'",
-        }
-
-    # Must have at least schedule or trigger
-    has_schedule = bool(fm.get("schedule"))
-    has_trigger = bool(fm.get("trigger"))
-    if not has_schedule and not has_trigger:
-        return {
-            "type": "not_due",
-            "name": name,
-            "reason": "no schedule and no trigger configured",
-        }
-
-    # Force-run
-    if force_name and name == force_name:
-        pass  # skip due checks, force dispatch
-    elif force_name:
-        # Not the requested workflow — still report execution failures
-        has_sched = bool(fm.get("schedule"))
-        has_trig = bool(fm.get("trigger"))
-        if has_trig:
-            _, err, _ = execute_trigger(fm)
-            if err:
-                return {"type": "error", "name": name, "reason": err}
-        return {"type": "not_due", "name": name, "reason": "skipped (--run focused on different workflow)"}
-
-    # --- Due evaluation ---
-    latest_path, latest_state = get_latest_state_file(name)
-
-    # Check collision: is workflow currently running?
-    if latest_state and latest_state.get("status") == "scheduled" and not latest_state.get("completed_at"):
-        if force_name and name == force_name:
-            # Force-run even if running — let the agent handle it
-            pass
-        else:
-            skip_reason = "workflow is already in progress (status: scheduled, no completed_at)"
-            if not dry_run:
-                create_skipped_state_file(name, skip_reason)
-            return {
-                "type": "not_due",
-                "name": name,
-                "reason": skip_reason,
-            }
-
-    # Evaluate trigger
-    trigger_output = None
-    trigger_output_file = None
-    trigger_error = None
-    trigger_empty_reason = None
-
-    if has_trigger:
-        output, err, empty = execute_trigger(fm)
-        if err:
-            trigger_error = err  # timeout, crash — script error
-        elif empty:
-            trigger_empty_reason = empty  # normal non-due
-        elif output is not None:
-            trigger_output = output
-
-    # AND semantics: if both schedule and trigger, BOTH must be satisfied
-    schedule_due = True
-    if has_schedule and not (force_name and name == force_name):
-        schedule_due = evaluate_schedule(fm, latest_path, latest_state)
-
-    trigger_fired = trigger_output is not None
-
-    is_due = False
-    if force_name and name == force_name:
-        is_due = True
-    elif has_schedule and has_trigger:
-        is_due = schedule_due and trigger_fired
-    elif has_schedule:
-        is_due = schedule_due
-    elif has_trigger:
-        is_due = trigger_fired
-
-    # Record trigger execution failure (timeout, crash) as script error
-    if trigger_error:
-        return {
-            "type": "error",
-            "name": name,
-            "reason": trigger_error,
-        }
-
-    if not is_due:
-        reasons = []
-        if has_schedule and not schedule_due:
-            reasons.append("schedule not due")
-        if has_trigger and not trigger_fired:
-            if trigger_empty_reason:
-                reasons.append(trigger_empty_reason)
-        return {
-            "type": "not_due",
-            "name": name,
-            "reason": "; ".join(reasons) if reasons else "not due",
-        }
-
-    # --- Dispatch ---
-    if trigger_output is not None:
-        tf_name = f"trigger-{today_prefix()}-{next_nnn(name):03d}.txt"
-        if not dry_run:
-            save_trigger_output(name, tf_name, trigger_output)
-        trigger_output_file = os.path.join(get_state_dir(name), tf_name)
-
-    if not dry_run:
-        state_file = create_state_file(name, trigger_output_file)
-    else:
-        state_file = None
-
-    return {
-        "type": "due",
-        "name": name,
-        "trigger_output_file": trigger_output_file,
-        "state_file": state_file,
-    }
+def recover(root: Path, name: str, force: bool) -> dict:
+    path = lock_path(root, name)
+    lock = read_json(path)
+    if lock is None:
+        raise ValueError(f"no active lock for workflow '{name}'")
+    expires = parse_timestamp(lock.get("expires_at"))
+    stale = expires is None or now_utc() >= expires
+    if not stale and not force:
+        raise ValueError("workflow lease is still active; use --force only after confirming the run is abandoned")
+    state_value = lock.get("state_file")
+    if state_value:
+        state_path = ensure_state_path(root, state_value)
+        state = read_json(state_path)
+        if state and state.get("status") == "scheduled":
+            state["status"] = "failed"
+            state["completed_at"] = now_iso()
+            state["items_processed"] = state.get("items_processed")
+            state["failure"] = {"step": "lease", "error": "run recovered after an abandoned or stale lease"}
+            state.pop("lease_expires_at", None)
+            atomic_json(state_path, state)
+    path.unlink(missing_ok=True)
+    return {"workflow": name, "recovered": True, "state_file": state_value}
 
 
-def write_dispatch_log(dispatch):
-    """Write complete dispatch log to .state/dispatch/<date>.json."""
-    log_dir = os.path.join(project_root(), DISPATCH_DIR)
-    os.makedirs(log_dir, exist_ok=True)
-
-    # Find next NNN for dispatch logs
-    prefix = today_prefix() + "-"
-    max_n = 0
-    if os.path.isdir(log_dir):
-        for f in os.listdir(log_dir):
-            if f.startswith(prefix) and f.endswith(".json"):
-                parts = f[len(prefix):-5]
-                if parts.isdigit():
-                    max_n = max(max_n, int(parts))
-    nnn = max_n + 1
-    filename = f"{prefix}{nnn:03d}.json"
-    path = os.path.join(log_dir, filename)
-
-    log_entry = {
-        "invoked_at": now_iso(),
-        "due": dispatch.get("due", []),
-        "script_errors": dispatch.get("script_errors", []),
-        "not_due": dispatch.get("not_due", []),
-    }
-
-    fd, tmp = tempfile.mkstemp(dir=log_dir, prefix=".tmp_")
-    try:
-        with os.fdopen(fd, "w") as f:
-            json.dump(log_entry, f, indent=2)
-        os.rename(tmp, path)
-    except Exception:
-        if os.path.exists(tmp):
-            os.unlink(tmp)
-        raise
-
-    return path
+def error_record(workflow: dict) -> dict:
+    return {"name": workflow["name"], "reason": "; ".join(workflow["errors"]), "state_file": None}
 
 
-# --- CLI ---
-
-def build_parser():
-    p = argparse.ArgumentParser(description="Loop Creation Kit — workflow dispatch scanner")
-    p.add_argument("--run", metavar="NAME", help="Force-run a specific workflow by name")
-    p.add_argument("--list", action="store_true", help="List all workflows and their status")
-    p.add_argument("--dry-run", action="store_true", help="Show what would run without executing")
-    return p
-
-
-def cmd_list_only(workflows):
-    """Handle --list: print workflow info and exit."""
-    rows = []
-    for fp, fm, body in workflows:
-        name = fm.get("name", os.path.splitext(os.path.basename(fp))[0])
-        schedule = fm.get("schedule", "—")
-        trigger = fm.get("trigger", "—")
-        if "error" in fm.get("_error", ""):
-            schedule = "[parse error]"
-            trigger = "[parse error]"
-
-        _, latest = get_latest_state_file(name)
-        if latest:
-            last_run = latest.get("started_at", "unknown")
-            last_status = latest.get("status", "unknown")
-        else:
-            last_run = "never"
-            last_status = "—"
-
-        rows.append({
-            "name": name,
-            "schedule": schedule,
-            "trigger": trigger,
-            "last_run": last_run,
-            "last_status": last_status,
+def static_preview(root: Path, workflows: list[dict], evaluate_triggers: bool) -> dict:
+    output = {"validated": [], "script_errors": []}
+    for workflow in workflows:
+        if workflow["errors"]:
+            output["script_errors"].append(error_record(workflow))
+            continue
+        due = schedule_due(root, workflow)
+        trigger_status = "absent"
+        trigger_reason = None
+        if workflow["frontmatter"].get("trigger"):
+            if evaluate_triggers and due:
+                trigger = execute_trigger(root, workflow)
+                trigger_status = trigger["status"]
+                trigger_reason = trigger["reason"]
+            else:
+                trigger_status = "not_evaluated"
+        output["validated"].append({
+            "name": workflow["name"],
+            "schedule_due": due,
+            "trigger_status": trigger_status,
+            "trigger_reason": trigger_reason,
         })
-
-    print(json.dumps({"workflows": rows}, indent=2))
-    sys.exit(0)
+    return output
 
 
-def main():
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Validate and dispatch agent workflows")
+    parser.add_argument("--project-root", default=".", help="Project containing workflows/ (default: current directory)")
+    parser.add_argument("--run", metavar="NAME", help="Force-dispatch one workflow without schedule or trigger evaluation")
+    parser.add_argument("--list", action="store_true", help="List workflows and latest status")
+    parser.add_argument("--dry-run", action="store_true", help="Validate and preview without executing triggers or writing state")
+    parser.add_argument("--evaluate-triggers", action="store_true", help="With --dry-run, explicitly execute trigger commands")
+    parser.add_argument("--validate", nargs="?", const="*", metavar="NAME", help="Statically validate all workflows or one name")
+    parser.add_argument("--test-trigger", metavar="NAME", help="Explicitly execute one workflow trigger without dispatching")
+
+    commands = parser.add_subparsers(dest="command")
+    complete = commands.add_parser("complete", help="Finalize an active run")
+    complete.add_argument("state_file")
+    complete.add_argument("--status", choices=("success", "partial"), default="success")
+    complete.add_argument("--items", type=int, default=0)
+
+    fail = commands.add_parser("fail", help="Mark an active run failed")
+    fail.add_argument("state_file")
+    fail.add_argument("--error", required=True)
+    fail.add_argument("--step", default="workflow")
+    fail.add_argument("--partial-results")
+    fail.add_argument("--items", type=int, default=0)
+
+    beat = commands.add_parser("heartbeat", help="Extend an active run lease")
+    beat.add_argument("state_file")
+    beat.add_argument("--lease-seconds", type=int, default=LEASE_SECONDS_DEFAULT)
+
+    recovery = commands.add_parser("recover", help="Release an abandoned or stale workflow lease")
+    recovery.add_argument("name")
+    recovery.add_argument("--force", action="store_true")
+    return parser
+
+
+def select_by_name(workflows: list[dict], name: str) -> dict | None:
+    return next((workflow for workflow in workflows if workflow["name"] == name), None)
+
+
+def main() -> int:
     args = build_parser().parse_args()
+    root = Path(args.project_root).expanduser().resolve()
 
-    root = project_root()
-    workflows_root = os.path.join(root, WORKFLOWS_DIR)
+    try:
+        if args.command == "complete":
+            print(json.dumps(update_run(root, args.state_file, args.status, args.items), indent=2))
+            return 0
+        if args.command == "fail":
+            failure = {"step": args.step, "error": args.error}
+            if args.partial_results:
+                failure["partial_results"] = args.partial_results
+            print(json.dumps(update_run(root, args.state_file, "failed", args.items, failure), indent=2))
+            return 0
+        if args.command == "heartbeat":
+            if args.lease_seconds <= 0:
+                raise ValueError("lease seconds must be positive")
+            print(json.dumps(heartbeat(root, args.state_file, args.lease_seconds), indent=2))
+            return 0
+        if args.command == "recover":
+            print(json.dumps(recover(root, args.name, args.force), indent=2))
+            return 0
+    except ValueError as exc:
+        print(json.dumps({"error": str(exc)}, indent=2))
+        return 1
 
-    if not os.path.isdir(workflows_root):
-        output = {"due": [], "script_errors": [], "not_due": []}
-        print(json.dumps(output))
-        sys.exit(0)
+    workflows = load_workflows(root)
 
-    all_workflows = read_all_workflows()
+    if args.validate is not None:
+        selected = workflows if args.validate == "*" else [w for w in workflows if w["name"] == args.validate]
+        if args.validate != "*" and not selected:
+            print(json.dumps({"valid": [], "errors": [{"name": args.validate, "reason": "workflow not found"}]}, indent=2))
+            return 1
+        errors = [error_record(workflow) for workflow in selected if workflow["errors"]]
+        valid = [workflow["name"] for workflow in selected if not workflow["errors"]]
+        print(json.dumps({"valid": valid, "errors": errors}, indent=2))
+        return 1 if errors else 0
 
     if args.list:
-        cmd_list_only(all_workflows)
-
-    dispatch = {
-        "due": [],
-        "script_errors": [],
-        "not_due": [],
-    }
-
-    for fp, fm, body in all_workflows:
-        if "_error" in fm:
-            name = os.path.splitext(os.path.basename(fp))[0]
-            dispatch["script_errors"].append({
-                "name": name,
-                "reason": fm["_error"],
-                "state_file": None,
+        rows = []
+        for workflow in workflows:
+            _, latest = latest_state(root, workflow["name"])
+            rows.append({
+                "name": workflow["name"],
+                "valid": not workflow["errors"],
+                "errors": workflow["errors"],
+                "schedule": workflow["frontmatter"].get("schedule"),
+                "timezone": workflow["frontmatter"].get("timezone"),
+                "has_trigger": bool(workflow["frontmatter"].get("trigger")),
+                "last_status": latest.get("status") if latest else None,
+                "last_run": latest.get("started_at") if latest else None,
             })
+        print(json.dumps({"workflows": rows}, indent=2))
+        return 0
+
+    if args.test_trigger:
+        workflow = select_by_name(workflows, args.test_trigger)
+        if workflow is None:
+            print(json.dumps({"error": "workflow not found", "name": args.test_trigger}, indent=2))
+            return 1
+        if workflow["errors"]:
+            print(json.dumps(error_record(workflow), indent=2))
+            return 1
+        print(json.dumps({"name": workflow["name"], **execute_trigger(root, workflow)}, indent=2))
+        return 0
+
+    if args.evaluate_triggers and not args.dry_run:
+        print(json.dumps({"error": "--evaluate-triggers requires --dry-run"}, indent=2))
+        return 1
+    if args.dry_run:
+        print(json.dumps(static_preview(root, workflows, args.evaluate_triggers), indent=2))
+        return 0
+
+    dispatch = {"due": [], "script_errors": [], "not_due": []}
+    selected = workflows
+    if args.run:
+        workflow = select_by_name(workflows, args.run)
+        if workflow is None:
+            dispatch["script_errors"].append({"name": args.run, "reason": "workflow not found", "state_file": None})
+            print(json.dumps(dispatch, indent=2))
+            return 1
+        selected = [workflow]
+
+    for workflow in selected:
+        if workflow["errors"]:
+            dispatch["script_errors"].append(error_record(workflow))
             continue
+        result = dispatch_one(root, workflow, force=bool(args.run))
+        bucket = "due" if result["type"] == "due" else "script_errors" if result["type"] == "error" else "not_due"
+        result.pop("type")
+        dispatch[bucket].append(result)
 
-        result = process_workflow(fp, fm, body, args.run, args.dry_run)
-        if result is None:
-            continue
-
-        if result["type"] == "due":
-            dispatch["due"].append({
-                "name": result["name"],
-                "trigger_output_file": result["trigger_output_file"],
-                "state_file": result["state_file"],
-            })
-        elif result["type"] == "error":
-            dispatch["script_errors"].append({
-                "name": result["name"],
-                "reason": result["reason"],
-                "state_file": result.get("state_file"),
-            })
-        elif result["type"] == "not_due":
-            dispatch["not_due"].append({
-                "name": result["name"],
-                "reason": result["reason"],
-            })
-
-    # Write dispatch log (skip during dry-run)
-    if not args.dry_run:
-        write_dispatch_log(dispatch)
-
-    # Output to stdout
+    write_dispatch_log(root, dispatch)
     print(json.dumps(dispatch, indent=2))
+    return 1 if dispatch["script_errors"] else 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

@@ -1,9 +1,9 @@
 {
   "name": "loop",
-  "description": "Loop Creation Kit: automated workflow creation and execution skills",
-  "version": "1.0.0",
+  "description": "Create and execute recurring workflows with validation, explicit permissions, atomic leases, and deterministic run state",
+  "version": "2.0.0",
   "homepage": "https://github.com/kimmywork/skills",
   "repository": "https://github.com/kimmywork/skills",
-  "keywords": ["loop", "automation", "workflow", "scheduling"],
+  "keywords": ["loop", "automation", "workflow", "scheduling", "validation"],
   "skills": ["./skills/"]
 }

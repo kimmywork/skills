@@ -1,115 +1,46 @@
 ---
 name: cloudconvert
-description: "Convert non-text documents (PDF, DOC/DOCX, EPUB) to Markdown via CloudConvert CLI to save processing tokens. Skip .txt/.md/.json/.csv which are already agent-readable."
-metadata:
-  author: "Kimmy Liu"
-  version: "1.1"
+description: Convert non-text documents such as PDF, DOC, DOCX, EPUB, and RTF to Markdown with the CloudConvert CLI. Use when a document must become agent-readable and external upload to CloudConvert is acceptable; skip formats already readable as text.
 ---
 
-# CloudConvert Document Conversion
+# CloudConvert
 
-## Overview
-Convert documents to Markdown using CloudConvert CLI for efficient text-based processing of complex document formats (PDF, DOC/DOCX, EPUB, etc.).
+Convert a document to Markdown through the external CloudConvert service.
 
-## Quick Start
+## Privacy boundary
 
-### 1. Check Environment
-First, verify the CloudConvert CLI is installed and API key is set:
+CloudConvert uploads the input to a third party. Before conversion, determine whether the file is public, non-sensitive, or explicitly approved for external processing. For sensitive, confidential, regulated, or unknown material, disclose the upload and obtain approval; otherwise use an approved local method or stop.
 
-```bash
-# Check and install CLI
-./scripts/check_and_install.sh
+Never expose the API key in output, commands, logs, or generated files.
 
-# Check API key
-./scripts/check_api_key.sh
-```
+## Process
 
-### 2. Convert Documents
-Convert any supported document to Markdown:
+1. Confirm that conversion is needed. Read `.txt`, `.md`, `.json`, `.yaml`, `.csv`, HTML, and other directly readable text without uploading them.
+2. Inspect the file type, sensitivity, desired output location, and overwrite risk.
+3. Resolve this skill directory and check the environment:
 
 ```bash
-# Basic conversion
-./scripts/convert_to_markdown.sh document.pdf
-
-# Convert to specific output directory
-./scripts/convert_to_markdown.sh document.docx /output/path
+<skill>/scripts/check_environment.sh
+<skill>/scripts/check_api_key.sh
 ```
 
-## Workflow Decision Tree
+4. If the CLI is missing, show the installation command. Run `install_cli.sh` only after the user approves a global npm installation.
+5. Convert one file at a time unless the user explicitly requests a batch:
 
-### When to Use This Skill
-- **User asks to "process", "read", "query", or "analyze" a document**
-- **Document is in complex format (PDF, DOC/DOCX, EPUB, etc.)**
-- **Need to save processing tokens by converting to Markdown first**
-
-### Document Conversion Process
-
-1. **Check Environment**
-   - Verify CloudConvert CLI is installed (`./scripts/check_and_install.sh`)
-   - Verify API key is set (`./scripts/check_api_key.sh`)
-
-2. **Convert Document**
-   - Use `./scripts/convert_to_markdown.sh` to convert to Markdown
-   - Output file will be saved with `.md` extension
-
-3. **Process Markdown**
-   - Use the generated Markdown file for further processing
-   - Delete temporary files if needed
-
-## Supported Formats
-
-### Input Formats
-- PDF (`.pdf`)
-- Microsoft Word (`.doc`, `.docx`)
-- EPUB (`.epub`)
-- Rich Text Format (`.rtf`)
-- HTML (`.html`, `.htm`)
-- And more...
-
-### Not Needed (Agent-readable)
-- Plain Text (`.txt`)
-- Markdown (`.md`)
-- JSON / YAML / CSV and other structured text
-
-### Output Format
-- Markdown (`.md`)
-
-## Advanced Usage
-
-### Convert with Parameters
 ```bash
-# Convert specific pages
-cloudconvert convert -f md --pages=1-5 document.pdf
-
-# Convert with custom parameters
-cloudconvert convert -f md --width=800 document.pdf
+<skill>/scripts/convert_to_markdown.sh <input-file> <output-directory>
 ```
 
-### Batch Conversion
-```bash
-# Convert multiple files
-cloudconvert convert -f md file1.pdf file2.docx file3.epub
-```
+6. Verify that the expected Markdown file exists and is non-empty before using it.
+7. Report the output path and any conversion limitations in the user's language. Do not delete the source or unrelated files.
 
-### Check Account Status
-```bash
-cloudconvert credits
-```
+## Failure handling
 
-## Troubleshooting
+- Missing CLI: request installation approval or offer an approved alternative.
+- Missing API key: explain how to set `CLOUDCONVERT_API_KEY`; never request that the user paste it into chat.
+- Existing output: stop rather than overwrite; use the script's `--force` flag only with explicit approval.
+- Failed or empty conversion: preserve the source, report the error, and do not claim success.
 
-### Common Issues
-1. **CLI not installed**: Run `./scripts/check_and_install.sh`
-2. **API key not set**: Run `./scripts/check_api_key.sh`
-3. **Conversion failed**: Check if input format is supported
+## Reference
 
-### Debug Mode
-```bash
-# Use JSON output for debugging
-cloudconvert convert -f md --json document.pdf
-```
-
-## Resources
-- [CloudConvert CLI Reference](references/cloudconvert_reference.md)
-- [API Documentation](https://cloudconvert.com/docs)
-- [CLI Repository](https://github.com/cloudconvert/cloudconvert-cli)
+Read `references/cloudconvert_reference.md` for installation, supported inputs, and CLI details.

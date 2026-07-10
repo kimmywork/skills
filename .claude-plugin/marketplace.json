@@ -6,18 +6,18 @@
   },
   "plugins": [
     {
-      "name": "drafting-loop",
-      "description": "Universal work orchestration for drafting, delivery, research, review, and verified outcomes",
+      "name": "drafting",
+      "description": "Independent skills for exploration, incremental planning and execution, research, challenge, verification, and retrospectives",
       "source": "./drafting/"
     },
     {
       "name": "utility",
-      "description": "utility for daily work",
+      "description": "Utility skills for daily work",
       "source": "./utility/"
     },
     {
       "name": "loop",
-      "description": "Loop Creation Kit: automated workflow creation and execution",
+      "description": "Permission-bounded recurring workflow creation, validation, and execution",
       "source": "./loop/"
     }
   ]

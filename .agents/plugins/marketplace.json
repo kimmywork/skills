@@ -5,7 +5,7 @@
   },
   "plugins": [
     {
-      "name": "drafting-loop",
+      "name": "drafting",
       "source": {
         "source": "local",
         "path": "./drafting"

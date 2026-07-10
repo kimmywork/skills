@@ -1,52 +1,25 @@
 ---
 name: probing
-description: Use dialogue to surface the real target, narrow competing directions, and frame hard decisions when the user cannot yet state what they want clearly enough to scope, plan, or execute.
+description: Explore an uncertain goal with the user until a useful direction, decision, or target emerges. Use when the user has a vague idea, competing possibilities, unclear priorities, or cannot yet state what they want well enough to plan or act.
 ---
 
 # Probing
 
-Use dialogue to converge on a workable target, decision, or brief when the user needs thinking help before formal scoping.
+Help the user discover what they actually want without forcing premature scope or solutions.
 
-## Five layers
+## Approach
 
-1. **Outcome**: What decision, artifact, or understanding should exist after this?
-2. **Audience/use**: Who uses it and in what situation?
-3. **Boundaries**: What is in, out, constrained, risky, or sensitive?
-4. **Evidence/style**: What inputs, references, standards, or examples matter?
-5. **Done**: How will the user know it succeeded?
+1. Start from the outcome or decision the user is trying to reach.
+2. Inspect available materials before asking for facts that can be recovered directly.
+3. Surface relevant needs, users, constraints, preferences, evidence, risks, and definitions of success.
+4. Ask the smallest question that most reduces uncertainty. Group questions only when they are independent and easy to answer together.
+5. When the user is stuck, offer a few concrete directions with meaningful trade-offs.
+6. Distinguish facts, assumptions, preferences, unknowns, and decisions.
+7. Periodically reflect the current understanding and let the user correct it.
+8. Continue until the user chooses a direction, the target is clear enough for planning or action, or the remaining uncertainty would no longer change the direction.
 
-## Rules
-
-- Ask at most 3 questions per turn.
-- If a blocking fact can be recovered from materials or the workspace, inspect it instead of asking.
-- Prefer multiple-choice options when the user is stuck.
-- Do not force all five layers if the target becomes clear early.
-- Resolve upstream decisions before exploring dependent branches.
-- For tightly coupled or high-stakes decisions, ask one question at a time and resolve dependencies before branching further.
-- If the user is choosing among directions, compare options instead of continuing pure questioning.
-- Do not turn tentative discussion into scope, planning, or execution until the target is stable enough for shared understanding.
-- After 5 rounds without convergence, propose 3 candidate directions and ask the user to choose.
-- Capture assumptions explicitly; do not bury them in prose.
+Do not disguise a recommendation as a question. If one direction is clearly stronger, recommend it and explain the decisive trade-off briefly.
 
 ## Output
 
-When ready, produce one of: a clarified objective, candidate directions, or a compact scope seed.
-
-```yaml
-guided_scope:
-  kind: <kind>
-  goal: <outcome>
-  audience: []
-  in_scope: []
-  out_of_scope: []
-  constraints: []
-  success_criteria: []
-  assumptions: []
-  open_questions: []
-```
-
-The result should be ready for shaping, planning, or direct execution, depending on completeness.
-
-## Language
-
-Human-facing output follows the user's language. Durable skill artifacts stay English.
+Adapt to the conversation and the user's language. Conclude with the agreed target, candidate directions, unresolved decisions, or the most useful next question. Keep tentative conclusions explicitly tentative.

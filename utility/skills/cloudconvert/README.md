@@ -1,58 +1,34 @@
 # CloudConvert Skill
 
-Convert non-text documents (PDF, DOC/DOCX, EPUB) to Markdown using CloudConvert CLI.
+Convert approved non-text documents to Markdown through the external CloudConvert service.
 
-## Installation
+## Important
 
-```bash
-npx skills add kimmywork/skills --skill cloudconvert
-```
+The input file is uploaded to CloudConvert. Do not use this skill for confidential, regulated, sensitive, or unknown material without explicit approval for third-party processing.
 
 ## Setup
 
-1. Get your API key from [CloudConvert Dashboard](https://cloudconvert.com/dashboard/api/v2/keys)
-
-2. Set the environment variable:
-
 ```bash
-export CLOUDCONVERT_API_KEY=your_api_key
+utility/skills/cloudconvert/scripts/check_environment.sh
+utility/skills/cloudconvert/scripts/check_api_key.sh
 ```
 
-Add to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.) for persistence.
-
-## Usage
-
-### Check Environment
+If installation is approved:
 
 ```bash
-./scripts/check_and_install.sh    # Verify/install CLI
-./scripts/check_api_key.sh        # Verify API key
+utility/skills/cloudconvert/scripts/install_cli.sh
 ```
 
-### Convert Documents
+Set `CLOUDCONVERT_API_KEY` in the shell environment; never paste it into chat or commit it.
+
+## Convert
 
 ```bash
-# Basic conversion
-./scripts/convert_to_markdown.sh document.pdf
-
-# Specify output directory
-./scripts/convert_to_markdown.sh document.docx /output/path
+utility/skills/cloudconvert/scripts/convert_to_markdown.sh document.pdf /output/path
 ```
 
-## Supported Formats
+The script refuses to overwrite an existing Markdown file. Use `--force` only after explicit overwrite approval.
 
-| Input | Output |
-|-------|--------|
-| PDF (.pdf) | Markdown (.md) |
-| Word (.doc, .docx) | Markdown (.md) |
-| EPUB (.epub) | Markdown (.md) |
-| RTF (.rtf) | Markdown (.md) |
-| HTML (.html, .htm) | Markdown (.md) |
+See `references/cloudconvert_reference.md` for limitations and CLI details.
 
-## Author
-
-Kimmy Liu
-
-## Version
-
-0.1
+Version: 1.2.0

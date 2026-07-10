@@ -1,4 +1,4 @@
 interface:
   display_name: "CloudConvert Document Conversion"
-  short_description: "Convert documents (PDF, DOC/DOCX, EPUB) to Markdown using CloudConvert CLI"
-  default_prompt: "Convert document to Markdown using CloudConvert"
+  short_description: "Convert approved non-text documents to Markdown through the external CloudConvert service"
+  default_prompt: "Convert this approved document to Markdown with CloudConvert"

@@ -1,40 +1,26 @@
 ---
 name: deep-research
-description: Investigate questions through source-based research, tracing, synthesis, and uncertainty management. Use for research, root cause analysis, system mapping, source tracing, contradiction resolution, or any task where the answer must be derived from evidence.
+description: Investigate a question through source-based evidence, tracing, comparison, and synthesis. Use for research, root cause analysis, system mapping, source tracing, contradiction resolution, or any task whose answer must be derived rather than assumed.
 ---
 
 # Deep Research
 
-Investigate with source discipline and explicit uncertainty.
+Answer the question from evidence and make uncertainty visible.
 
-## Load
+## Approach
 
-- `references/investigation-workflow.md`
-- `references/source-quality-hierarchy.md`
-- `references/methodology-patterns.md` for formal or broad investigations
-- `../drafting-loop/references/mode-spectrum.md`
-- `../drafting-loop/references/handoff-schemas.md`
+1. State the research question, boundaries, and what a useful answer must establish.
+2. Inspect available local materials, then plan the additional sources needed.
+3. Prefer primary, authoritative, and current sources; use summaries to discover evidence, not replace it.
+4. Record citations, URLs, file paths, data, or reproducible commands as evidence is gathered. Include publication or retrieval dates when freshness could change the answer.
+5. Trace causes, transformations, dependencies, or source chains when the question requires them.
+6. Cross-check consequential claims with independent evidence when possible.
+7. Separate sourced observations from inference and speculation.
+8. Resolve contradictions where possible; otherwise present the competing evidence and why it remains unresolved.
+9. Synthesize an answer that directly addresses the question, with confidence and gaps stated proportionally to the evidence.
 
-## Workflow
-
-1. Restate the research question and boundaries.
-2. Choose question-answer mode, quick scan, or a methodology pattern.
-3. Build a source plan. Prefer primary sources and local source files over summaries.
-4. Gather evidence with citations, URLs, file paths, or reproducible commands.
-5. Trace source -> transformation -> delivery -> storage/consumption when relevant.
-6. Separate observation, inference, and speculation.
-7. Cross-check important claims independently.
-8. Label confidence: confirmed, likely, uncertain, contradicted, unknown.
-9. Produce synthesis, gaps, confidence notes, and the most useful next inquiry.
-
-## Quick mode
-
-For small questions: locate, trace one level up/down, confirm with a source, state confidence.
+Scale the process to the question. A narrow lookup may need one authoritative source; a high-stakes or disputed conclusion needs broader corroboration.
 
 ## Output
 
-Report sections: Question, Scope, Method, Key findings, Evidence table, Contradictions/gaps, Confidence summary, Implications/next steps.
-
-## Language
-
-Human-facing output follows the user's language. Durable skill artifacts stay English.
+Adapt the report and language to the user. Include the question and scope, key findings, supporting sources, contradictions or gaps, confidence, and the most useful next inquiry when uncertainty remains.

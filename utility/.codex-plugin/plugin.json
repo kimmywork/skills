@@ -1,26 +1,26 @@
 {
-    "name": "utility",
-    "version": "1.1.0",
-    "description": "Utility skills for daily work",
-    "author": {
-        "name": "Kimmy Liu"
-    },
-    "homepage": "https://github.com/kimmywork/skills",
-    "repository": "https://github.com/kimmywork/skills",
-    "license": "MIT",
-    "keywords": ["utils", "document", "markdown", "conversion", "style"],
-    "skills": "skills",
-    "interface": {
-        "displayName": "Utility",
-        "shortDescription": "Daily productivity skills",
-        "longDescription": "Utility skills for daily work: document conversion (CloudConvert) and writing style extraction. Converts non-text documents to Markdown and extracts structured writing style profiles from author samples.",
-        "developerName": "Kimmy Liu",
-        "category": "Productivity",
-        "capabilities": ["Interactive", "Write"],
-        "defaultPrompt": [
-            "Convert this PDF document to Markdown for analysis",
-            "Extract the writing style profile from these author samples",
-            "Help me clone this author's writing voice for my own content"
-        ]
-    }
+  "name": "utility",
+  "version": "1.2.0",
+  "description": "Utility skills for daily work",
+  "author": {
+    "name": "Kimmy Liu"
+  },
+  "homepage": "https://github.com/kimmywork/skills",
+  "repository": "https://github.com/kimmywork/skills",
+  "license": "MIT",
+  "keywords": ["utils", "document", "markdown", "conversion", "style", "explanation"],
+  "skills": "skills",
+  "interface": {
+    "displayName": "Utility",
+    "shortDescription": "Daily productivity skills",
+    "longDescription": "Utilities for document conversion, human-readable explanations, and writing style extraction, comparison, validation, and application.",
+    "developerName": "Kimmy Liu",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "defaultPrompt": [
+      "Convert this PDF document to Markdown for analysis",
+      "Explain why this code or artifact is structured this way",
+      "Extract and apply the writing style from these samples"
+    ]
+  }
 }

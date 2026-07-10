@@ -1,18 +1,17 @@
 {
-  "name": "drafting-loop",
-  "description": "Universal work orchestration for all kinds of knowledge work",
-  "version": "1.0.0",
+  "name": "drafting",
+  "description": "Independent general-purpose skills for exploring, planning, executing, researching, challenging, and verifying work",
+  "version": "2.0.0",
   "homepage": "https://github.com/kimmywork/skills",
   "repository": "https://github.com/kimmywork/skills",
   "keywords": [
     "drafting",
-    "orchestration",
-    "work-loop",
-    "crafting",
-    "composing",
-    "evaluating",
-    "investigating",
-    "creating"
+    "requirements",
+    "incremental-planning",
+    "execution",
+    "research",
+    "verification",
+    "validation"
   ],
   "skills": [
     "./skills/"

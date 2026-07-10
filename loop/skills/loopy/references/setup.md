@@ -1,67 +1,49 @@
-# Setup
+# Loopy Setup
 
 ## Dependencies
 
-The `loopy.py` script requires:
-
-- **Python 3.8+**
-- **PyYAML** — usually pre-installed on macOS/Linux
-- **croniter** — install via pip:
-
-```bash
-pip install croniter
-```
-
-Verify:
+- Python 3.10+
+- PyYAML
+- croniter
+- IANA timezone data available to Python; install `tzdata` where the OS does not provide it
 
 ```bash
-python3 -c "import croniter; print('OK')"
+python3 -m pip install pyyaml croniter tzdata
 ```
 
-## Trigger command environment
+## Invocation
 
-Trigger commands run via `/bin/sh -c` from the project root. Ensure `$PATH`, `$HOME`, and authentication tokens are available to the shell.
+Resolve the installed skill path and pass the target project explicitly:
 
-For cron jobs, set environment variables explicitly:
-
-```cron
-# Example crontab
-LOOPY_TRIGGER_TIMEOUT=60
-HOME=/Users/username
-PATH=/usr/local/bin:/usr/bin:/bin
-0 9 * * * cd /path/to/project && pi -p "run loopy"
+```bash
+LOOPY=/absolute/path/to/loopy
+PROJECT=/absolute/path/to/project
+python3 "$LOOPY/scripts/loopy.py" --project-root "$PROJECT" --validate
+python3 "$LOOPY/scripts/loopy.py" --project-root "$PROJECT" --dry-run
+python3 "$LOOPY/scripts/loopy.py" --project-root "$PROJECT"
 ```
 
-Workflow trigger examples:
-- `gh pr list --state open --json number,title,updatedAt` — GitHub CLI
-- `ls docs/` — check for new files
-- `curl -s http://status.example.com/api` — HTTP health check
+## Environment
 
-## Configuration
+| Variable | Default | Purpose |
+|---|---:|---|
+| `LOOPY_TRIGGER_TIMEOUT` | 30 seconds | Maximum trigger-command runtime |
+| `LOOPY_LEASE_SECONDS` | 86400 seconds | Default run lease when `timeout_minutes` is absent |
 
-| Env var | Default | Description |
-|---|---|---|
-| `LOOPY_TRIGGER_TIMEOUT` | 30 | Trigger command timeout in seconds |
-
-## Gitignore
-
-Add to `.gitignore`:
-
-```
-workflows/.state/
-```
+Trigger commands run via `/bin/sh` from the project root. Provide only the minimum PATH and credentials authorized by the workflow. Do not place secrets in workflow files or trigger output.
 
 ## Scheduling
 
-The `loopy` skill is invoked by the agent. Configure periodic invocation via your agent platform:
+A platform scheduler should invoke the agent with the project and loopy skill available. Avoid directly running the scanner from cron without an agent capable of executing and finalizing the returned dispatch.
 
-- **Codex**: Automations tab → pick project, prompt, cadence
-- **Claude Code**: `/loop` or scheduled tasks
-- **cron + agent CLI**: `0 9 * * * cd /project && pi -p "run loopy"`
+Examples include Codex Automations, Claude scheduled tasks, or a cron-launched agent CLI.
 
-## Marketplace registration
+## Repository hygiene
 
-If distributing as a plugin, register in both marketplace manifests:
+Add:
 
-- `.agents/plugins/marketplace.json`
-- `.claude-plugin/marketplace.json`
+```gitignore
+workflows/.state/
+```
+
+Do not commit dispatch logs, trigger output, locks, or run state.

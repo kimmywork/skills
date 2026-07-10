@@ -1,58 +1,50 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Document to Markdown converter using CloudConvert
-# Usage: convert_to_markdown.sh <input_file> [output_dir]
+usage() {
+    echo "Usage: $0 <input-file> [output-directory] [--force]" >&2
+}
 
-set -e
+[[ $# -ge 1 ]] || { usage; exit 1; }
+input=$1
+shift
+output_dir=.
+output_dir_set=false
+force=false
 
-INPUT_FILE="$1"
-OUTPUT_DIR="${2:-.}"
+for argument in "$@"; do
+    if [[ "$argument" == "--force" ]]; then
+        force=true
+    elif [[ "$output_dir_set" == false ]]; then
+        output_dir=$argument
+        output_dir_set=true
+    else
+        usage
+        exit 1
+    fi
+done
 
-if [ -z "$INPUT_FILE" ]; then
-    echo "Usage: $0 <input_file> [output_dir]"
-    echo ""
-    echo "Converts documents (PDF, DOC, DOCX, EPUB, etc.) to Markdown"
-    echo ""
-    echo "Examples:"
-    echo "  $0 document.pdf"
-    echo "  $0 document.docx /output/path"
+[[ -f "$input" ]] || { echo "Input file does not exist: $input" >&2; exit 1; }
+command -v cloudconvert >/dev/null 2>&1 || { echo "cloudconvert CLI is not installed" >&2; exit 1; }
+[[ -n "${CLOUDCONVERT_API_KEY:-}" ]] || { echo "CLOUDCONVERT_API_KEY is not set" >&2; exit 1; }
+
+filename=$(basename "$input")
+basename=${filename%.*}
+output_dir=$(mkdir -p "$output_dir" && cd "$output_dir" && pwd)
+output_file="$output_dir/$basename.md"
+
+if [[ -e "$output_file" && "$force" == false ]]; then
+    echo "Output already exists: $output_file" >&2
+    echo "Re-run with --force only after overwrite approval." >&2
     exit 1
 fi
 
-if [ ! -f "$INPUT_FILE" ]; then
-    echo "Error: File '$INPUT_FILE' does not exist"
-    exit 1
+if [[ "$force" == true ]]; then
+    rm -f "$output_file"
 fi
 
-# Check if CLOUDCONVERT_API_KEY is set
-if [ -z "$CLOUDCONVERT_API_KEY" ]; then
-    echo "Error: CLOUDCONVERT_API_KEY environment variable is not set"
-    echo ""
-    echo "Please set your API key:"
-    echo "1. Get your API key from: https://cloudconvert.com/dashboard/api/v2/keys"
-    echo "2. Set it as an environment variable:"
-    echo "   export CLOUDCONVERT_API_KEY=your_key_here"
-    exit 1
-fi
+echo "Uploading to CloudConvert and converting: $input" >&2
+cloudconvert convert -f md --output-dir "$output_dir" "$input"
 
-# Get the file extension and base name
-FILENAME=$(basename "$INPUT_FILE")
-BASENAME="${FILENAME%.*}"
-EXTENSION="${FILENAME##*.}"
-
-echo "Converting $INPUT_FILE to Markdown..."
-
-# Create output directory if it doesn't exist
-mkdir -p "$OUTPUT_DIR"
-
-# Use cloudconvert to convert to markdown
-cloudconvert convert -f md --output-dir "$OUTPUT_DIR" "$INPUT_FILE"
-
-OUTPUT_FILE="$OUTPUT_DIR/$BASENAME.md"
-
-if [ -f "$OUTPUT_FILE" ]; then
-    echo "✓ Conversion successful: $OUTPUT_FILE"
-else
-    echo "✗ Conversion failed"
-    exit 1
-fi
+[[ -s "$output_file" ]] || { echo "Conversion did not create a non-empty Markdown file: $output_file" >&2; exit 1; }
+printf '%s\n' "$output_file"

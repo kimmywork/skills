@@ -1,46 +1,25 @@
 ---
 name: distillation
-description: Turn repeated friction, failures, review feedback, or successful patterns into durable workflow, template, script, or skill improvements. Use for retrospectives, lessons learned, process refinement, and converting execution evidence into reusable guidance.
+description: Summarize and retrospect on completed or ongoing work, then decide whether the lessons should update an existing SKILL.md or become a new reusable skill. Use for retrospectives, process reviews, lessons learned, and workflow improvement.
 ---
 
 # Distillation
 
-Improve reusable workflow guidance only from concrete evidence.
+Turn execution experience into a concise retrospective and, only when justified, durable skill guidance.
 
-## Load
+## Approach
 
-- `references/distillation-template.md`
-- `../drafting-loop/references/phase-review-and-process-audit.md`
-- `../drafting-loop/references/failure-paths.md`
-- `../drafting-loop/references/anti-patterns.md`
+1. Reconstruct what was attempted, what happened, what changed, and what evidence is available.
+2. Summarize outcomes, effective choices, friction, failures, corrections, and unresolved issues.
+3. Identify causes and reusable lessons rather than merely repeating the timeline.
+4. Decide whether each lesson is one-off, project-local, or broadly reusable.
+5. Check existing skills before proposing a new one.
+6. Update a skill only when the evidence reveals missing, misleading, duplicated, or repeatedly improvised guidance.
+7. Propose a new skill only when the capability has a distinct trigger, boundary, and recurring user value.
+8. Prefer the smallest useful change; do not add process weight without evidence that it prevents recurring friction.
 
-## Triggers
-
-- Same review issue repeats.
-- A rollback or failure exposes missing guidance.
-- A process audit or retrospective finds a coverage gap, false guidance, missing guardrail, repeated improvisation, context overhead, trigger misfire, or atomic extraction candidate.
-- A template was missing or misleading.
-- User feedback reveals reusable process friction.
-- A successful pattern is stable enough to promote into durable guidance.
-
-## Workflow
-
-1. Collect evidence from the run, review, retro, or recurring workflow: artifacts, issues, fixes, decisions, and feedback.
-2. Classify the gap using `references/distillation-template.md` dimensions.
-3. Identify the general pattern; ignore one-off weak signals.
-4. Decide whether to change a skill, reference, template, script, SOP/checklist, routing description, propose a new skill, or make no change.
-5. Check not only local fit but also cross-skill overlap, duplication, naming conflict, boundary conflict, and trigger confusion.
-6. Check duplication and bundle scope.
-7. Draft the smallest durable improvement.
-8. Verify cross-references, language, and SKILL.md line limit.
-9. Record why the improvement should help future runs.
+If the user requested only a retrospective, recommend skill changes but do not edit skills without approval. When changing skills, check overlap, trigger confusion, duplication, bundle scope, references, language, and repository validation rules.
 
 ## Output
 
-Use `references/distillation-template.md`.
-
-Do not add process weight unless it prevents real recurring failure or improves reusable execution.
-
-## Language
-
-Human-facing output follows the user's language. Durable skill artifacts stay English.
+In the user's language, provide a short retrospective, reusable lessons, and one of: no skill change, update an existing skill, or propose a new skill. Support the decision with concrete evidence and name the smallest next change.

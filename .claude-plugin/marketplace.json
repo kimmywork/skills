@@ -19,6 +19,11 @@
       "name": "loop",
       "description": "Permission-bounded recurring workflow creation, validation, and execution",
       "source": "./loop/"
+    },
+    {
+      "name": "deprecated-solution-delivery-loop",
+      "description": "[Deprecated] A compact, agent-neutral skill family for solution delivery",
+      "source": "./delivery/"
     }
   ]
 }

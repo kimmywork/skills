@@ -1,0 +1,11 @@
+theme: jekyll-theme-primer
+
+github:
+  private: false
+  source:
+    branch: "master"
+    path: "/docs"
+  repository_url: "https://github.com/kimmywork/skills"
+
+title: "Kimmy's Skills"
+description: "A collection of agent-neutral skills for knowledge work, workflow automation, and daily productivity."

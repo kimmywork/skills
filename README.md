@@ -32,27 +32,33 @@ claude plugin install utility@kimmywork-skills
 
 ## Skills
 
-### Drafting (6 skills)
+### Drafting (8 skills)
 
 Independent, general-purpose skills for exploring, planning, executing, researching, challenging, and verifying work. There is no top-level orchestrator or required phase protocol.
 
 #### `probing`
 > Explore an uncertain goal with the user until a useful direction, decision, or target emerges.
 
-#### `challenge`
-> Pressure-test an existing artifact, plan, idea, conclusion, or decision.
+#### `deep-research`
+> Investigate questions through source-based evidence, tracing, comparison, synthesis, and explicit uncertainty.
 
 #### `increment`
 > Reach agreement on requirements, create a plan of verifiable increments, and optionally execute it one increment at a time.
 
+#### `challenge`
+> Pressure-test an existing artifact, plan, idea, conclusion, or decision.
+
 #### `vnv`
 > Verify and validate existing work for plan adherence, correctness, acceptance, compliance, factuality, review readiness, or second-perspective confidence.
 
-#### `deep-research`
-> Investigate questions through source-based evidence, tracing, comparison, synthesis, and explicit uncertainty.
+#### `align`
+> Keep project documentation aligned when implementation, requirements, decisions, or research evidence changes.
 
 #### `distillation`
 > Summarize and retrospect on work, then decide whether the lessons justify extracting or updating a skill.
+
+#### `worklog`
+> Record completed workspace changes as traceable daily log entries and maintain a current workstate snapshot.
 
 ---
 
@@ -68,7 +74,10 @@ Create, validate, and execute permission-bounded recurring workflows.
 
 ---
 
-### Utility (3 skills)
+### Utility (4 skills)
+
+#### `agent-facing-doc`
+> Create, update, or review agent-facing documentation including AGENTS.md, SKILL.md files, and prompt templates.
 
 #### `cloudconvert`
 > Convert approved non-text documents to Markdown through the external CloudConvert service.

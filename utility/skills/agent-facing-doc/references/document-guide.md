@@ -6,8 +6,9 @@ This guide applies when creating, modifying, or reviewing any document that guid
 
 - **Agent first**: Write for agents. Prefer direct, accurate, executable instructions over rationale. State scope, trigger, required action, output, and prohibition whenever they matter.
 - **Agent neutral**: Do not depend on a particular agent, runtime, harness, or tool unless that dependency is the capability being provided. Skill bundles use the standard `agentskills.io` structure: YAML frontmatter, Markdown body, and optional bundled resources.
+- **Self-describing names**: Name files so their purpose is clear from the name alone. Agents discover and select resources by path and filename; a descriptive name reduces lookup cost and prevents misuse. Prefer `workflow-format.md` over `reference-1.md`, `clarification-checklist.md` over `questions.md`.
 - **Proportionate**: Keep every agent-facing document as short as its role permits. The `<=100` line limit applies specifically to `SKILL.md`; move skill detail to references instead of expanding its main body.
-- **Focused**: Give each skill one capability with a distinct trigger, boundary, and output. Do not turn a leaf skill into an orchestrator or require a fixed workflow when the task does not need one.
+- **Focused**: Give each document one purpose implied by its name and role. A skill has one capability with a distinct trigger, boundary, and output. A reference covers one topic. A checklist addresses one workflow phase. Do not turn a leaf skill into an orchestrator or require a fixed workflow when the task does not need one.
 - **Experience-driven**: Add constraints when execution evidence, failures, friction, or user feedback shows that they prevent recurring problems. Avoid ceremony added only for theoretical completeness.
 - **Collective ownership**: Treat project knowledge, skills, and documentation as collectively maintained artifacts. Preserve provenance and version history for traceability; do not assign personal ownership or use documentation as a blame mechanism.
 

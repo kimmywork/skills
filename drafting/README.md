@@ -9,9 +9,11 @@ A bundle of independent, agent-neutral skills for general knowledge work. Each s
 | `probing` | Explore uncertain goals and competing directions with the user. |
 | `challenge` | Pressure-test an existing artifact, plan, idea, conclusion, or decision. |
 | `increment` | Confirm requirements, plan verifiable increments, and optionally execute them. |
+| `align` | Keep project documentation aligned after knowledge, implementation, decision, or evidence changes. |
 | `vnv` | Verify and validate results from the perspectives relevant to the task. |
 | `deep-research` | Derive answers from sources, tracing, comparison, and synthesis. |
 | `distillation` | Run a retrospective and decide whether reusable skill guidance should change. |
+| `worklog` | Record traceable workspace changes and maintain current work state. |
 
 `style-calibration` is maintained in the `utility` bundle because it is an optional writing utility rather than part of this bundle.
 

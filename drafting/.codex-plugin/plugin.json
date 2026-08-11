@@ -1,7 +1,7 @@
 {
   "name": "drafting",
   "version": "2.0.0",
-  "description": "Independent general-purpose skills for exploring, planning, executing, researching, challenging, and verifying work",
+  "description": "Independent general-purpose skills for exploring, planning, executing, aligning documentation, researching, challenging, and verifying work",
   "author": {
     "name": "Kimmy Liu"
   },
@@ -13,6 +13,7 @@
     "requirements",
     "incremental-planning",
     "execution",
+    "documentation-alignment",
     "research",
     "verification",
     "validation"
@@ -21,7 +22,7 @@
   "interface": {
     "displayName": "Drafting",
     "shortDescription": "Independent skills for general knowledge work",
-    "longDescription": "General-purpose skills for exploring uncertain goals, planning and executing verifiable increments, conducting research, challenging ideas, validating results, and distilling lessons.",
+    "longDescription": "General-purpose skills for exploring uncertain goals, planning and executing verifiable increments, aligning project documentation after knowledge changes, conducting research, challenging ideas, validating results, and distilling lessons.",
     "developerName": "Kimmy Liu",
     "category": "Productivity",
     "capabilities": [
@@ -31,7 +32,8 @@
     "defaultPrompt": [
       "Clarify these requirements and turn them into a verifiable incremental plan",
       "Challenge this plan and expose its weakest assumptions",
-      "Verify this deliverable against its requirements and acceptance criteria"
+      "Verify this deliverable against its requirements and acceptance criteria",
+      "Update plans and architecture notes after these implementation changes"
     ]
   }
 }

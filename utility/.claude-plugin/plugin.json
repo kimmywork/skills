@@ -1,12 +1,12 @@
 {
   "name": "utility",
-  "description": "Utility skills for daily work",
+  "description": "Utility skills for daily work with documents, agent-facing instructions, explanations, and writing style",
   "version": "1.2.0",
   "author": {
     "name": "Kimmy Liu"
   },
   "homepage": "https://github.com/kimmywork/skills",
   "repository": "https://github.com/kimmywork/skills",
-  "keywords": ["utils", "document", "markdown", "conversion", "style", "explanation"],
+  "keywords": ["utils", "document", "agent-facing", "skill-maintenance", "markdown", "conversion", "style", "explanation"],
   "skills": ["./skills/"]
 }

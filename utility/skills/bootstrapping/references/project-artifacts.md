@@ -1,8 +1,6 @@
 # Project Artifacts
 
-Artifact catalog by priority (P0-P3). Each entry includes its purpose,
-audience, and suggested content. For existing projects, skip artifacts
-already present.
+Artifact catalog by priority (P0-P3). Each entry includes its purpose, audience, and suggested content. For existing projects, skip artifacts already present.
 
 ## P0 — Must have
 

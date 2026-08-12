@@ -32,7 +32,7 @@ claude plugin install utility@kimmywork-skills
 
 ## Skills
 
-### Drafting (8 skills)
+### Drafting (9 skills)
 
 Independent, general-purpose skills for exploring, planning, executing, researching, challenging, and verifying work. There is no top-level orchestrator or required phase protocol.
 
@@ -59,6 +59,9 @@ Independent, general-purpose skills for exploring, planning, executing, research
 
 #### `worklog`
 > Record completed workspace changes as traceable daily log entries and maintain a current workstate snapshot.
+
+#### `restraint`
+> Do what the user actually wants, and nothing more; avoid over-engineering.
 
 ---
 

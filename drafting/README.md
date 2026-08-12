@@ -13,6 +13,7 @@ A bundle of independent, agent-neutral skills for general knowledge work. Each s
 | `vnv` | Verify and validate results from the perspectives relevant to the task. |
 | `deep-research` | Derive answers from sources, tracing, comparison, and synthesis. |
 | `distillation` | Run a retrospective and decide whether reusable skill guidance should change. |
+| `restraint` | Act with restraint — do what the user wants, nothing more; avoid over-engineering. |
 | `worklog` | Record traceable workspace changes and maintain current work state. |
 
 `style-calibration` is maintained in the `utility` bundle because it is an optional writing utility rather than part of this bundle.

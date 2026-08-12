@@ -4,6 +4,7 @@ skills-lock.json
 .pi-subagents/
 tracks/
 reference-skills/
+.reasonix/
 .DS_Store
 # Loop state files
 workflows/.state/

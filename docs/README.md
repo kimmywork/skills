@@ -77,13 +77,16 @@ Create, validate, and execute permission-bounded recurring workflows.
 
 ---
 
-### Utility (4 skills)
+### Utility (5 skills)
 
 #### `agent-facing-doc`
 > Create, update, or review agent-facing documentation including AGENTS.md, SKILL.md files, and prompt templates.
 
 #### `cloudconvert`
 > Convert approved non-text documents to Markdown through the external CloudConvert service.
+
+#### `bootstrapping`
+> Start a new project — establish conventions, principles, structure, and infrastructure; generate the agreed artifacts.
 
 #### `rationale`
 > Explain agent-optimized artifacts, code changes, concepts, and design decisions for human comprehension.

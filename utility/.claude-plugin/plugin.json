@@ -7,6 +7,6 @@
   },
   "homepage": "https://github.com/kimmywork/skills",
   "repository": "https://github.com/kimmywork/skills",
-  "keywords": ["utils", "document", "agent-facing", "skill-maintenance", "markdown", "conversion", "style", "explanation"],
+  "keywords": ["utils", "document", "agent-facing", "skill-maintenance", "markdown", "conversion", "style", "explanation", "bootstrap", "project-setup"],
   "skills": ["./skills/"]
 }

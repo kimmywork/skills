@@ -43,7 +43,7 @@ Turn approved intent into a designed, executable delivery plan.
 - Each increment must have a defined verification method.
 - When increments have dependencies, draw the dependency graph and start from the least-dependent. An increment must not begin until all predecessors pass verification.
 - Do not create speculative scaffolding. Do not require issue trackers or ADRs.
-- For software deliverables, refer to `../implementation-execution/references/software-mode.md` for E2E/integration seams and test-first guidance.
+- For software deliverables, refer to `../implementation-execution/references/software-mode.md` for E2E/integration seams and layered quality-gate guidance.
 - Use subagents when helpful; for automation/subagents, design maker/checker roles and stop conditions so the loop can run without guessing.
 
 ## Anti-patterns

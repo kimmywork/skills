@@ -37,7 +37,8 @@ Use Git Worktrees for parallel development without stashing.
 - **Unit tests:** Cover individual functions and modules. Fast, isolated. Aim for 80%+ coverage of core logic.
 - **Integration tests:** Cover module interactions, API endpoints, and database access. Use test fixtures, not production data.
 - **E2E tests:** Cover critical user journeys. Minimal set, slow, run nightly or pre-release.
-- **TDD:** Red (write failing test) → Green (make it pass) → Refactor (clean up). Use for new features and bug fixes.
+- **Static analysis & linting:** Run a language-appropriate static analyzer and linter on every change (ESLint, Ruff, Pylint, golangci-lint, etc.). Fail the gate on warnings.
+- **Style checks:** Enforce the project style guide with an auto-formatter (Prettier, Black, gofmt, clang-format, etc.) and a style check in CI.
 
 ## Architecture principles
 

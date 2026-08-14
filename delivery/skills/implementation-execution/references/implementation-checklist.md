@@ -21,7 +21,7 @@ Use per verifiable increment.
 - [ ] Produced the smallest change for the increment.
 - [ ] No speculative scaffolding or unapproved scope.
 - [ ] Changes match the plan or have a change note.
-- [ ] For software deliverables: TDD/build/test steps per `software-mode.md`.
+- [ ] For software deliverables: quality gate passed (build, multi-level tests, static analysis, linter, style check) per `software-mode.md`.
 
 ## Refinement
 

@@ -21,7 +21,7 @@ npx skills add kimmywork/skills --skill solution-delivery-loop requirement-disco
 - `solution-delivery-loop` — entry point and router. Routes to the correct phase, manages the review-feedback loop, and triggers process distillation.
 - `requirement-discovery` — users, scenarios, scope, non-goals, requirements, acceptance. Preserves research raw material under `docs/track/<feature>/research/`.
 - `solution-design` — principles, alternatives, deliverable structure, interfaces/contracts, verification strategy, plan. Includes a mandatory "challenge the design" step.
-- `implementation-execution` — produces verifiable increments. Generic execution loop; software mode supports TDD-driven slice execution. Concrete change-control signals guard against undocumented drift.
+- `implementation-execution` — produces verifiable increments. Generic execution loop; software mode gates each slice on a layered quality gate (multi-level tests, static analysis, linter, style check). Concrete change-control signals guard against undocumented drift.
 - `delivery-acceptance` — evidence-based review, verification, delivery decision. Supports both full and lightweight delivery records.
 - `review-feedback` — independent reviewer invoked after each phase.
 - `process-distillation` — after each review-feedback cycle, optionally analyzes the completed phase for skill improvements.

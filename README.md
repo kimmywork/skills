@@ -34,6 +34,8 @@ claude plugin install utility@kimmywork-skills
 
 ### Drafting (9 skills)
 
+[Drafting skills](drafting/README.md).
+
 Independent, general-purpose skills for exploring, planning, executing, researching, challenging, and verifying work. There is no top-level orchestrator or required phase protocol.
 
 #### `probing`
@@ -67,6 +69,8 @@ Independent, general-purpose skills for exploring, planning, executing, research
 
 ### Loop (2 skills)
 
+[Loop skills](loop/README.md).
+
 Create, validate, and execute permission-bounded recurring workflows.
 
 #### `loopify`
@@ -78,6 +82,8 @@ Create, validate, and execute permission-bounded recurring workflows.
 ---
 
 ### Utility (5 skills)
+
+[Utility skills](utility/README.md).
 
 #### `agent-facing-doc`
 > Create, update, or review agent-facing documentation including AGENTS.md, SKILL.md files, and prompt templates.

@@ -6,11 +6,11 @@ A bundle of lightweight, agent-neutral utility skills for daily work with docume
 
 | Skill | Purpose |
 |---|---|
-| `agent-facing-doc` | Create, update, or review agent-facing documentation including AGENTS.md, SKILL.md files, and prompt templates. |
-| `bootstrapping` | Start a new project — establish conventions, principles, structure, and infrastructure; generate the agreed artifacts. |
-| `cloudconvert` | Convert approved non-text documents to Markdown through the external CloudConvert service. |
-| `rationale` | Explain agent-optimized artifacts, code changes, concepts, and design decisions for human comprehension. |
-| `style-calibration` | Extract, validate, compare, and apply a writing style profile from samples. |
+| [`agent-facing-doc`](skills/agent-facing-doc/SKILL.md) | Create, update, or review agent-facing documentation including AGENTS.md, SKILL.md files, and prompt templates. |
+| [`bootstrapping`](skills/bootstrapping/SKILL.md) | Start a new project — establish conventions, principles, structure, and infrastructure; generate the agreed artifacts. |
+| [`cloudconvert`](skills/cloudconvert/SKILL.md) | Convert approved non-text documents to Markdown through the external CloudConvert service. |
+| [`rationale`](skills/rationale/SKILL.md) | Explain agent-optimized artifacts, code changes, concepts, and design decisions for human comprehension. |
+| [`style-calibration`](skills/style-calibration/SKILL.md) | Extract, validate, compare, and apply a writing style profile from samples. |
 
 ## Design
 

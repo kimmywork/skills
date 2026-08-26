@@ -4,8 +4,8 @@ Create and execute recurring agent workflows with explicit permissions, validati
 
 ## Skills
 
-- `loopify` clarifies a recurring task, drafts `workflows/*.md`, obtains confirmation, and validates it.
-- `loopy` validates, dispatches, finalizes, and recovers workflow runs.
+- [`loopify`](skills/loopify/SKILL.md) clarifies a recurring task, drafts `workflows/*.md`, obtains confirmation, and validates it.
+- [`loopy`](skills/loopy/SKILL.md) validates, dispatches, finalizes, and recovers workflow runs.
 
 ## Minimal workflow
 

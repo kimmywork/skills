@@ -18,14 +18,14 @@ npx skills add kimmywork/skills --skill solution-delivery-loop requirement-disco
 
 ## Skill family
 
-- `solution-delivery-loop` — entry point and router. Routes to the correct phase, manages the review-feedback loop, and triggers process distillation.
-- `requirement-discovery` — users, scenarios, scope, non-goals, requirements, acceptance. Preserves research raw material under `docs/track/<feature>/research/`.
-- `solution-design` — principles, alternatives, deliverable structure, interfaces/contracts, verification strategy, plan. Includes a mandatory "challenge the design" step.
-- `implementation-execution` — produces verifiable increments. Generic execution loop; software mode gates each slice on a layered quality gate (multi-level tests, static analysis, linter, style check). Concrete change-control signals guard against undocumented drift.
-- `delivery-acceptance` — evidence-based review, verification, delivery decision. Supports both full and lightweight delivery records.
-- `review-feedback` — independent reviewer invoked after each phase.
-- `process-distillation` — after each review-feedback cycle, optionally analyzes the completed phase for skill improvements.
-- `structured-investigation` — universal investigation methodology for any domain (code, systems, data, research, analysis).
+- [`solution-delivery-loop`](skills/solution-delivery-loop/SKILL.md) — entry point and router. Routes to the correct phase, manages the review-feedback loop, and triggers process distillation.
+- [`requirement-discovery`](skills/requirement-discovery/SKILL.md) — users, scenarios, scope, non-goals, requirements, acceptance. Preserves research raw material under `docs/track/<feature>/research/`.
+- [`solution-design`](skills/solution-design/SKILL.md) — principles, alternatives, deliverable structure, interfaces/contracts, verification strategy, plan. Includes a mandatory "challenge the design" step.
+- [`implementation-execution`](skills/implementation-execution/SKILL.md) — produces verifiable increments. Generic execution loop; software mode gates each slice on a layered quality gate (multi-level tests, static analysis, linter, style check). Concrete change-control signals guard against undocumented drift.
+- [`delivery-acceptance`](skills/delivery-acceptance/SKILL.md) — evidence-based review, verification, delivery decision. Supports both full and lightweight delivery records.
+- [`review-feedback`](skills/review-feedback/SKILL.md) — independent reviewer invoked after each phase.
+- [`process-distillation`](skills/process-distillation/SKILL.md) — after each review-feedback cycle, optionally analyzes the completed phase for skill improvements.
+- [`structured-investigation`](skills/structured-investigation/SKILL.md) — universal investigation methodology for any domain (code, systems, data, research, analysis).
 
 ## Loop Engineering alignment
 

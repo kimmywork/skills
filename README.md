@@ -32,7 +32,7 @@ claude plugin install utility@kimmywork-skills
 
 ## Skills
 
-### Drafting (9 skills)
+### Drafting (10 skills)
 
 [Drafting skills](drafting/README.md).
 
@@ -64,6 +64,9 @@ Independent, general-purpose skills for exploring, planning, executing, research
 
 #### `restraint`
 > Do what the user actually wants, and nothing more; avoid over-engineering.
+
+#### `prune`
+> Subtract what is unnecessary — obsolete workspace clutter and overgrowth in a drafted design or plan — keeping the smallest necessary and sufficient set.
 
 ---
 

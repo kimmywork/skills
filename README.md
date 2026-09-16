@@ -68,6 +68,9 @@ Independent, general-purpose skills for exploring, planning, executing, research
 #### `prune`
 > Subtract what is unnecessary — obsolete workspace clutter and overgrowth in a drafted design or plan — keeping the smallest necessary and sufficient set.
 
+#### `design-system`
+> Build, extract, or rebuild a design system and deliver it as a showcase plus a token-complete specification.
+
 ---
 
 ### Loop (2 skills)

@@ -12,6 +12,7 @@ A bundle of independent, agent-neutral skills for general knowledge work. Each s
 | [`align`](skills/align/SKILL.md) | Keep project documentation aligned after knowledge, implementation, decision, or evidence changes. |
 | [`vnv`](skills/vnv/SKILL.md) | Verify and validate results from the perspectives relevant to the task. |
 | [`deep-research`](skills/deep-research/SKILL.md) | Derive answers from sources, tracing, comparison, and synthesis. |
+| [`design-system`](skills/design-system/SKILL.md) | Build, extract, or rebuild a design system and deliver it as a showcase plus a token-complete specification. |
 | [`distillation`](skills/distillation/SKILL.md) | Run a retrospective and decide whether reusable skill guidance should change. |
 | [`restraint`](skills/restraint/SKILL.md) | Act with restraint — do what the user wants, nothing more; avoid over-engineering. |
 | [`prune`](skills/prune/SKILL.md) and [Rationale](skills/prune/README.md) | Subtract what is unnecessary — obsolete workspace clutter and overgrowth in a drafted design or plan — keeping the smallest necessary and sufficient set. |

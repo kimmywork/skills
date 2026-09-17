@@ -65,7 +65,7 @@ The process is surface-independent; the medium is not. Read the supplement for e
 
 Two files, always both:
 
-- **Showcase** — a single self-contained HTML file that opens without a build step: live theme and scheme switching, a table of contents built from the rendered sections, live samples of every component, whole-use scenes on the target canvas (app screens, terminal sessions, command transcripts, print pages), and an automatically computed contrast table. It must not overflow horizontally at its narrowest target width, and every inline asset carries an explicit size.
+- **Showcase** — a single self-contained HTML file that opens without a build step and still opens offline: linked assets such as webfonts declare system fallbacks and degrade readably. It carries live theme and scheme switching, a table of contents built from the rendered sections, live samples of every component, whole-use scenes on the target canvas (app screens, terminal sessions, command transcripts, print pages), and an automatically computed contrast table. It must not overflow horizontally at its narrowest target width, and every inline asset carries an explicit size.
 - **Specification** — a Markdown file that opens with the product context and scenarios, then the principles, the foundations with complete token tables per scheme and mode, the component specs, and the copy table.
 
 Both artifacts must agree; the strongest form is both generated from one token source. Add a check that parses both and fails on drift, including undeclared cross-surface references, and prove the check by mutating an artifact and confirming it fails. Keep the two files together, in whatever location the user's project uses for documentation.

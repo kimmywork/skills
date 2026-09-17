@@ -11,6 +11,10 @@ Real-time, input-first, and viewed at a distance or in the hand. HUD, menus, ove
 - HUD density is budgeted: gameplay stays legible underneath; hide what the current context does not need.
 - Menu-heavy mobile games are landscape-first: keep the world screen bright and move item grids, achievements, and summons onto dark panels, so art and rarity frames read against a controlled background.
 
+## Genre and player habits
+
+The rules above are genre-neutral; how much they bite depends on the genre and on how its players actually play. Design to the genre's reading load, input model, and session shape: keep reading minimal where play is continuous, treat dialogue and lore as a first-class reading surface where the game is story-led, and respect the session length and pressure model the players expect — short, interruptible sessions must never be gated by timers or purchases. Derive the specifics for this game rather than importing another genre's defaults.
+
 ## Readability and feedback
 
 - Text must be readable at the intended distance; define one minimum size rule and test it at the smallest supported screen.

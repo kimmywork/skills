@@ -58,6 +58,7 @@ Beyond the frameworks, every design system has to answer these aspects. They nam
 - **Long-form reading** — how it differs from interface chrome.
 - **Reversibility** — which destructive actions can be undone and which need confirmation.
 - **Naming parity** — the same concept across code, specification, and screen; axis names (scheme, mode, density) must not reuse vocabulary the product already uses for something else.
+- **Locales** — which languages and regions ship, and what each changes beyond translation: date, number, and currency formats, name order, punctuation and capitalization, formality and tone, text expansion or contraction, and reading direction. Locale conventions are part of the contract, not a copy detail.
 - **Extensibility** — what it costs to absorb a new surface or host.
 - **Host-owned surfaces** — terminals and OS high-contrast modes where the app cannot read or set the palette; state what the app still controls (weight, dim, layout, glyphs) and how meaning survives without color.
 - **Non-visual use** — color, motion, and pointer independence.
@@ -84,6 +85,7 @@ Each foundation must state both its tokens and its rules.
 - **Interactions** — exercise the showcase's real controls (theme, scheme, tabs, navigation), not just its rendering.
 - **Structure** — the table of contents and section ids come from what actually rendered, not from a list maintained beside it; no hidden placeholders or string-level structural edits.
 - **Fit** — the showcase does not overflow horizontally at its narrowest target width; wide tables scroll inside their container; inline assets carry explicit sizes; derived colors are computed from tokens.
-- **Scenes** — every whole-use scene renders in every scheme and mode; check layout, not only token values.
+- **Scenes** — every whole-use scene renders in every scheme and mode, and its layout is checked, not only its tokens: no critical element overlaps another, none leaves its canvas or region, fixed-size assets fit their container, and long strings wrap or clamp inside the space reserved for them.
+- **Locales** — if more than one locale ships, the showcase switches live and fails on a missing or clipped string; formats and conventions are checked per locale, not only translation coverage.
 - **Naming** — if the stylesheet is injected into pages you do not own, prefix every variable and never emit root-level declarations; if tokens are mapped onto a framework's theme, avoid keys the framework already defines and confirm the emitted CSS.
 - **Scale** — check the type scale, radii, hit targets, and durations for values that are off the declared scale.

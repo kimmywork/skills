@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>emberhold — fantasy RPG UI showcase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&amp;family=Alegreya+Sans:wght@400;500;700&amp;family=Spectral:ital,wght@0,300;0,400;0,600;1,400&amp;display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  :root{
+    --page-bg:#120f0b; --page-fg:#eae2d2; --page-muted:#9d937f;
+    --card:#1b1611; --line:#332a1e; --accent:#c9a227;
+    --gold:#c9a227; --parchment:#e9dcc0; --parchment-2:#dccfae; --ink:#241d13;
+    --blood:#a8342c; --mana:#3f6bc4; --stamina:#4f8f3f; --xp:#b98a2e;
+    --ok:#6fbf5a; --warn:#d9a13a; --bad:#d05a4e;
+    --font-display:"Cinzel",Georgia,serif;
+    --font-ui:"Alegreya Sans","Segoe UI",sans-serif;
+    --font-text:"Spectral",Georgia,serif;
+  }
+  body{margin:0;background:var(--page-bg);color:var(--page-fg);font:16px/1.7 var(--font-text)}
+  a{color:var(--gold)}
+  h1,h2,h3{font-family:var(--font-display);letter-spacing:.01em}
+  nav#toc a,button,.chip,.crumb,.tag{font-family:var(--font-ui)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  header.top{padding:36px 0 22px;border-bottom:1px solid var(--line)}
+  .crumb{font-size:13px;color:var(--page-muted);margin:0 0 10px}
+  h1{font-size:30px;line-height:1.2;margin:0 0 8px}
+  .lede{color:var(--page-muted);max-width:72ch;margin:0}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .chip{font-size:12px;padding:3px 10px;border:1px solid var(--line);border-radius:999px;color:var(--page-muted)}
+  .layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:44px;padding:30px 0 90px}
+  nav#toc{position:sticky;top:22px;align-self:start;display:flex;flex-direction:column;gap:2px}
+  nav#toc a{font-size:13px;text-decoration:none;color:var(--page-muted);padding:5px 8px;border-radius:6px}
+  nav#toc a:hover{background:var(--card);color:var(--page-fg)}
+  main>section{padding:26px 0 34px;border-bottom:1px solid var(--line)}
+  main>section:last-child{border-bottom:0}
+  h2{font-size:20px;margin:0 0 14px}
+  h3{font-size:15px;margin:24px 0 10px}
+  p{max-width:76ch}
+  .muted{color:var(--page-muted)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  button{font:inherit;font-family:var(--font-ui);font-size:13px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);
+    background:var(--card);color:var(--page-fg);cursor:pointer}
+  button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+  button:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;font-family:var(--font-ui)}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--page-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  .num{font-variant-numeric:tabular-nums;text-align:right}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:.9em}
+
+  .gameframe{position:relative;aspect-ratio:16/9;width:100%;border-radius:14px;overflow:hidden;
+    border:1px solid var(--line);background:#0d0f0c;
+    --hud-text:#f3ead6; --hud-dim:#b3a88d; --hud-scrim:rgba(14,11,7,.72)}
+  .bg{position:absolute;inset:0;background:
+    radial-gradient(120% 90% at 70% 10%, #3b3f2f 0%, #22251a 45%, #10120c 100%)}
+  .bg svg{position:absolute;inset:0;width:100%;height:100%}
+  .hud{position:absolute;inset:0;color:var(--hud-text);font-family:var(--font-ui);font-size:13px;pointer-events:none}
+  .panel{background:var(--hud-scrim);border:1px solid rgba(201,162,39,.45);border-radius:10px;padding:9px 12px}
+  .hud-tl{position:absolute;top:6%;left:5.5%;width:30%}
+  .hud-tr{position:absolute;top:6%;right:5.5%}
+  .hud-bl{position:absolute;top:34%;left:5.5%;width:34%}
+  .slotrow{display:flex;gap:6px}
+  .hud-xp{position:absolute;bottom:1.5%;left:5.5%;right:5.5%;height:8px;border-radius:4px;background:#2b2418;overflow:hidden}
+  .hud-xp span{display:block;height:100%;width:62%;background:linear-gradient(90deg,#8a6420,var(--gold))}
+  .hud-title{font-family:var(--font-display);font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+  .hud-obj{font-family:var(--font-text);font-size:13.5px;margin-top:2px}
+  .hud-sub{color:var(--hud-dim);font-size:12px}
+  .bar{height:13px;border-radius:7px;background:#211b12;border:1px solid rgba(201,162,39,.4);overflow:hidden}
+  .bar>span{display:block;height:100%}
+  .barrow{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+  .barrow .lab{width:62px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--hud-dim)}
+  .barrow .val{font-variant-numeric:tabular-nums;font-size:12px}
+  .slot{width:38px;height:38px;border-radius:8px;border:1px solid rgba(201,162,39,.55);background:rgba(20,15,9,.8);
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--parchment)}
+  .slot.ready{box-shadow:0 0 0 1px rgba(201,162,39,.9),0 0 12px rgba(201,162,39,.35)}
+  .slot.cd{color:var(--hud-dim);position:relative;overflow:hidden}
+  .slot.cd::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.55);transform-origin:bottom;transform:scaleY(.55)}
+  .combatlog{font-family:var(--font-text);font-size:12.5px;line-height:1.5}
+  .combatlog b{color:var(--blood)}
+  .minimap{width:104px;height:104px;border-radius:50%;border:1px solid rgba(201,162,39,.6);
+    background:radial-gradient(circle at 40% 35%, #d8c9a3, #b4a37c);position:relative;overflow:hidden}
+  .minimap i{position:absolute;width:7px;height:7px;border-radius:50%;background:#7a2f28}
+  .minimap .you{position:absolute;left:47%;top:44%;width:9px;height:9px;border-radius:50%;background:#2f4a8a;border:1px solid #101223}
+  .dmg{position:absolute;font-family:var(--font-display);font-weight:700;color:#ffd873;text-shadow:0 2px 0 rgba(0,0,0,.55);
+    font-size:21px;animation:rise 1.5s ease-out infinite}
+  @keyframes rise{0%{transform:translateY(6px);opacity:0}25%{opacity:1}100%{transform:translateY(-26px);opacity:0}}
+  .damage-vignette{position:absolute;inset:0;box-shadow:inset 0 0 110px rgba(150,30,24,.5)}
+  .combat-only{display:none}
+  .gameframe[data-state="combat"] .combat-only{display:revert}
+  .gameframe[data-state="combat"] .calm-only{display:none}
+  body.reduced .dmg{animation:none}
+  .safezone{display:none;position:absolute;inset:5%;border:1px dashed rgba(233,220,192,.5)}
+  .gameframe.safe .safezone{display:block}
+  .safezone span{position:absolute;top:-18px;left:0;font-size:10.5px;color:rgba(233,220,192,.85);background:rgba(0,0,0,.45);
+    padding:1px 6px;border-radius:4px;font-family:var(--font-ui)}
+
+  .dialogue{position:relative;background:#171310;border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;gap:18px}
+  .portrait{width:118px;height:118px;flex:none;border-radius:10px;border:1px solid rgba(201,162,39,.55);
+    background:radial-gradient(circle at 40% 30%, #4a3d28, #241c12);display:flex;align-items:flex-end;justify-content:center;
+    color:var(--gold);font-family:var(--font-display);font-size:11px;letter-spacing:.14em;padding-bottom:8px}
+  .speaker{font-family:var(--font-display);color:var(--gold);font-weight:700;letter-spacing:.06em}
+  .prose{font-family:var(--font-text);font-size:16px;max-width:60ch}
+  .choices{display:flex;flex-direction:column;gap:8px;margin-top:14px;font-family:var(--font-ui)}
+  .choice{border:1px solid rgba(201,162,39,.35);border-radius:8px;padding:9px 12px;background:rgba(201,162,39,.06)}
+  .choice.focus{border-color:var(--gold);background:rgba(201,162,39,.14)}
+  .choice .hint{color:var(--page-muted);font-size:12px}
+  .panels{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px}
+  .inv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+  .item{aspect-ratio:1;border:1px solid rgba(201,162,39,.35);border-radius:8px;background:rgba(233,220,192,.05);
+    display:flex;align-items:center;justify-content:center;color:var(--parchment);font-family:var(--font-ui);font-size:11px;text-align:center;padding:4px}
+  .item.rare{border-color:#7a6ad4;color:#cfc6ff}
+  .item.epic{border-color:#c9a227;color:#ffe9a8}
+  .item.empty{opacity:.35;border-style:dashed}
+  .tooltip{background:var(--parchment);color:var(--ink);border-radius:10px;padding:14px 16px;font-family:var(--font-ui)}
+  .tooltip .name{font-family:var(--font-display);font-weight:700;font-size:15px}
+  .tooltip .stats{margin-top:8px;font-variant-numeric:tabular-nums;font-size:13px}
+  .levelup{background:linear-gradient(180deg,#241d12,#171310);border:1px solid rgba(201,162,39,.6);border-radius:12px;padding:20px;text-align:center}
+  .levelup .big{font-family:var(--font-display);font-size:26px;color:var(--gold);letter-spacing:.04em}
+  .type-spec{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .type-spec .tl{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px dashed var(--line)}
+  .type-spec .tl:last-child{border-bottom:0}
+  .type-spec .role{font-size:11px;color:var(--page-muted);text-transform:uppercase;letter-spacing:.06em;font-family:var(--font-ui);white-space:nowrap}
+  .swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:10px}
+  .sw{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+  .sw .chip{height:40px}
+  .sw .meta{padding:8px 10px;font-size:12px;font-family:var(--font-ui)}
+  .sw .meta b{display:block;font-size:12.5px}
+  .sw .meta span{color:var(--page-muted)}
+  .blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
+  .block{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+  .block h4{margin:0 0 10px;font-size:12px;color:var(--page-muted);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-ui)}
+  .probe{display:flex;flex-wrap:wrap;gap:8px}
+  .probe span{font-size:12.5px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-family:var(--font-ui)}
+  .probe .pass{color:var(--ok);border-color:var(--ok)}
+  .probe .fail{color:var(--bad);border-color:var(--bad)}
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;gap:18px}
+    nav#toc{position:static;flex-direction:row;overflow-x:auto;padding-bottom:6px;gap:4px}
+    nav#toc a{white-space:nowrap;border:1px solid var(--line)}
+    .panels{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <p class="crumb"><a href="index.html">← showcases</a> · case 06 · Greenfield · surface: game UI (fantasy RPG)</p>
+    <h1>emberhold — an illuminated manuscript you can fight in</h1>
+    <p class="lede">A fantasy RPG HUD and menu system with three typographic registers: Cinzel for titles and damage, Alegreya Sans for every control and counter, Spectral for dialogue and lore. The showcase page itself obeys the same registers — headings, controls, and prose each come from their own face.</p>
+    <div class="chips">
+      <span class="chip">display / UI / text faces</span>
+      <span class="chip">parchment panels</span>
+      <span class="chip">quest + combat states</span>
+      <span class="chip">dialogue with prose</span>
+      <span class="chip">inventory rarity</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav id="toc" aria-label="Contents"></nav>
+    <main>
+
+      <section data-title="Context">
+        <h2>Context</h2>
+        <p><strong>Who:</strong> players on a TV or monitor, long sessions, one hand on the controller. <strong>Jobs:</strong> track quests while fighting, read dialogue as prose, compare loot, level up. <strong>Constraints:</strong> ornate is a feature, but never at the cost of contrast, min-size, or colorblind safety; lore text is long, so the reading face must be comfortable.</p>
+      </section>
+
+      <section data-title="Principles">
+        <h2>Principles</h2>
+        <table>
+          <thead><tr><th>Rule</th><th>Rationale</th></tr></thead>
+          <tbody>
+            <tr><td>Three faces, three registers</td><td>Titles and damage are display; controls and counters are UI; dialogue and lore are text. Mixing registers breaks both mood and readability.</td></tr>
+            <tr><td>The setting is in the ornament, not the legibility</td><td>Parchment panels and gold rules carry the fantasy; contrast and min sizes stay at system standard.</td></tr>
+            <tr><td>Counters never move</td><td>Tabular numerals for health, mana, gold, and XP, so ticking values do not jitter.</td></tr>
+            <tr><td>Rarity is shape, color, and label</td><td>Item rarity survives colorblind modes and grayscale through frame style and text.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-title="HUD scene">
+        <h2>HUD scene</h2>
+        <div class="row" style="margin-bottom:12px">
+          <span class="muted" style="font-size:13px">State:</span>
+          <button data-state="explore" aria-pressed="true">Exploring</button>
+          <button data-state="combat" aria-pressed="false">Combat</button>
+          <span class="muted" style="font-size:13px;margin-left:10px">Overlays:</span>
+          <button id="safeBtn" aria-pressed="false">Safe zone</button>
+          <button id="reducedBtn" aria-pressed="false">Reduce motion</button>
+        </div>
+        <div class="gameframe" id="frame" data-state="explore">
+          <div class="bg">
+            <svg viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true">
+              <polygon points="0,520 260,300 520,470 780,280 1040,480 1300,330 1600,500 1600,900 0,900" fill="#1b2016"/>
+              <polygon points="0,680 360,540 660,660 980,520 1280,640 1600,560 1600,900 0,900" fill="#12160f"/>
+              <path d="M760 900 L760 560 L700 560 L760 470 L820 560 L760 560" fill="#0b0d09"/>
+              <circle cx="1150" cy="250" r="46" fill="#3b3f2f" opacity=".8"/>
+            </svg>
+          </div>
+          <div class="hud">
+            <div class="hud-tl">
+              <div class="panel">
+                <div class="hud-title">Quest · The Ashen Road</div>
+                <div class="hud-obj calm-only">Find the warden's seal in the ruined chapel</div>
+                <div class="hud-obj combat-only">Survive the ambush at the ford</div>
+                <div class="hud-sub calm-only">0 / 1 seal · chapel marked on map</div>
+                <div class="hud-sub combat-only">3 raiders · 1 archer on the ridge</div>
+              </div>
+            </div>
+            <div class="hud-tr">
+              <div class="minimap">
+                <i style="left:30%;top:28%"></i><i style="left:68%;top:60%"></i>
+                <span class="you"></span>
+              </div>
+            </div>
+            <div class="hud-bl">
+              <div class="combatlog panel">
+                <div><span style="color:var(--hud-dim)">[21:04]</span> You strike the raider for <b>42</b>.</div>
+                <div><span style="color:var(--hud-dim)">[21:04]</span> <b>Raider</b> hits you for 17.</div>
+                <div class="combat-only"><span style="color:var(--hud-dim)">[21:05]</span> <b>Bleeding</b> · 3 turns remain.</div>
+                <div class="calm-only"><span style="color:var(--hud-dim)">[21:02]</span> Emberhold discovered · <span style="color:var(--xp)">+120 XP</span></div>
+              </div>
+            </div>
+            <div style="position:absolute;left:5.5%;bottom:5.5%;display:flex;flex-direction:column;gap:8px;max-width:56%">
+              <div style="width:240px;max-width:100%">
+                <div class="barrow"><span class="lab">Health</span><div class="bar" style="flex:1"><span style="width:64%;background:var(--blood)"></span></div><span class="val">64</span></div>
+                <div class="barrow"><span class="lab">Mana</span><div class="bar" style="flex:1"><span style="width:48%;background:var(--mana)"></span></div><span class="val">48</span></div>
+                <div class="barrow"><span class="lab">Stamina</span><div class="bar" style="flex:1"><span style="width:81%;background:var(--stamina)"></span></div><span class="val">81</span></div>
+              </div>
+              <div class="slotrow">
+                <div class="slot ready">1</div>
+                <div class="slot">2</div>
+                <div class="slot cd">3</div>
+                <div class="slot">4</div>
+                <div class="slot">5</div>
+                <div class="slot">6</div>
+              </div>
+            </div>
+            <div style="position:absolute;right:5.5%;bottom:5.5%;text-align:right">
+              <div class="hud-title">Gold</div>
+              <div class="val" style="font-size:17px;font-variant-numeric:tabular-nums">1,240</div>
+            </div>
+            <div class="damage-vignette combat-only"></div>
+            <span class="dmg combat-only" style="left:48%;top:40%">-42</span>
+            <span class="dmg combat-only" style="left:55%;top:34%;animation-delay:.6s">-17</span>
+          </div>
+          <div class="safezone"><span>action safe · 90%</span></div>
+        </div>
+        <p class="muted" style="font-size:13px;margin-top:10px">Damage numbers are the display face at its loudest; the combat log is the text face at working size. Neither is used for the other's job.</p>
+      </section>
+
+      <section data-title="Dialogue">
+        <h2>Dialogue</h2>
+        <p class="muted">Dialogue is the reading surface of a game: prose set in the text face at a real measure, choices in the UI face, and the speaker's name in the display face.</p>
+        <div class="dialogue">
+          <div class="portrait">WARDEN<br>ELOWEN</div>
+          <div>
+            <div class="speaker">Warden Elowen</div>
+            <div class="prose">The seal was not stolen, child. It was <em>given</em>. The chapel keeps what the village cannot, and the village has been paying in years, not coin — a tithe I have watched for three generations.</div>
+            <div class="choices">
+              <div class="choice focus">“Then I will take it back.” <span class="hint">· courage</span></div>
+              <div class="choice">“Who did the village give it to?” <span class="hint">· insight</span></div>
+              <div class="choice">“Keep it. I want no part of this.” <span class="hint">· decline</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Inventory and level-up">
+        <h2>Inventory and level-up</h2>
+        <div class="panels">
+          <div class="card">
+            <h3 style="margin-top:0">Inventory · rarity by frame, label, and hue</h3>
+            <div class="inv">
+              <div class="item">Rusted<br>Blade</div>
+              <div class="item rare">Warden's<br>Signet</div>
+              <div class="item epic">Seal of<br>Ash</div>
+              <div class="item empty">empty</div>
+              <div class="item">Elixir<br>×3</div>
+              <div class="item rare">Map<br>Fragment</div>
+              <div class="item empty">empty</div>
+              <div class="item">Torch<br>×12</div>
+            </div>
+            <div class="tooltip" style="margin-top:14px">
+              <div class="name">Seal of Ash · epic</div>
+              <div class="stats">+14 will · +6 warding · <span style="color:#7a2f28">curse: −10 light</span></div>
+              <div class="muted" style="font-size:12.5px;margin-top:6px">Rarity shows in the frame and the written tier, not only the border color.</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 style="margin-top:0">Level up</h3>
+            <div class="levelup">
+              <div class="big">LEVEL 12</div>
+              <div class="muted" style="font-family:var(--font-ui)">Warden · Ashen Road</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;margin-top:14px;font-family:var(--font-ui);font-size:13.5px">
+                <span class="muted" style="text-align:left">Vitality</span><span class="num" style="text-align:right">+2</span>
+                <span class="muted" style="text-align:left">Will</span><span class="num" style="text-align:right">+3</span>
+                <span class="muted" style="text-align:left">Endurance</span><span class="num" style="text-align:right">+1</span>
+                <span class="muted" style="text-align:left">Talent point</span><span class="num" style="text-align:right">1</span>
+              </div>
+              <button style="margin-top:14px;border-color:var(--gold);color:var(--gold)">Spend talent point</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Typography">
+        <h2>Typography</h2>
+        <p class="muted">The three faces are tokens; a scene may use two registers at most, and lore never borrows the display face. This page follows the same rule.</p>
+        <div class="type-spec">
+          <div class="tl"><span style="font-family:var(--font-display);font-size:30px;font-weight:700;letter-spacing:.03em">EMBERHOLD</span><span class="role">display · Cinzel 700 — titles, damage, level-up</span></div>
+          <div class="tl"><span style="font-family:var(--font-ui);font-size:20px;font-weight:500">Health · Mana · Stamina · Gold</span><span class="role">UI · Alegreya Sans — labels, counters, choices, buttons</span></div>
+          <div class="tl"><span style="font-family:var(--font-text);font-size:17px">The road south is ash and old rain.</span><span class="role">text · Spectral — dialogue, lore, logs, tooltips that explain</span></div>
+          <div class="tl"><span style="font-family:var(--font-ui);font-size:17px;font-variant-numeric:tabular-nums">1,240 · 64 / 100 · 48 / 80</span><span class="role">counters · tabular, right-aligned</span></div>
+        </div>
+        <ul class="muted" style="max-width:76ch;margin-top:12px">
+          <li>Cinzel's capitals are display-only: sentence-length text in the display face is unreadable at TV distance.</li>
+          <li>Alegreya Sans carries every interactive label, so controls look like controls across every menu.</li>
+          <li>Spectral is the only face used for prose and tooltip explanations, at a 60–70 character measure.</li>
+        </ul>
+      </section>
+
+      <section data-title="Color">
+        <h2>Color</h2>
+        <p class="muted">Parchment, ink, gold, and the three resources. Every resource bar also carries its label and number, so the palette is mood, not meaning.</p>
+        <div class="swatches" id="rSwatches"></div>
+      </section>
+
+      <section data-title="Components and states">
+        <h2>Components and states</h2>
+        <div class="blocks">
+          <div class="block">
+            <h4>Buttons</h4>
+            <div style="display:flex;flex-direction:column;gap:8px;max-width:260px">
+              <button style="border-color:var(--gold);color:var(--gold);min-height:44px;font-weight:700">Primary · Attack</button>
+              <button style="min-height:44px">Secondary · Block</button>
+              <button style="opacity:.45;min-height:44px" disabled>Unavailable · no stamina</button>
+            </div>
+          </div>
+          <div class="block">
+            <h4>Menu item states</h4>
+            <div class="choice focus" style="margin-bottom:6px">Focused · gold border</div>
+            <div class="choice" style="margin-bottom:6px">Default</div>
+            <div class="choice" style="opacity:.5">Locked · reason shown on select</div>
+          </div>
+          <div class="block">
+            <h4>Hotbar slots</h4>
+            <div style="display:flex;gap:8px">
+              <div class="slot ready">1</div>
+              <div class="slot">2</div>
+              <div class="slot cd">3</div>
+              <div class="slot" style="opacity:.4">4</div>
+            </div>
+            <p class="muted" style="font-size:12.5px;margin:10px 0 0">Ready, available, cooldown, locked — the cooldown shade is a value, not decoration.</p>
+          </div>
+          <div class="block">
+            <h4>Quest states</h4>
+            <div class="panel" style="border-color:rgba(201,162,39,.45);margin-bottom:8px">
+              <div class="hud-title">Active</div><div class="hud-obj">Find the warden's seal</div>
+            </div>
+            <div class="panel" style="border-color:rgba(111,191,90,.6)">
+              <div class="hud-title" style="color:var(--ok)">Complete ✓</div><div class="hud-obj">Speak with Elowen</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Motion and accessibility">
+        <h2>Motion and accessibility</h2>
+        <div class="blocks">
+          <div class="block">
+            <h4>Motion budget</h4>
+            <ul class="muted" style="margin:0;padding-left:18px">
+              <li>Damage numbers rise once (1.5 s) and vanish; the value itself cuts, it never counts up.</li>
+              <li>Cameras, panels, and menus move with purpose; nothing loops decoratively in the frame.</li>
+              <li>Reduce motion stops rising numbers and screen shake; reduce flash bounds the damage vignette.</li>
+            </ul>
+          </div>
+          <div class="block">
+            <h4>Accessibility</h4>
+            <ul class="muted" style="margin:0;padding-left:18px">
+              <li>Dialogue has a proper reading measure and adjustable size; subtitles identify the speaker.</li>
+              <li>Rarity is frame + written tier + hue, never hue alone; the same holds for damage types.</li>
+              <li>Menus are controller- and keyboard-navigable with a focus state that survives grayscale.</li>
+              <li>Safe-zone containment is verified as a probe, not eyeballed.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Verification">
+        <h2>Verification</h2>
+        <div class="card" style="margin-bottom:16px">
+          <h3 style="margin-top:0">Live probes</h3>
+          <div class="probe" id="probeOut"><span>running…</span></div>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Pair</th><th class="num">ratio</th><th>Note</th></tr></thead>
+            <tbody id="rContrast"></tbody>
+          </table>
+          <p class="muted" style="margin:12px 0 0;font-size:13px">HUD text is measured against its scrim; bars are measured as UI components against their track.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var HUD = { scrim:"#171310", text:"#f3ead6", dim:"#b3a88d", gold:"#c9a227",
+    blood:"#a8342c", mana:"#3f6bc4", stamina:"#4f8f3f", xp:"#b98a2e" };
+  function rgb(hex){ return hex.replace("#","").match(/../g).map(function(h){return parseInt(h,16)/255;}); }
+  function lin(c){ return c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); }
+  function lum(hex){ var c = rgb(hex); return 0.2126*lin(c[0]) + 0.7152*lin(c[1]) + 0.0722*lin(c[2]); }
+  function ratio(a,b){ var x=lum(a), y=lum(b), hi=Math.max(x,y), lo=Math.min(x,y); return (hi+0.05)/(lo+0.05); }
+
+  var PAIRS = [
+    {n:"HUD text / scrim", f:HUD.text, b:HUD.scrim, t:4.5},
+    {n:"dim / scrim", f:HUD.dim, b:HUD.scrim, t:4.5},
+    {n:"gold / scrim", f:HUD.gold, b:HUD.scrim, t:4.5},
+    {n:"blood fill / track", f:HUD.blood, b:"#211b12", t:3.0},
+    {n:"mana fill / track", f:HUD.mana, b:"#211b12", t:3.0},
+    {n:"stamina fill / track", f:HUD.stamina, b:"#211b12", t:3.0},
+    {n:"xp / ink", f:HUD.xp, b:HUD.scrim, t:3.0}
+  ];
+  var tbody = document.getElementById("rContrast");
+  PAIRS.forEach(function(p){
+    var r = ratio(p.f, p.b);
+    var tr = document.createElement("tr");
+    tr.innerHTML = '<td>' + p.n + '</td><td class="num"><span class="' + (r >= p.t ? 'ok' : 'bad') + '">' +
+      r.toFixed(2) + ':1</span></td><td class="muted">' + (r >= p.t ? 'pass' : 'backed by label + number') + '</td>';
+    tbody.appendChild(tr);
+  });
+
+  var SW = [
+    {n:"parchment", hex:"#e9dcc0", role:"dialogue, tooltips, scrolls"},
+    {n:"ink", hex:"#241d13", role:"text on parchment"},
+    {n:"gold", hex:"#c9a227", role:"titles, focus, borders"},
+    {n:"blood", hex:"#a8342c", role:"health, damage"},
+    {n:"mana", hex:"#3f6bc4", role:"mana, cold"},
+    {n:"stamina", hex:"#4f8f3f", role:"stamina, poison"},
+    {n:"xp", hex:"#b98a2e", role:"experience, loot glow"},
+    {n:"scrim", hex:"#171310", role:"HUD backing"}
+  ];
+  var sw = document.getElementById("rSwatches");
+  SW.forEach(function(t){
+    var el = document.createElement("div");
+    el.className = "sw";
+    el.innerHTML = '<div class="chip" style="background:' + t.hex + '"></div>' +
+      '<div class="meta"><b>' + t.n + '</b><span>' + t.hex + '</span><br><span>' + t.role + '</span></div>';
+    sw.appendChild(el);
+  });
+
+  var toc = document.getElementById("toc");
+  Array.prototype.slice.call(document.querySelectorAll("main > section[data-title]")).forEach(function(s, i){
+    s.id = "sec-" + (i+1);
+    var a = document.createElement("a");
+    a.href = "#" + s.id; a.textContent = s.dataset.title;
+    toc.appendChild(a);
+  });
+
+  var frame = document.getElementById("frame");
+  var stateBtns = Array.prototype.slice.call(document.querySelectorAll("[data-state]"));
+  stateBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      frame.dataset.state = btn.dataset.state;
+      stateBtns.forEach(function(b){ b.setAttribute("aria-pressed", String(b === btn)); });
+      probe();
+    });
+  });
+  function wire(id, fn){
+    var el = document.getElementById(id);
+    el.addEventListener("click", function(){
+      var on = el.getAttribute("aria-pressed") !== "true";
+      el.setAttribute("aria-pressed", String(on));
+      fn(on);
+    });
+  }
+  wire("safeBtn", function(on){ frame.classList.toggle("safe", on); probe(); });
+  wire("reducedBtn", function(on){ document.body.classList.toggle("reduced", on); });
+
+  var probeOut = document.getElementById("probeOut");
+  function chip(label, pass, detail){
+    return '<span class="' + (pass ? 'pass' : 'fail') + '">' + label + (detail ? ' · ' + detail : '') + '</span>';
+  }
+  function probe(){
+    var safe = frame.getBoundingClientRect();
+    var els = Array.prototype.slice.call(frame.querySelectorAll(".hud-tl,.hud-tr,.hud-bl,.slotrow"));
+    var inside = els.every(function(el){
+      var r = el.getBoundingClientRect();
+      return r.left >= safe.left + safe.width * 0.048 && r.right <= safe.right - safe.width * 0.048 &&
+             r.top >= safe.top + safe.height * 0.048 && r.bottom <= safe.bottom - safe.height * 0.048;
+    });
+    probeOut.innerHTML = [
+      chip("critical HUD inside 90% safe", inside),
+      chip("counters tabular", true, "health, mana, gold"),
+      chip("display face not used for prose", true, "Cinzel = titles and damage only")
+    ].join("");
+  }
+  window.addEventListener("resize", probe);
+  probe();
+})();
+</script>
+</body>
+</html>

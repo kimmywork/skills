@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en" data-web="dusk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>orbit — terminal surface showcase</title>
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  :root[data-web="dusk"]{
+    --page-bg:#0f1115; --page-fg:#e7eaf0; --page-muted:#9099a8;
+    --card:#151922; --line:#262d3a; --accent:#7aa2f7;
+    --web-accent:#7aa2f7; --web-ok:#9ece6a; --web-warn:#e0af68; --web-bad:#f7768e;
+    --web-surface:#1b2130; --web-text:#dde3ee; --web-subtle:#8b94a7;
+  }
+  :root[data-web="dawn"]{
+    --page-bg:#f7f4ee; --page-fg:#1b1e24; --page-muted:#5d6673;
+    --card:#ffffff; --line:#e3ddd1; --accent:#3a5ccc;
+    --web-accent:#3a5ccc; --web-ok:#2f7d32; --web-warn:#8a6100; --web-bad:#b3261e;
+    --web-surface:#f0ece3; --web-text:#23262c; --web-subtle:#6b7280;
+  }
+  body{margin:0;background:var(--page-bg);color:var(--page-fg);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  a{color:var(--accent)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  header.top{padding:36px 0 22px;border-bottom:1px solid var(--line)}
+  .crumb{font-size:13px;color:var(--page-muted);margin:0 0 10px}
+  h1{font-size:30px;line-height:1.2;margin:0 0 8px;letter-spacing:-.01em}
+  .lede{color:var(--page-muted);max-width:70ch;margin:0}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .chip{font-size:12px;padding:3px 10px;border:1px solid var(--line);border-radius:999px;color:var(--page-muted)}
+  .layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:44px;padding:30px 0 90px}
+  nav#toc{position:sticky;top:22px;align-self:start;display:flex;flex-direction:column;gap:2px}
+  nav#toc a{font-size:13px;text-decoration:none;color:var(--page-muted);padding:5px 8px;border-radius:6px}
+  nav#toc a:hover{background:var(--card);color:var(--page-fg)}
+  main>section{padding:26px 0 34px;border-bottom:1px solid var(--line)}
+  main>section:last-child{border-bottom:0}
+  h2{font-size:20px;margin:0 0 14px;letter-spacing:-.01em}
+  h3{font-size:15px;margin:26px 0 10px}
+  p{max-width:76ch}
+  .muted{color:var(--page-muted)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+  .stack{display:flex;flex-direction:column;gap:14px}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  button{font:inherit;font-size:13px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);
+    background:var(--card);color:var(--page-fg);cursor:pointer}
+  button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+  button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--page-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  .num{font-variant-numeric:tabular-nums;text-align:right}
+  .ok{color:var(--web-ok);font-weight:600}
+  .bad{color:var(--web-bad);font-weight:600}
+  .warn{color:var(--web-warn);font-weight:600}
+  code,kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em}
+  .screen{--host-bg:#101317;--host-fg:#d7dce2;--host-dim:#7d8794;
+    --ansi-cyan:#2ad4d4;--ansi-green:#4ec46a;--ansi-yellow:#d9b04a;--ansi-red:#f06a6a;
+    --ansi-blue:#6f8ff0;--ansi-magenta:#d47adb;--ansi-white:#eef1f5;
+    background:var(--host-bg);color:var(--host-fg);border:1px solid var(--host-dim);
+    border-radius:10px;overflow:hidden;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+    font-size:12.5px;line-height:1.5}
+  body[data-host="light"] .screen{--host-bg:#f6f1e7;--host-fg:#22252b;--host-dim:#9a9284;
+    --ansi-cyan:#0e6f6f;--ansi-green:#2f7d32;--ansi-yellow:#7a5c00;--ansi-red:#a3231c;
+    --ansi-blue:#2743c9;--ansi-magenta:#7c2483;--ansi-white:#ffffff}
+  body[data-host="mono"] .screen{--host-bg:#000000;--host-fg:#ffffff;--host-dim:#c9c9c9;
+    --ansi-cyan:#ffffff;--ansi-green:#ffffff;--ansi-yellow:#ffffff;--ansi-red:#ffffff;
+    --ansi-blue:#ffffff;--ansi-magenta:#ffffff;--ansi-white:#ffffff}
+  .tui{padding:14px 16px;overflow-x:auto}
+  .tui .line{display:block;white-space:pre}
+  .c-cyan{color:var(--ansi-cyan)}.c-green{color:var(--ansi-green)}.c-yellow{color:var(--ansi-yellow)}
+  .c-red{color:var(--ansi-red)}.c-blue{color:var(--ansi-blue)}.c-white{color:var(--ansi-white)}
+  .dim{color:var(--host-dim)}
+  body[data-host="mono"] .tui .strong{font-weight:700}
+  .statusline{border-top:1px solid var(--host-dim);padding:6px 16px;color:var(--host-fg);
+    display:flex;gap:14px;flex-wrap:wrap;font-size:12px}
+  .statusline .sep{color:var(--host-dim)}
+  .panel{border:1px solid var(--host-dim);border-radius:6px;padding:8px 12px;margin:10px 0 4px}
+  .panel .title{color:var(--ansi-yellow)}
+  .tui .sel{background:var(--host-fg);color:var(--host-bg)}
+  .tui .bold{font-weight:700}
+  .tui .italic{font-style:italic}
+  .grid2 .screen{min-width:0}
+  .blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
+  .block{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
+  .block h4{margin:0 0 10px;font-size:12px;color:var(--page-muted);text-transform:uppercase;letter-spacing:.05em}
+  .block p{margin:0;font-size:13px;color:var(--page-muted)}
+  .ascii{white-space:pre;overflow-x:auto;margin:0;font-size:12.5px;line-height:1.5;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .swatch{width:34px;height:22px;border-radius:5px;border:1px solid var(--line);display:inline-block;vertical-align:middle}
+  .checkout{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;white-space:pre-wrap;
+    background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;gap:18px}
+    nav#toc{position:static;flex-direction:row;overflow-x:auto;padding-bottom:6px;gap:4px}
+    nav#toc a{white-space:nowrap;border:1px solid var(--line)}
+    .grid2{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body data-host="dark">
+<div class="wrap">
+  <header class="top">
+    <p class="crumb"><a href="index.html">← showcases</a> · case 01 · Greenfield · surfaces: TUI + Web</p>
+    <h1>orbit — one vocabulary, two surfaces</h1>
+    <p class="lede">An agent console with a terminal TUI and a web dashboard. The terminal owns its palette, so TUI tokens are ANSI roles and contrast is advisory; a web theme change must never move a TUI pixel. This page is the showcase half of the system; the rules it obeys live in the page.</p>
+    <div class="chips">
+      <span class="chip">host-owned palette</span>
+      <span class="chip">shared vocabulary, declared sharing boundary</span>
+      <span class="chip">monochrome high-contrast path</span>
+      <span class="chip">advisory measurement</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav id="toc" aria-label="Contents"></nav>
+    <main>
+
+      <section data-title="Context">
+        <h2>Context</h2>
+        <p><strong>Who:</strong> developers running an agent in a terminal, plus the same sessions reviewed in a browser. <strong>Jobs:</strong> start a task, watch tool calls, approve or deny actions, resume work later. <strong>Constraints:</strong> the terminal emulator owns background, foreground, and the ANSI palette; the app controls only roles, weight, and layout. The TUI and the web app share one vocabulary, not one token set.</p>
+        <div class="grid2">
+          <div class="card">
+            <h3 style="margin-top:0">Shared (declared)</h3>
+            <p class="muted" style="margin:0">Term table — session, turn, tool call, permission, plan, checkpoint. One action keeps one word across both surfaces.</p>
+          </div>
+          <div class="card">
+            <h3 style="margin-top:0">Not shared</h3>
+            <p class="muted" style="margin:0">Tokens, components, and layout. The TUI never references a web token; the drift check fails on an undeclared cross-surface reference.</p>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Principles">
+        <h2>Principles</h2>
+        <table>
+          <thead><tr><th>Rule</th><th>Rationale</th></tr></thead>
+          <tbody>
+            <tr><td>Roles, not values</td><td>The host palette cannot be read or set; naming an RGB value would be a lie the app cannot keep.</td></tr>
+            <tr><td>Color is never the only carrier</td><td>Every colored state also carries a word or glyph, so a failed or overridden ANSI role cannot hide meaning.</td></tr>
+            <tr><td>High contrast is the default foreground plus weight</td><td>No ANSI role is legible on both light and dark hosts; “brighter color” cannot be the escape hatch.</td></tr>
+            <tr><td>The cell is the layout unit</td><td>Gaps, indents, truncation, and status collapse are counted in cells, never in pixels.</td></tr>
+            <tr><td>Surfaces stay decoupled at the token layer</td><td>A web theme choice that reached the TUI once produced dark text on a dark terminal; the boundary is now a checked rule.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-title="Roles and advisory contrast">
+        <h2>Roles and advisory contrast</h2>
+        <p class="muted">The app emits roles; the numbers below are measured against one named reference palette (<code>xterm-style defaults</code>) and are advisory only. The guarantee is structural: a word or glyph always accompanies color, and a monochrome path always exists.</p>
+        <div class="card">
+          <table>
+            <thead><tr><th>Role</th><th>ANSI</th><th>Used for</th><th class="num">on dark host</th><th class="num">on light host</th></tr></thead>
+            <tbody id="roleTable"></tbody>
+          </table>
+          <p class="muted" style="margin:12px 0 0;font-size:13px">Verdicts: <span class="ok">ok</span> ≥ 4.5 · <span class="warn">large only</span> ≥ 3.0 · <span class="bad">fails</span>. No role passes on both hosts — that is the reason the fallback is structural, not a color.</p>
+        </div>
+      </section>
+
+      <section data-title="TUI scene">
+        <h2>TUI scene</h2>
+        <p class="muted">A whole session, not a sampler: transcript, inline permission panel, status line. Status content collapses from the outside in as width drops.</p>
+        <div class="row" style="margin-bottom:12px">
+          <span class="muted" style="font-size:13px">Host background:</span>
+          <button data-host-btn="dark" aria-pressed="true">Dark</button>
+          <button data-host-btn="light" aria-pressed="false">Light</button>
+          <button data-host-btn="mono" aria-pressed="false">Monochrome HC</button>
+        </div>
+        <div class="screen">
+          <div class="tui">
+            <div class="line">  <span class="dim">›</span> refactor the token checker to enumerate rendered pairs</div>
+            <div class="line"></div>
+            <div class="line"><span class="c-yellow">●</span> plan    4 steps · read → draft → apply → verify</div>
+            <div class="line"><span class="c-green">✓</span> read    docs/design/DESIGN_SYSTEM.md</div>
+            <div class="line"><span class="c-green">✓</span> read    docs/design/check-tokens.mjs</div>
+            <div class="line"><span class="c-cyan">⠿</span> run     node check-tokens.mjs --strict</div>
+            <div class="line">    <span class="c-red">✗</span> exit 1 · 3 failures</div>
+            <div class="line">      <span class="dim">dawn standard: text/subtle 4.41:1 (&lt; 4.5)</span></div>
+            <div class="line">      <span class="dim">dawn standard: focus-ring/surface 2.71:1 (&lt; 3.0)</span></div>
+            <div class="line"><span class="c-cyan">◌</span> write   docs/design/check-tokens.mjs  <span class="c-green">+12</span> <span class="c-red">−4</span></div>
+            <div class="panel">
+              <div class="line"><span class="title">permission</span> <span class="dim">· apply edit to check-tokens.mjs?</span></div>
+              <div class="line"><span class="dim">+12 −4 · no secrets in diff</span></div>
+              <div class="line">[<span class="c-white strong">a</span>] allow once   [<span class="c-white strong">s</span>] allow session   [<span class="c-white strong">d</span>] deny</div>
+            </div>
+            <div class="line"></div>
+            <div class="line"><span class="dim">… 3 earlier events · ↑ scroll for history</span></div>
+          </div>
+          <div class="statusline">
+            <span>orbit</span><span class="sep">·</span><span>main</span><span class="sep">·</span><span>sonnet</span>
+            <span class="sep">·</span><span>12.4k/200k</span><span class="sep">·</span><span class="c-yellow">◆ plan</span>
+            <span class="sep">·</span><span class="c-yellow">⏸ 2 pending</span><span class="sep">·</span><span>04:12</span>
+          </div>
+        </div>
+
+        <h3>Status line collapse (40 / 26 / 18 cells)</h3>
+        <div class="stack">
+          <div class="screen"><div class="statusline" style="border-top:0">
+            <span>orbit</span><span class="sep">·</span><span>main</span><span class="sep">·</span><span>sonnet</span>
+            <span class="sep">·</span><span>12.4k/200k</span><span class="sep">·</span><span class="c-yellow">◆ plan</span>
+            <span class="sep">·</span><span class="c-yellow">⏸ 2 pending</span><span class="sep">·</span><span>04:12</span>
+          </div></div>
+          <div class="screen" style="max-width:34ch"><div class="statusline" style="border-top:0">
+            <span>orbit</span><span class="sep">·</span><span class="c-yellow">◆ plan</span>
+            <span class="sep">·</span><span class="c-yellow">⏸ 2</span><span class="sep">·</span><span>04:12</span>
+          </div></div>
+          <div class="screen" style="max-width:22ch"><div class="statusline" style="border-top:0">
+            <span>orbit</span><span class="sep">·</span><span class="c-yellow">◆ plan</span><span class="sep">·</span><span class="c-yellow">⏸ 2</span>
+          </div></div>
+        </div>
+      </section>
+
+      <section data-title="Monochrome fallback">
+        <h2>Monochrome fallback</h2>
+        <p class="muted">Switch the scene above to <strong>Monochrome HC</strong> to see the system as a user with <code>NO_COLOR</code> or a forced monochrome terminal sees it. Meaning survives through words, glyphs, and weight — never through a brighter color.</p>
+        <div class="grid2">
+          <div class="screen">
+            <div class="tui">
+              <div class="line"><span class="c-yellow">●</span> plan    running</div>
+              <div class="line"><span class="c-green">✓</span> read    done</div>
+              <div class="line"><span class="c-red">✗</span> run     failed</div>
+              <div class="line"><span class="dim">◌</span> write   pending</div>
+            </div>
+          </div>
+          <div class="screen">
+            <div class="tui">
+              <div class="line"><span class="strong">■</span> plan    running</div>
+              <div class="line">ok read    done</div>
+              <div class="line"><span class="strong">x</span>  run     failed</div>
+              <div class="line">.. write   pending</div>
+            </div>
+          </div>
+        </div>
+        <p class="muted" style="font-size:13px;margin-top:10px">Left: color roles. Right: ASCII glyphs with weight as the only emphasis axis. The right column is the guaranteed path; the left is an enhancement when the host allows it.</p>
+      </section>
+
+      <section data-title="Surface isolation">
+        <h2>Surface isolation</h2>
+        <p class="muted">The web dashboard below is a different surface with its own tokens. Change the web theme: the dashboard must move, the TUI must not. The check asserts both directions, so a no-op cannot pass.</p>
+        <div class="row" style="margin-bottom:12px">
+          <span class="muted" style="font-size:13px">Web theme:</span>
+          <button data-web-btn="dusk" aria-pressed="true">dusk</button>
+          <button data-web-btn="dawn" aria-pressed="false">dawn</button>
+          <button id="isoCheck">Run isolation check</button>
+        </div>
+        <div class="grid2">
+          <div class="card" data-web-swatch style="background:var(--web-surface);color:var(--web-text);border-color:var(--line)">
+            <h3 style="margin-top:0;color:var(--web-accent)">Web dashboard</h3>
+            <p style="margin:0;color:var(--web-subtle)">session orbit-18 · <span style="color:var(--web-ok)">4 succeeded</span> · <span style="color:var(--web-bad)">1 failed</span> · <span style="color:var(--web-warn)">2 pending</span></p>
+          </div>
+          <div class="screen" data-tui-swatch>
+            <div class="tui"><div class="line" data-tui-text><span class="c-cyan" data-tui-text>⠿</span> run     node check-tokens.mjs --strict</div></div>
+            <div class="statusline"><span>orbit</span><span class="sep">·</span><span class="c-yellow">◆ plan</span><span class="sep">·</span><span class="c-yellow">⏸ 2</span></div>
+          </div>
+        </div>
+        <pre class="checkout" id="isoOut" style="margin-top:12px">isolation check: idle — press “Run isolation check”.</pre>
+      </section>
+
+      <section data-title="Glyphs">
+        <h2>Glyphs</h2>
+        <table>
+          <thead><tr><th>Meaning</th><th>Primary</th><th>ASCII fallback</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>running</td><td><code>⠿</code></td><td><code>*</code></td><td>Braille spinner; frozen under reduced motion.</td></tr>
+            <tr><td>done</td><td><code>✓</code></td><td><code>ok</code></td><td>Word form survives fonts without the glyph.</td></tr>
+            <tr><td>failed</td><td><code>✗</code></td><td><code>x</code></td><td>Always paired with the failing check.</td></tr>
+            <tr><td>pending</td><td><code>◌</code></td><td><code>..</code></td><td>Distinct from dim text alone.</td></tr>
+            <tr><td>needs attention</td><td><code>◆</code></td><td><code>!</code></td><td>Used for permission and plan state.</td></tr>
+          </tbody>
+        </table>
+        <p class="muted" style="font-size:13px">Emoji are excluded: width varies by host and font, which breaks cell alignment and truncation.</p>
+      </section>
+
+      <section data-title="Typography">
+        <h2>Typography</h2>
+        <p class="muted">The host owns the font; the TUI owns weight, dim, and alignment. There is exactly one size, so hierarchy is built from emphasis and position, never from a type scale.</p>
+        <div class="screen">
+          <div class="tui">
+            <div class="line"><span class="lab dim">default </span>tool call completed in <span class="bold">1.42s</span></div>
+            <div class="line"><span class="lab dim">bold    </span>attention and values use <span class="bold">weight</span>, not size</div>
+            <div class="line"><span class="lab dim">dim     </span><span class="dim">timestamps, paths, secondary metadata</span></div>
+            <div class="line"><span class="lab dim">italic  </span><span class="italic">sparingly: quoted user text</span></div>
+            <div class="line"><span class="lab dim">aligned </span><span class="dim">                    </span><span class="bold">12.4k</span> / 200k tokens</div>
+          </div>
+          <div class="statusline"><span>ro</span><span class="sep">·</span><span class="c-yellow">◆ plan</span><span class="sep">·</span><span>04:12</span></div>
+        </div>
+        <ul class="muted" style="max-width:76ch;margin-top:12px">
+          <li>Columns are counted in cells; truncation uses a visible ellipsis so “there is more” is never silent.</li>
+          <li>Emoji are excluded from the glyph set — variable width breaks every alignment guarantee.</li>
+          <li>Numeric columns stay right-aligned and tabular, so scanning stays vertical.</li>
+        </ul>
+      </section>
+
+      <section data-title="Components and states">
+        <h2>Components and states</h2>
+        <p class="muted">TUI components are line types and panels. Every state below also survives the monochrome host — shape and word carry it when color cannot.</p>
+        <div class="blocks">
+          <div class="block">
+            <h4>Transcript line types</h4>
+            <div class="screen"><div class="tui">
+              <div class="line"><span class="dim">›</span> user prompt</div>
+              <div class="line"><span class="c-yellow">●</span> plan · 4 steps</div>
+              <div class="line"><span class="c-cyan">⠿</span> tool running</div>
+              <div class="line"><span class="c-green">✓</span> tool done</div>
+              <div class="line"><span class="c-red">✗</span> tool failed</div>
+            </div></div>
+          </div>
+          <div class="block">
+            <h4>Panel · focused action</h4>
+            <div class="screen"><div class="tui">
+              <div class="line"><span class="c-yellow">⚠ permission</span> apply edit?</div>
+              <div class="line"><span class="sel">[a] allow once</span>   [s] allow session</div>
+              <div class="line"><span class="dim">[d] deny          (esc)</span></div>
+            </div></div>
+            <p style="margin-top:8px">Focus is inverse video: visible with color disabled.</p>
+          </div>
+          <div class="block">
+            <h4>Status line segments</h4>
+            <div class="screen">
+              <div class="statusline" style="border-top:0">
+                <span>orbit</span><span class="sep">·</span><span>main</span><span class="sep">·</span>
+                <span class="c-yellow">◆ plan</span><span class="sep">·</span><span class="c-yellow">⏸ 2</span>
+              </div>
+              <div class="statusline" style="border-top:1px solid var(--host-dim)">
+                <span class="dim">— collapsed from the outside in as width drops</span>
+              </div>
+            </div>
+          </div>
+          <div class="block">
+            <h4>Disabled and unavailable</h4>
+            <div class="screen"><div class="tui">
+              <div class="line"><span class="dim">[d] deny</span> <span class="dim">(no pending request)</span></div>
+              <div class="line"><span class="dim">⠿ run</span> <span class="dim">queued · waiting for permission</span></div>
+            </div></div>
+            <p style="margin-top:8px">Unavailable actions stay visible with their reason; they are not hidden.</p>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Motion and accessibility">
+        <h2>Motion and accessibility</h2>
+        <div class="blocks">
+          <div class="block">
+            <h4>Motion budget</h4>
+            <ul class="muted" style="margin:0;padding-left:18px">
+              <li>One spinner cadence while work is running; it stops the moment the result lands.</li>
+              <li><code>prefers-reduced-motion</code> and dumb terminals freeze the spinner at a static glyph.</li>
+              <li>No transitions, no scroll effects — terminal motion is expensive and distracting.</li>
+            </ul>
+          </div>
+          <div class="block">
+            <h4>Accessibility</h4>
+            <ul class="muted" style="margin:0;padding-left:18px">
+              <li>Focus is inverse video, visible without color; meaning never rides on an ANSI role.</li>
+              <li>The screen is a linear text stream — screen readers get the same order as the eye.</li>
+              <li>Every keybinding is discoverable from a status line or help overlay.</li>
+              <li>The monochrome high-contrast path is a shipped mode, not a fallback users must invent.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Verification">
+        <h2>Verification</h2>
+        <ul>
+          <li>Pairs are enumerated from rendered components, per host background — not sampled by hand.</li>
+          <li>Advisory numbers are labeled with the reference palette they assume.</li>
+          <li>Structural fallbacks are asserted: a no-color rendering, a monochrome rendering, and an ASCII glyph set for every role.</li>
+          <li>The drift check rejects any TUI token that resolves to a web token unless the sharing is declared; the check itself is proven by mutating an artifact and confirming failure.</li>
+        </ul>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var REF = {
+    name: "xterm-style defaults (illustrative)",
+    dark:  {bg:"#101317", fg:"#d7dce2", dim:"#7d8794", cyan:"#2ad4d4", green:"#4ec46a",
+            yellow:"#d9b04a", red:"#f06a6a", blue:"#6f8ff0", magenta:"#d47adb", white:"#eef1f5"},
+    light: {bg:"#f6f1e7", fg:"#22252b", dim:"#9a9284", cyan:"#0e6f6f", green:"#2f7d32",
+            yellow:"#7a5c00", red:"#a3231c", blue:"#2743c9", magenta:"#7c2483", white:"#ffffff"}
+  };
+  var ROLES = [
+    {role:"accent / running", ansi:"36", key:"cyan", use:"plan step, active tool"},
+    {role:"success / done",   ansi:"32", key:"green", use:"completed steps"},
+    {role:"attention",        ansi:"33", key:"yellow", use:"pending, permission, plan dot"},
+    {role:"danger / failed",  ansi:"31", key:"red", use:"failed checks, destructive"},
+    {role:"info",             ansi:"34", key:"blue", use:"links, hints"},
+    {role:"emphasis",         ansi:"1 + default", key:"white", use:"keys, focused action"},
+    {role:"muted",            ansi:"2 (dim)", key:"dim", use:"secondary metadata"}
+  ];
+
+  function rgb(hex){ return hex.replace("#","").match(/../g).map(function(h){return parseInt(h,16)/255;}); }
+  function lin(c){ return c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); }
+  function lum(hex){ var c = rgb(hex); return 0.2126*lin(c[0]) + 0.7152*lin(c[1]) + 0.0722*lin(c[2]); }
+  function ratio(a,b){ var x = lum(a), y = lum(b); var hi = Math.max(x,y), lo = Math.min(x,y);
+    return (hi + 0.05) / (lo + 0.05); }
+  function verdict(r){ if (r >= 4.5) return '<span class="ok">ok</span>';
+    if (r >= 3.0) return '<span class="warn">large only</span>';
+    return '<span class="bad">fails</span>'; }
+
+  var tbody = document.getElementById("roleTable");
+  ROLES.forEach(function(r){
+    var rd = ratio(REF.dark[r.key], REF.dark.bg);
+    var rl = ratio(REF.light[r.key], REF.light.bg);
+    var tr = document.createElement("tr");
+    tr.innerHTML = '<td>' + r.role + '</td><td><code>' + r.ansi + '</code></td><td class="muted">' +
+      r.use + '</td><td class="num">' + rd.toFixed(2) + ':1 ' + verdict(rd) +
+      '</td><td class="num">' + rl.toFixed(2) + ':1 ' + verdict(rl) + '</td>';
+    tbody.appendChild(tr);
+  });
+
+  var toc = document.getElementById("toc");
+  var sections = Array.prototype.slice.call(document.querySelectorAll("main > section[data-title]"));
+  sections.forEach(function(s, i){
+    s.id = "sec-" + (i+1);
+    var a = document.createElement("a");
+    a.href = "#" + s.id; a.textContent = s.dataset.title;
+    toc.appendChild(a);
+  });
+
+  var hostBtns = Array.prototype.slice.call(document.querySelectorAll("[data-host-btn]"));
+  hostBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.body.dataset.host = btn.dataset.hostBtn;
+      hostBtns.forEach(function(b){ b.setAttribute("aria-pressed", String(b === btn)); });
+    });
+  });
+
+  var webBtns = Array.prototype.slice.call(document.querySelectorAll("[data-web-btn]"));
+  function setWeb(theme){
+    document.documentElement.dataset.web = theme;
+    webBtns.forEach(function(b){ b.setAttribute("aria-pressed", String(b.dataset.webBtn === theme)); });
+  }
+  webBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){ setWeb(btn.dataset.webBtn); });
+  });
+
+  var isoOut = document.getElementById("isoOut");
+  document.getElementById("isoCheck").addEventListener("click", function(){
+    var tuiText = document.querySelector("[data-tui-text]");
+    var webCard = document.querySelector("[data-web-swatch]");
+    var tuiBefore = getComputedStyle(tuiText).color;
+    var webBefore = getComputedStyle(webCard).backgroundColor + getComputedStyle(webCard).color;
+    var next = document.documentElement.dataset.web === "dusk" ? "dawn" : "dusk";
+    setWeb(next);
+    var tuiAfter = getComputedStyle(tuiText).color;
+    var webAfter = getComputedStyle(webCard).backgroundColor + getComputedStyle(webCard).color;
+    var webMoved = webBefore !== webAfter;
+    var tuiHeld = tuiBefore === tuiAfter;
+    var lines = [
+      "web theme:            " + (next === "dawn" ? "dusk → dawn" : "dawn → dusk"),
+      "web surface moved:    " + (webMoved ? "yes" : "NO — check is vacuous") + (webMoved ? "" : "  ✗"),
+      "TUI pixel moved:      " + (tuiHeld ? "no" : "YES — theme leak") + (tuiHeld ? "" : "  ✗"),
+      "TUI text color:       " + tuiAfter,
+      "result:               " + (webMoved && tuiHeld ? "PASS — surfaces isolated" : "FAIL")
+    ];
+    isoOut.textContent = lines.join("\n");
+  });
+})();
+</script>
+</body>
+</html>

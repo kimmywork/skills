@@ -105,3 +105,22 @@ Create, validate, and execute permission-bounded recurring workflows.
 
 #### `style-calibration`
 > Extract, validate, compare, and apply a writing style profile from samples.
+
+---
+
+## Showcases
+
+Example outputs of the `design-system` skill, one per surface class. Each is a single self-contained HTML file; typography demos load webfonts with system fallbacks:
+
+| Case | Surface | Demonstrates |
+|---|---|---|
+| [terminal](docs/showcases/terminal.html) | TUI + Web | Host-owned palette, ANSI roles, monochrome high-contrast fallback, surface isolation check |
+| [cli](docs/showcases/cli.html) | CLI | stdout/stderr grammar, exit codes, TTY/`NO_COLOR`/CI modes, runtime width |
+| [mobile](docs/showcases/mobile.html) | Mobile app | Whole-screen scenes, independent light/dark, touch and safe-area annotations, live probes |
+| [game](docs/showcases/game.html) | Game UI · sci-fi action | Safe zones, controller prompts, colorblind and motion proofs, handheld orientations |
+| [game-rpg](docs/showcases/game-rpg.html) | Game UI · fantasy RPG | Display/UI/text type registers, dialogue measure, parchment surfaces, rarity by frame |
+| [game-anime](docs/showcases/game-anime.html) | Game UI · anime gacha | Landscape world + dark menu panels, live EN/日本語 toggle, inventory/achievements/summon screens, rarity by frame + stars + label |
+| [game-casual](docs/showcases/game-casual.html) | Game UI · casual puzzle | Shape-coded pieces, bounded motion, one-thumb targets, no dark patterns |
+| [print](docs/showcases/print.html) | Print | Fixed canvas, shared grid, grayscale proof, print color values |
+
+Gallery: [`docs/showcases/index.html`](docs/showcases/index.html). Install the skill: `npx skills add kimmywork/skills --skill design-system` · Skill doc: [SKILL.md](https://skills.kimmy.fun/drafting/skills/design-system/SKILL.html).

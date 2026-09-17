@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design system showcases</title>
+<style>
+  *{box-sizing:border-box}
+  :root{
+    --bg:#f4f4f2; --fg:#17181b; --muted:#5f6470; --card:#ffffff; --line:#e3e3df;
+    --accent:#3f3f46;
+  }
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  a{color:inherit}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  header{padding:64px 0 30px}
+  .kicker{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 12px}
+  h1{font-size:36px;line-height:1.15;letter-spacing:-.02em;margin:0 0 14px;max-width:22ch}
+  .lede{color:var(--muted);max-width:72ch;margin:0}
+  .note{margin-top:22px;padding:14px 18px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    color:var(--muted);font-size:14px;max-width:80ch}
+  .install{margin-top:14px;padding:14px 18px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;max-width:80ch}
+  .install-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px}
+  .cmd{display:inline-block;background:#17181b;color:#f2f2ef;border-radius:8px;padding:8px 12px;font-size:12.5px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-x:auto;max-width:100%}
+  .install-actions{display:flex;gap:8px;align-items:center}
+  .install-actions button,.install-actions a{font:inherit;font-size:13px;font-weight:700;padding:8px 14px;border-radius:8px;
+    border:1px solid var(--line);background:#f6f6f4;color:var(--fg);cursor:pointer;text-decoration:none}
+  .install-actions a{background:#17181b;color:#fff;border-color:#17181b}
+  .install-actions button:focus-visible,.install-actions a:focus-visible{outline:2px solid #17181b;outline-offset:2px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px;padding:26px 0 40px}
+  .case{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;
+    overflow:hidden;text-decoration:none;transition:transform .12s ease,box-shadow .12s ease}
+  .case:hover,.case:focus-visible{transform:translateY(-2px);box-shadow:0 12px 30px rgba(20,22,26,.10);outline:none}
+  .case:focus-visible{outline:2px solid #17181b;outline-offset:2px}
+  .preview{height:150px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line);
+    background:#ececea;position:relative;overflow:hidden}
+  .tag{position:absolute;top:10px;left:12px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:#5f6470;font-weight:700}
+  .case .body{padding:16px 18px 20px;display:flex;flex-direction:column;gap:10px;flex:1}
+  .case h2{font-size:17px;margin:0;letter-spacing:-.01em}
+  .case p{margin:0;font-size:13.5px;color:var(--muted);flex:1}
+  .facts{display:flex;flex-wrap:wrap;gap:6px}
+  .facts span{font-size:11px;padding:2px 8px;border:1px solid var(--line);border-radius:999px;color:var(--muted)}
+  .open{font-size:13px;font-weight:700;color:var(--fg)}
+  .open::after{content:" →"}
+  /* mini previews */
+  .pv-term{width:190px;height:96px;background:#101317;border-radius:8px;padding:9px 11px;display:flex;flex-direction:column;gap:5px}
+  .pv-term i{display:block;height:5px;border-radius:2px;background:#39414f}
+  .pv-term i:nth-child(1){width:60%;background:#2ad4d4}
+  .pv-term i:nth-child(2){width:82%}
+  .pv-term i:nth-child(4){width:46%;background:#d9b04a}
+  .pv-cli{width:190px;height:96px;background:#12121a;border-radius:8px;padding:9px 11px;display:flex;flex-direction:column;gap:5px}
+  .pv-cli i{display:block;height:5px;border-radius:2px;background:#3a3a4a}
+  .pv-cli i:nth-child(1){width:38%;background:#a78bfa}
+  .pv-cli i:nth-child(3){width:74%;background:#5dd47e}
+  .pv-mobile{display:flex;gap:10px;align-items:center}
+  .pv-mobile .ph{width:52px;height:104px;border-radius:10px;border:3px solid #2c2f36;background:linear-gradient(180deg,#fff 30%,#eef1f4)}
+  .pv-mobile .ph.dark{background:linear-gradient(180deg,#151d20 30%,#0c1214)}
+  .pv-mobile .ph i{display:block;margin:8px 6px 0;height:4px;border-radius:2px;background:#c9cfd6}
+  .pv-mobile .ph.dark i{background:#3a464c}
+  .pv-game{width:200px;height:112px;border-radius:8px;background:linear-gradient(180deg,#0d1b2e,#17324a 45%,#0e1a24);position:relative;overflow:hidden}
+  .pv-game .hud{position:absolute;inset:0}
+  .pv-game .bar{position:absolute;left:10px;bottom:12px;width:64px;height:6px;border-radius:3px;background:#1f2937;overflow:hidden}
+  .pv-game .bar::after{content:"";display:block;width:72%;height:100%;background:#4ade80}
+  .pv-game .obj{position:absolute;left:10px;top:10px;width:56px;height:5px;border-radius:2px;background:#5eead4}
+  .pv-game .ret{position:absolute;left:50%;top:46%;width:14px;height:14px;margin:-7px 0 0 -7px;border:2px solid #fff;border-radius:50%}
+  .pv-print{position:relative;width:168px;height:112px}
+  .pv-print .paper{position:absolute;width:78px;height:110px;background:#fbf9f4;border:1px solid #d9d3c6;border-radius:3px;
+    box-shadow:0 4px 10px rgba(30,28,24,.14);padding:8px 9px}
+  .pv-print .paper:first-child{left:2px;top:2px}
+  .pv-print .paper:last-child{right:2px;top:2px;transform:rotate(2.5deg)}
+  .pv-print i{display:block;height:3px;border-radius:2px;background:#c9c3b6;margin-bottom:5px}
+  .pv-print i:first-child{width:70%;background:#0b5d4f;height:5px}
+  footer{border-top:1px solid var(--line);padding:22px 0 60px;color:var(--muted);font-size:13.5px;display:flex;
+    flex-wrap:wrap;gap:8px 22px;justify-content:space-between}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="kicker">design-system · example outputs</p>
+    <h1>Eight systems, eight surfaces, eight self-contained proofs</h1>
+    <p class="lede">Each case is a showcase artifact produced by the <code>design-system</code> skill for a different surface class: terminal, CLI, mobile app, four game genres, and print. Every page is a single HTML file, obeys its own system, and renders its whole-use scenes on the target canvas — not a component sampler.</p>
+    <div class="note">The gallery never injects a theme into the cases; a surface's system is isolated, and only vocabulary is shared. Game and document cases load webfonts from Google Fonts to demonstrate their type registers, and fall back to system faces offline; everything else is inline. Open a case directly to see its own controls, token tables, and verification probes.</div>
+    <div class="install">
+      <div>
+        <div class="install-label">Install the skill</div>
+        <code class="cmd" id="installCmd">npx skills add kimmywork/skills --skill design-system</code>
+      </div>
+      <div class="install-actions">
+        <button id="copyBtn" type="button">Copy</button>
+        <a href="https://skills.kimmy.fun/drafting/skills/design-system/SKILL.html" target="_blank" rel="noopener">Read SKILL.md ↗</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <a class="case" href="terminal.html">
+      <div class="preview"><span class="tag">TUI + Web</span>
+        <div class="pv-term" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="body">
+        <h2>orbit — agent console</h2>
+        <p>Host-owned palette, ANSI roles, monochrome high-contrast path, and a live isolation check that a web theme never moves a TUI pixel.</p>
+        <div class="facts"><span>advisory contrast</span><span>glyph table</span><span>surface isolation</span></div>
+        <span class="open">Open case</span>
+      </div>
+    </a>
+
+    <a class="case" href="cli.html">
+      <div class="preview"><span class="tag">CLI</span>
+        <div class="pv-cli" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="body">
+        <h2>relay — deployment CLI</h2>
+        <p>stdout/stderr grammar, exit codes as interface, runtime color and width, and whole transcripts including failure and pipe sessions.</p>
+        <div class="facts"><span>NO_COLOR / CI</span><span>width slider</span><span>--json contract</span></div>
+        <span class="open">Open case</span>
+      </div>
+    </a>
+
+    <a class="case" href="mobile.html">
+      <div class="preview"><span class="tag">Mobile app</span>
+        <div class="pv-mobile" aria-hidden="true">
+          <div class="ph"><i></i><i></i><i></i></div>
+          <div class="ph dark"><i></i><i></i><i></i></div>
+        </div>
+      </div>
+      <div class="body">
+        <h2>pulse — health app</h2>
+        <p>Six whole-screen scenes, independent light and dark schemes, 48dp targets, dynamic type to 2.0×, and probes that run on the page.</p>
+        <div class="facts"><span>360×760 frames</span><span>overlays in context</span><span>live probes</span></div>
+        <span class="open">Open case</span>
+      </div>
+    </a>
+
+    <a class="case" href="game.html">
+      <div class="preview"><span class="tag">Game UI · sci-fi</span>
+        <div class="pv-game" aria-hidden="true">
+          <div class="hud">
+            <span class="obj"></span><span class="bar"></span><span class="ret"></span>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <h2>drift — action game HUD</h2>
+        <p>Safe-zone containment, controller-first prompts, redundant status encoding, grayscale and colorblind proofs, motion and flash limits, handheld in both orientations.</p>
+        <div class="facts"><span>Chakra Petch · IBM Plex Sans</span><span>reduce motion / flash</span><span>portrait + landscape</span></div>
+        <span class="open">Open case</span>
+      </div>
+    </a>
+
+    <a class="case" href="game-rpg.html">
+      <div class="preview" style="background:#191510"><span class="tag" style="color:#9d937f">Game UI · fantasy RPG</span>
+        <div style="width:180px;height:104px;border-radius:8px;border:1px solid rgba(201,162,39,.6);background:linear-gradient(160deg,#2c2417,#171310);padding:12px;position:relative">
+          <div style="font-family:Georgia,serif;color:#c9a227;font-size:13px;letter-spacing:.08em">EMBERHOLD</div>
+          <div style="display:flex;gap:6px;margin-top:10px">
+            <span style="width:70px;height:7px;border-radius:4px;background:#a8342c"></span>
+            <span style="width:42px;height:7px;border-radius:4px;background:#3f6bc4"></span>
+          </div>
+          <div style="position:absolute;right:10px;bottom:10px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(201,162,39,.6);background:radial-gradient(circle at 40% 35%,#d8c9a3,#b4a37c)"></div>
+        </div>
+      </div>
+      <div class="body">
+        <h2>emberhold — fantasy RPG</h2>
+        <p>Parchment panels and gold rules over a three-register type system, dialogue as real prose at a proper measure, inventory rarity that survives grayscale, quest and combat states.</p>
+        <div class="facts"><span>Cinzel · Alegreya Sans · Spectral</span><span>dialogue measure</span><span>rarity by frame</span></div>
+        <span class="open">Open case</span>
+      </div>
+    </a>
+
+    <a class="case" href="game-anime.html">
+      <div class="preview" style="background:linear-gradient(180deg,#8ed0f5 0%,#bfe6f7 40%,#7fb85c 62%,#5f9445 100%)"><span class="tag" style="color:#2b3a55">Game UI · anime gacha</span>
+        <div style="position:relative;width:190px;height:100px">
+          <span style="position:absolute;top:6px;left:4px;width:44px;height:44px;border-radius:50%;border:2px solid #fff;background:radial-gradient(circle at 35% 30%,#a8d38a,#4b7a3f)"></span>
+          <span style="position:absolute;top:14px;left:60px;width:74px;height:9px;border-radius:5px;background:rgba(18,24,40,.55)"></span>
+          <span style="position:absolute;top:30px;left:60px;width:52px;height:9px;border-radius:5px;background:rgba(18,24,40,.45)"></span>
+          <span style="position:absolute;bottom:8px;left:4px;width:96px;height:7px;border-radius:4px;background:linear-gradient(90deg,#7fdc86,#4fae58)"></span>
+          <span style="position:absolute;bottom:8px;right:4px;width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.8);background:rgba(18,24,40,.55)"></span>
+        </div>
+      </div>
+      <div class="body">
+        <h2>asteria — anime gacha</h2>
+        <p>Landscape 16:9 throughout: bright world screens, dark panels for inventory, achievements, and summons, a live English/日本語 toggle, and rarity that survives grayscale.</p>
+        <div class="facts"><span>Kaisei Decol · Zen Maru · Zen Kaku</span><span>EN / JP toggle</span><span>world · character · inventory · achievements · gacha</span></div>
+        <span class="open">Open case</span>
+      </div>
+    </a>
+
+    <a class="case" href="game-casual.html">
+      <div class="preview" style="background:#fff1f6"><span class="tag" style="color:#7a7286">Game UI · casual puzzle</span>
+        <div style="display:grid;grid-template-columns:repeat(4,26px);gap:6px">
+          <span style="width:26px;height:26px;border-radius:50%;background:#e0487a"></span>
+          <span style="width:26px;height:26px;border-radius:6px;background:#e8a819"></span>
+          <span style="width:22px;height:22px;border-radius:4px;background:#2f9e77;transform:rotate(45deg)"></span>
+          <span style="width:26px;height:26px;background:#3f7fd2;clip-path:polygon(50% 6%,94% 92%,6% 92%)"></span>
+          <span style="width:26px;height:26px;background:#8a4fd0;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)"></span>
+          <span style="width:26px;height:26px;background:#dd6b25;clip-path:polygon(25% 5%,75% 5%,100% 50%,75% 95%,25% 95%,0% 50%)"></span>
+          <span style="width:26px;height:26px;border-radius:50%;background:#e0487a"></span>
+          <span style="width:26px;height:26px;border-radius:6px;background:#e8a819"></span>
+        </div>
+      </div>
+      <div class="body">
+        <h2>sugarfall — casual puzzle</h2>
+        <p>Shape-coded pieces that stay readable in grayscale, bounded juice with a reduced-motion build, big one-thumb targets, and failure states that never pressure a purchase.</p>
+        <div class="facts"><span>Luckiest Guy · Baloo 2 · Nunito Sans</span><span>shape-coded board</span><span>no dark patterns</span></div>
+        <span class="open">Open case</span>
+      </div>
+    </a>
+
+    <a class="case" href="print.html">
+      <div class="preview"><span class="tag">Print</span>
+        <div class="pv-print" aria-hidden="true">
+          <div class="paper"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="paper"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+      </div>
+      <div class="body">
+        <h2>fieldstation — poster and report</h2>
+        <p>Fixed canvas at true proportion, shared typographic grid, grayscale hierarchy proof, and color tokens with print values.</p>
+        <div class="facts"><span>A2 / A4</span><span>grid overlay</span><span>CMYK preview</span></div>
+        <span class="open">Open case</span>
+      </div>
+    </a>
+  </div>
+
+  <footer>
+    <span>Each case is one self-contained HTML file — no builds; webfonts degrade to system faces offline.</span>
+    <span><a href="https://github.com/kimmywork/skills">kimmywork/skills</a> · <code>drafting/skills/design-system</code></span>
+  </footer>
+</div>
+<script>
+(function(){
+  "use strict";
+  var btn = document.getElementById("copyBtn");
+  var cmd = document.getElementById("installCmd");
+  function fallback(text, done){
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.left = "-9999px";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+    done();
+  }
+  btn.addEventListener("click", function(){
+    var text = cmd.textContent.trim();
+    function done(){
+      btn.textContent = "Copied";
+      setTimeout(function(){ btn.textContent = "Copy"; }, 1600);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function(){ fallback(text, done); });
+    } else {
+      fallback(text, done);
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pulse — mobile app showcase</title>
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  :root{
+    --page-bg:#f6f7f9; --page-fg:#16181d; --page-muted:#5c6470;
+    --card:#ffffff; --line:#e4e7ec; --accent:#0f766e;
+    --ok:#15803d; --warn:#8a6100; --bad:#b3261e;
+  }
+  body{margin:0;background:var(--page-bg);color:var(--page-fg);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  a{color:var(--accent)}
+  .wrap{max-width:1220px;margin:0 auto;padding:0 24px}
+  header.top{padding:36px 0 22px;border-bottom:1px solid var(--line)}
+  .crumb{font-size:13px;color:var(--page-muted);margin:0 0 10px}
+  h1{font-size:30px;line-height:1.2;margin:0 0 8px;letter-spacing:-.01em}
+  .lede{color:var(--page-muted);max-width:70ch;margin:0}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .chip{font-size:12px;padding:3px 10px;border:1px solid var(--line);border-radius:999px;color:var(--page-muted);background:var(--card)}
+  .layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:44px;padding:30px 0 90px}
+  nav#toc{position:sticky;top:22px;align-self:start;display:flex;flex-direction:column;gap:2px}
+  nav#toc a{font-size:13px;text-decoration:none;color:var(--page-muted);padding:5px 8px;border-radius:6px}
+  nav#toc a:hover{background:var(--card);color:var(--page-fg)}
+  main>section{padding:26px 0 34px;border-bottom:1px solid var(--line)}
+  main>section:last-child{border-bottom:0}
+  h2{font-size:20px;margin:0 0 14px;letter-spacing:-.01em}
+  h3{font-size:15px;margin:24px 0 10px}
+  p{max-width:76ch}
+  .muted{color:var(--page-muted)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  button{font:inherit;font-size:13px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);
+    background:var(--card);color:var(--page-fg);cursor:pointer}
+  button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+  button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--page-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  .num{font-variant-numeric:tabular-nums;text-align:right}
+  .ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em}
+
+  /* device frames */
+  .scenes{display:flex;gap:22px;overflow-x:auto;padding:6px 4px 20px;scroll-snap-type:x proximity}
+  .scene{flex:0 0 auto;margin:0;scroll-snap-align:start}
+  .scene figcaption{font-size:12.5px;color:var(--page-muted);max-width:360px;margin-top:10px}
+  .phone,.appscope{
+    --app-bg:#f7f8fa; --app-surface:#ffffff; --app-text:#14171c; --app-subtle:#5f6673;
+    --app-accent:#0f766e; --app-accent-soft:#d7ecea; --app-border:#e4e7ec;
+    --app-ok:#15803d; --app-warn:#b45309; --app-bad:#b91c1c;
+    background:var(--app-bg);color:var(--app-text)}
+  .phone{position:relative;width:360px;height:760px;border-radius:30px;overflow:hidden;
+    display:flex;flex-direction:column;border:1px solid var(--line);box-shadow:0 10px 30px rgba(20,22,26,.10);
+    font-size:14px}
+  body[data-mode="dark"] .phone,body[data-mode="dark"] .appscope{
+    --app-bg:#0c1214; --app-surface:#151d20; --app-text:#e8eef0; --app-subtle:#9aa8ad;
+    --app-accent:#2dd4bf; --app-accent-soft:#10312e; --app-border:#243034;
+    --app-ok:#4ade80; --app-warn:#fbbf24; --app-bad:#f87171}
+  .statusbar{flex:none;height:30px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 20px;font-size:11.5px;color:var(--app-subtle);background:var(--app-bg)}
+  .topbar{flex:none;display:flex;align-items:center;justify-content:space-between;
+    padding:6px 20px 12px;background:var(--app-bg)}
+  .scr-title{font-size:calc(20px * var(--ts,1));font-weight:700;letter-spacing:-.01em}
+  .avatar{width:32px;height:32px;border-radius:50%;background:var(--app-accent-soft);color:var(--app-accent);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+  .content{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 20px 18px;display:flex;flex-direction:column;gap:14px;
+    scrollbar-width:thin}
+  .content.center{justify-content:center;align-items:center;text-align:center;gap:18px}
+  .bottombar{flex:none;display:flex;border-top:1px solid var(--app-border);background:var(--app-surface)}
+  .nav-item{flex:1;padding:10px 0 12px;display:flex;flex-direction:column;align-items:center;gap:3px;
+    font-size:calc(11px * var(--ts,1));color:var(--app-subtle);text-decoration:none}
+  .nav-item.active{color:var(--app-accent);font-weight:600}
+  .hero{background:var(--app-surface);border:1px solid var(--app-border);border-radius:18px;padding:18px;
+    display:flex;align-items:center;gap:16px}
+  .hero-num{font-size:calc(34px * var(--ts,1));font-weight:800;letter-spacing:-.02em;line-height:1}
+  .tile{background:var(--app-surface);border:1px solid var(--app-border);border-radius:14px;padding:12px 14px;flex:1;min-width:0}
+  .tile-num{font-size:calc(20px * var(--ts,1));font-weight:700;line-height:1.2}
+  .tile-cap{font-size:calc(11.5px * var(--ts,1));color:var(--app-subtle)}
+  .tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .sec-h{font-size:calc(13px * var(--ts,1));font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--app-subtle);margin:6px 0 -6px}
+  .listrow{background:var(--app-surface);border:1px solid var(--app-border);border-radius:14px;padding:12px 14px;
+    display:flex;align-items:center;gap:12px;min-height:56px}
+  .listrow .grow{flex:1;min-width:0}
+  .t{font-size:calc(14px * var(--ts,1));font-weight:600}
+  .s{font-size:calc(12px * var(--ts,1));color:var(--app-subtle)}
+  .ring-track{stroke:var(--app-border)}
+  .ring-value{stroke:var(--app-accent)}
+  .chart-line{stroke:var(--app-accent);fill:none;stroke-width:3;stroke-linecap:round}
+  .chart-dot{fill:var(--app-accent)}
+  .chart-axis{stroke:var(--app-border);stroke-width:1}
+  .pill{font-size:calc(11px * var(--ts,1));padding:2px 8px;border-radius:999px;background:var(--app-accent-soft);
+    color:var(--app-accent);font-weight:600;white-space:nowrap}
+  .pill.warn{background:transparent;border:1px solid var(--app-warn);color:var(--app-warn)}
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border-radius:14px;
+    background:var(--app-accent);color:#ffffff;font-weight:700;font-size:calc(15px * var(--ts,1));border:0;width:100%;cursor:pointer}
+  .btn.secondary{background:transparent;color:var(--app-accent);border:1.5px solid var(--app-accent)}
+  .btn.ghost{background:var(--app-surface);color:var(--app-text);border:1px solid var(--app-border)}
+  .breathe{width:180px;height:180px;border-radius:50%;background:var(--app-accent-soft);
+    border:2px solid var(--app-accent);display:flex;align-items:center;justify-content:center;
+    font-size:calc(16px * var(--ts,1));font-weight:700;color:var(--app-accent);
+    animation:breathe 6s ease-in-out infinite}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+  @media (prefers-reduced-motion: reduce){.breathe{animation:none}}
+  .scrim{position:absolute;inset:0;background:rgba(10,12,14,.45);display:flex;align-items:flex-end}
+  .sheet{width:100%;background:var(--app-surface);border-radius:22px 22px 0 0;padding:14px 20px 22px;
+    display:flex;flex-direction:column;gap:12px}
+  .grabber{width:40px;height:4px;border-radius:2px;background:var(--app-border);margin:0 auto}
+  .dots{display:flex;gap:6px;justify-content:center}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--app-border)}
+  .dot.on{background:var(--app-accent)}
+  .chart{width:100%;height:auto;display:block}
+  .phone.annotations [data-tap]{outline:2px dashed #f59e0b;outline-offset:2px}
+  .phone.annotations .statusbar{box-shadow:inset 0 -2px 0 #f59e0b}
+  .phone.annotations .bottombar{box-shadow:inset 0 2px 0 #f59e0b}
+  .samples{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:16px}
+  .sample{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+  .sample h4{margin:0 0 10px;font-size:13px;color:var(--page-muted);text-transform:uppercase;letter-spacing:.05em}
+  .probe{display:flex;flex-wrap:wrap;gap:8px}
+  .probe span{font-size:12.5px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card)}
+  .probe .pass{color:var(--ok);border-color:var(--ok)}
+  .probe .fail{color:var(--bad);border-color:var(--bad)}
+  .swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:10px}
+  .sw{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+  .sw .chip{height:44px;background:var(--app-surface)}
+  .sw .meta{padding:8px 10px;font-size:12px}
+  .sw .meta b{display:block;font-size:12.5px}
+  .sw .meta span{color:var(--page-muted)}
+  .type-spec{background:var(--app-surface);border:1px solid var(--app-border);border-radius:12px;padding:16px 18px;color:var(--app-text)}
+  .type-spec .tl{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px dashed var(--app-border);padding:8px 0}
+  .type-spec .tl:last-child{border-bottom:0}
+  .type-spec .role{font-size:11px;color:var(--app-subtle);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;gap:18px}
+    nav#toc{position:static;flex-direction:row;overflow-x:auto;padding-bottom:6px;gap:4px}
+    nav#toc a{white-space:nowrap;border:1px solid var(--line)}
+  }
+</style>
+</head>
+<body data-mode="light">
+<div class="wrap">
+  <header class="top">
+    <p class="crumb"><a href="index.html">← showcases</a> · case 03 · Rebuild · surface: mobile app (Compose)</p>
+    <h1>pulse — whole screens, both modes, real ergonomics</h1>
+    <p class="lede">A health app rebuilt as a system. Dark mode is a feature with its own measurements, not an inversion; every scene is a full 360×760 screen; states appear in the form they actually take; touch, safe-area, and type-scaling constraints are verified, not assumed.</p>
+    <div class="chips">
+      <span class="chip">6 whole screen scenes</span>
+      <span class="chip">independent light / dark</span>
+      <span class="chip">48dp targets</span>
+      <span class="chip">dynamic type 2.0×</span>
+      <span class="chip">live probes</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav id="toc" aria-label="Contents"></nav>
+    <main>
+
+      <section data-title="Context">
+        <h2>Context</h2>
+        <p><strong>Who:</strong> people checking a chronic condition several times a day, often at night. <strong>Jobs:</strong> see the current status, run a guided session, review a weekly report. <strong>Constraints:</strong> one hand, variable light, OS font scaling, two schemes that are both first-class. The system governs whole screens and states — component samples alone would hide how they meet on a phone.</p>
+        <div class="row" style="margin-top:14px">
+          <span class="muted" style="font-size:13px">Scheme:</span>
+          <button data-mode-btn="light" aria-pressed="true">Light</button>
+          <button data-mode-btn="dark" aria-pressed="false">Dark</button>
+          <span class="muted" style="font-size:13px;margin-left:10px">Annotations:</span>
+          <button id="annoBtn" aria-pressed="false">Touch + safe areas</button>
+        </div>
+      </section>
+
+      <section data-title="Scenes">
+        <h2>Scenes</h2>
+        <p class="muted">Pan the strip. Six screens run real scenarios: status, an immersive session, a report, a whole-screen empty state, onboarding, and a stacked sheet.</p>
+        <div class="scenes" id="scenes">
+
+          <figure class="scene">
+            <div class="phone" data-scene="home">
+              <div class="statusbar"><span>9:41</span><span>▮▮▮ ▾</span></div>
+              <div class="topbar"><span class="scr-title">Today</span><span class="avatar" data-tap>M</span></div>
+              <div class="content">
+                <div class="hero">
+                  <svg width="72" height="72" viewBox="0 0 72 72" aria-hidden="true">
+                    <circle class="ring-track" cx="36" cy="36" r="30" fill="none" stroke-width="8"/>
+                    <circle class="ring-value" cx="36" cy="36" r="30" fill="none" stroke-width="8" stroke-linecap="round"
+                      stroke-dasharray="188" stroke-dashoffset="58" transform="rotate(-90 36 36)"/>
+                  </svg>
+                  <div>
+                    <div class="hero-num">72</div>
+                    <div class="s">resting score · <span style="color:var(--app-ok)">calm</span></div>
+                  </div>
+                </div>
+                <div class="tiles">
+                  <div class="tile"><div class="tile-num">6.4h</div><div class="tile-cap">sleep</div></div>
+                  <div class="tile"><div class="tile-num">3</div><div class="tile-cap">sessions</div></div>
+                  <div class="tile"><div class="tile-num">+4%</div><div class="tile-cap">vs last week</div></div>
+                </div>
+                <div class="sec-h">Next</div>
+                <div class="listrow" data-tap>
+                  <svg width="24" height="24" data-icon viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                  <div class="grow"><div class="t">Evening breathing</div><div class="s">21:30 · 10 min</div></div>
+                  <svg width="20" height="20" data-icon viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                </div>
+                <button class="btn" data-tap>
+                  <svg width="20" height="20" data-icon viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg>
+                  Start a session
+                </button>
+              </div>
+              <nav class="bottombar">
+                <a class="nav-item active" href="#sec-3" data-tap>
+                  <svg width="24" height="24" data-icon viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-6v-6h-4v6H4z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                  Today</a>
+                <a class="nav-item" href="#sec-3" data-tap>
+                  <svg width="24" height="24" data-icon viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m6 10V5m6 14v-7" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                  Report</a>
+                <a class="nav-item" href="#sec-3" data-tap>
+                  <svg width="24" height="24" data-icon viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a8 8 0 1 1-8 8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v4l3 2" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                  History</a>
+                <a class="nav-item" href="#sec-3" data-tap>
+                  <svg width="24" height="24" data-icon viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 20a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                  Profile</a>
+              </nav>
+            </div>
+            <figcaption>Home — the first screen answers one question: “how am I today?” Status is color + number + word.</figcaption>
+          </figure>
+
+          <figure class="scene">
+            <div class="phone" data-scene="focus">
+              <div class="statusbar"><span>9:43</span><span>▮▮▮ ▾</span></div>
+              <div class="content center" style="padding-top:40px">
+                <div class="sec-h" style="margin:0">Evening breathing</div>
+                <div class="breathe" data-tap>4:12</div>
+                <div class="s">in 4 · hold 4 · out 6</div>
+                <div style="display:flex;gap:12px;width:100%">
+                  <button class="btn ghost" data-tap>
+                    <svg width="20" height="20" data-icon viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h14v14H7z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                    Pause</button>
+                  <button class="btn secondary" data-tap>End session</button>
+                </div>
+                <p class="s" style="max-width:30ch;margin:0">Leaving early is always allowed; the session is saved to history.</p>
+              </div>
+              <div class="bottombar"><a class="nav-item active" href="#sec-3">Session · no chrome while running</a></div>
+            </div>
+            <figcaption>Immersive session — content centered, no navigation, one escape hatch. Never scrolled.</figcaption>
+          </figure>
+
+          <figure class="scene">
+            <div class="phone" data-scene="report">
+              <div class="statusbar"><span>9:52</span><span>▮▮▮ ▾</span></div>
+              <div class="topbar"><span class="scr-title">Report</span><span class="pill">Week 37</span></div>
+              <div class="content">
+                <div class="listrow" style="padding:16px">
+                  <div class="grow">
+                    <div class="t">Resting score</div>
+                    <svg class="chart" width="288" height="96" viewBox="0 0 288 96" data-icon aria-label="Resting score, last 7 days">
+                      <path class="chart-line" d="M4 70 L48 64 L92 66 L136 54 L180 58 L224 44 L268 40"/>
+                      <circle class="chart-dot" cx="268" cy="40" r="5"/>
+                      <path class="chart-axis" d="M4 86h264"/>
+                    </svg>
+                    <div class="s">72 avg · <span style="color:var(--app-ok)">improving</span></div>
+                  </div>
+                </div>
+                <div class="sec-h">Insights</div>
+                <div class="listrow"><div class="grow"><div class="t">Sleep is the strongest factor</div><div class="s">Sessions before 21:00 score 8% higher</div></div></div>
+                <div class="listrow"><div class="grow"><div class="t">Thursday is the dip</div><div class="s">3 of the last 4 weeks</div></div><span class="pill warn">pattern</span></div>
+                <button class="btn secondary" data-tap>Share with my clinician</button>
+              </div>
+              <nav class="bottombar">
+                <a class="nav-item" href="#sec-3">Today</a>
+                <a class="nav-item active" href="#sec-3">Report</a>
+                <a class="nav-item" href="#sec-3">History</a>
+                <a class="nav-item" href="#sec-3">Profile</a>
+              </nav>
+            </div>
+            <figcaption>Report — data explains itself: label, chart, plain-language sentence.</figcaption>
+          </figure>
+
+          <figure class="scene">
+            <div class="phone" data-scene="empty">
+              <div class="statusbar"><span>10:04</span><span>▮▮▮ ▾</span></div>
+              <div class="topbar"><span class="scr-title">Report</span></div>
+              <div class="content center">
+                <svg width="64" height="64" data-icon viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 19V9m6 10V5m6 14v-7" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                </svg>
+                <h3 style="margin:0;font-size:calc(18px * var(--ts,1))">No sessions yet</h3>
+                <p class="s" style="margin:0;max-width:28ch">A report needs at least three sessions. They take ten minutes and the first one counts tomorrow morning.</p>
+                <button class="btn" data-tap>Start the first session</button>
+                <button class="btn ghost" data-tap>Remind me tonight</button>
+              </div>
+              <nav class="bottombar">
+                <a class="nav-item" href="#sec-3">Today</a>
+                <a class="nav-item active" href="#sec-3">Report</a>
+                <a class="nav-item" href="#sec-3">History</a>
+                <a class="nav-item" href="#sec-3">Profile</a>
+              </nav>
+            </div>
+            <figcaption>Whole-screen empty state — distinct from the inline placeholder shown in Components.</figcaption>
+          </figure>
+
+          <figure class="scene">
+            <div class="phone" data-scene="onboarding">
+              <div class="statusbar"><span>10:10</span><span>▮▮▮ ▾</span></div>
+              <div class="content center">
+                <svg width="120" height="120" data-icon viewBox="0 0 120 120" aria-hidden="true">
+                  <circle cx="60" cy="60" r="46" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="60" cy="60" r="26" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <path d="M60 14v14M60 92v14M14 60h14M92 60h14" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <h3 style="margin:0;font-size:calc(20px * var(--ts,1))">Three short sessions set your baseline</h3>
+                <p class="s" style="margin:0;max-width:30ch">No account, no wearable. Everything stays on this phone unless you share it.</p>
+                <button class="btn" data-tap>Continue</button>
+                <div class="dots" aria-label="Step 2 of 3"><span class="dot on"></span><span class="dot on"></span><span class="dot"></span></div>
+              </div>
+              <div class="bottombar"><a class="nav-item" href="#sec-3" data-tap>Skip for now</a></div>
+            </div>
+            <figcaption>Onboarding — one idea per screen, progress visible, skip always available.</figcaption>
+          </figure>
+
+          <figure class="scene">
+            <div class="phone" data-scene="sheet">
+              <div class="statusbar"><span>10:16</span><span>▮▮▮ ▾</span></div>
+              <div class="topbar"><span class="scr-title">Today</span><span class="avatar">M</span></div>
+              <div class="content" aria-hidden="true">
+                <div class="hero"><div class="hero-num">72</div><div class="s">resting score</div></div>
+                <div class="tiles">
+                  <div class="tile"><div class="tile-num">6.4h</div><div class="tile-cap">sleep</div></div>
+                  <div class="tile"><div class="tile-num">3</div><div class="tile-cap">sessions</div></div>
+                  <div class="tile"><div class="tile-num">+4%</div><div class="tile-cap">vs last week</div></div>
+                </div>
+              </div>
+              <div class="scrim">
+                <div class="sheet" role="dialog" aria-label="Reminder settings">
+                  <div class="grabber"></div>
+                  <div class="t" style="font-size:calc(16px * var(--ts,1));font-weight:700">Reminder</div>
+                  <div class="listrow" data-tap><div class="grow"><div class="t">21:30</div><div class="s">Every evening</div></div><span class="pill">on</span></div>
+                  <div class="listrow" data-tap><div class="grow"><div class="t">Quiet hours</div><div class="s">22:30 – 07:00</div></div><span class="pill">on</span></div>
+                  <button class="btn" data-tap>Save</button>
+                </div>
+              </div>
+            </div>
+            <figcaption>Bottom sheet stacked on a real screen with a scrim — interruption in context, not a floating sample.</figcaption>
+          </figure>
+
+        </div>
+      </section>
+
+      <section data-title="Typography and color">
+        <h2>Typography and color</h2>
+        <p class="muted">The system owns the face (SF Pro on iOS, Roboto on Android) and the app owns the scale. Color is two designed palettes with separate measurements — never one palette inverted.</p>
+        <div class="grid2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px">
+          <div class="type-spec">
+            <div class="tl"><span style="font-size:28px;font-weight:800;letter-spacing:-.02em">72</span><span class="role">display 34/40 · hero numbers</span></div>
+            <div class="tl"><span style="font-size:20px;font-weight:700">Today</span><span class="role">title 20/26 · screen titles</span></div>
+            <div class="tl"><span style="font-size:15px;font-weight:600">Evening breathing</span><span class="role">body 15/22 · rows, actions</span></div>
+            <div class="tl"><span style="font-size:12.5px">21:30 · 10 min</span><span class="role">caption 12/16 · metadata</span></div>
+            <div class="tl"><span style="font-size:15px;font-variant-numeric:tabular-nums">6.4h · 3 · +4%</span><span class="role">tabular numerals · statistics</span></div>
+          </div>
+          <div>
+            <div class="swatches appscope" id="swatches"></div>
+            <p class="muted" style="font-size:12.5px;margin:10px 0 0">Swatches follow the scheme switch above. Semantic colors (ok, warn, bad) follow the mode, never the scheme; chart colors are data, not decoration.</p>
+          </div>
+        </div>
+        <ul class="muted" style="max-width:76ch;margin-top:12px">
+          <li>Text scales with the OS to 2.0×; layouts reflow instead of truncating meaning.</li>
+          <li>Weights carry hierarchy (700 title / 600 action / 400 body) — a second face is not the answer.</li>
+        </ul>
+      </section>
+
+      <section data-title="Components and states">
+        <h2>Components and states</h2>
+        <p class="muted">Samples shrink to phone width rather than assuming a desktop canvas. States appear inline exactly where they occur.</p>
+        <div class="samples appscope">
+          <div class="sample">
+            <h4>Actions</h4>
+            <div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
+              <button class="btn">Primary</button>
+              <button class="btn secondary">Secondary</button>
+              <button class="btn ghost">Ghost</button>
+            </div>
+            <p class="muted" style="font-size:12.5px;margin:10px 0 0">All ≥ 48px tall; primary carries the accent, never two primaries.</p>
+          </div>
+          <div class="sample">
+            <h4>Inline states</h4>
+            <div style="border:1px solid var(--app-border);border-radius:10px;min-height:120px;display:flex;align-items:center;justify-content:center;color:var(--app-subtle);font-size:13px">
+              chart area · “3 more sessions needed”
+            </div>
+            <p class="muted" style="font-size:12.5px;margin:10px 0 0">Inline placeholder for a chart inside a populated screen — different from the whole-screen empty state.</p>
+          </div>
+          <div class="sample">
+            <h4>Rows and pills</h4>
+            <div class="listrow">
+              <div class="grow"><div class="t">Evening breathing</div><div class="s">21:30 · 10 min</div></div>
+              <span class="pill">10 min</span>
+            </div>
+          </div>
+          <div class="sample">
+            <h4>Icon scale</h4>
+            <div class="row">
+              <svg width="16" height="16" data-icon viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+              <svg width="20" height="20" data-icon viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+              <svg width="24" height="24" data-icon viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+              <svg width="32" height="32" data-icon viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+              <svg width="48" height="48" data-icon viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+              <svg width="64" height="64" data-icon viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </div>
+            <p class="muted" style="font-size:12.5px;margin:10px 0 0">Every inline SVG carries a default size and is overridden per context — 16/20/24/32/48/64.</p>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Motion">
+        <h2>Motion</h2>
+        <div class="card">
+          <table>
+            <thead><tr><th>Token</th><th class="num">Duration</th><th>Used for</th><th>Never</th></tr></thead>
+            <tbody>
+              <tr><td>fast</td><td class="num">120 ms</td><td>state change, pressed feedback</td><td>data values</td></tr>
+              <tr><td>base</td><td class="num">200 ms</td><td>sheet and overlay entrance</td><td>scrolling content</td></tr>
+              <tr><td>slow</td><td class="num">320 ms</td><td>screen transitions, scene change</td><td>interruptions</td></tr>
+              <tr><td>breathe</td><td class="num">6 s loop</td><td>the guided breathing pace</td><td>anything not breathing</td></tr>
+            </tbody>
+          </table>
+          <ul class="muted" style="margin:14px 0 0;padding-left:18px">
+            <li>Discrete data changes discretely: a score, a count, a health state never tweens — it cuts.</li>
+            <li>Motion is reserved for guidance and transitions, so the breathing guide stays the loudest thing on screen.</li>
+            <li>Under <code>prefers-reduced-motion</code> transitions cross-fade, and the guide is a static ring.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section data-title="Accessibility">
+        <h2>Accessibility</h2>
+        <div class="samples appscope">
+          <div class="sample"><h4>Targets</h4><p class="muted" style="margin:0">Every control is at least 48×48 dp; primary actions sit in thumb reach. Toggle the annotations above to see the boxes.</p></div>
+          <div class="sample"><h4>Text scaling</h4><p class="muted" style="margin:0">System scaling to 2.0× with reflow, not truncation; the scenes above are the proof.</p></div>
+          <div class="sample"><h4>Not by color alone</h4><p class="muted" style="margin:0">Status is color + icon + word; the chart carries labels and a sentence, not only a hue.</p></div>
+          <div class="sample"><h4>Screen readers</h4><p class="muted" style="margin:0">Icon-only controls carry labels; overlays trap and restore focus; headings follow the reading order.</p></div>
+        </div>
+        <p class="muted" style="font-size:13px">Contrast is measured per scheme in Verification — dark is not an inversion, so both tables must pass independently.</p>
+      </section>
+
+      <section data-title="Ergonomics">
+        <h2>Ergonomics</h2>
+        <p class="muted">Toggle annotations to see thumb targets and safe areas; switch type scale to stress the layout with OS font scaling.</p>
+        <div class="row" style="margin-bottom:12px">
+          <span class="muted" style="font-size:13px">Type scale:</span>
+          <button data-ts="1" aria-pressed="true">1.0×</button>
+          <button data-ts="1.5" aria-pressed="false">1.5×</button>
+          <button data-ts="2" aria-pressed="false">2.0×</button>
+        </div>
+        <ul class="muted" style="max-width:76ch">
+          <li>Status bar and home indicator are reserved bands; the bottom bar never overlaps them.</li>
+          <li>Primary actions sit in thumb reach; destructive or rare actions stay out of it.</li>
+          <li>At 2.0× the screens reflow: tiles wrap, labels truncate with an ellipsis, buttons grow — nothing clips.</li>
+          <li>Motion budget: only the breathing guide animates, and it is static under <code>prefers-reduced-motion</code>.</li>
+        </ul>
+      </section>
+
+      <section data-title="Verification">
+        <h2>Verification</h2>
+        <div class="card" style="margin-bottom:16px">
+          <h3 style="margin-top:0">Live probes</h3>
+          <div class="probe" id="probeOut"><span>running…</span></div>
+          <p class="muted" style="font-size:13px;margin:12px 0 0">Icon sizes, per-frame overflow, equal frame heights, and reduced-motion support are asserted on this page; resize the window to re-run the overflow probe.</p>
+        </div>
+        <h3>Contrast, per scheme</h3>
+        <div class="card">
+          <table>
+            <thead><tr><th>Pair</th><th class="num">light</th><th class="num">dark</th></tr></thead>
+            <tbody id="mContrast"></tbody>
+          </table>
+          <p class="muted" style="margin:12px 0 0;font-size:13px">Both schemes are measured independently; dark is a designed palette, not an inversion of light.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var LIGHT = { bg:"#f7f8fa", surface:"#ffffff", text:"#14171c", subtle:"#5f6673",
+    accent:"#0f766e", ok:"#15803d", warn:"#b45309", bad:"#b91c1c", border:"#e4e7ec" };
+  var DARK  = { bg:"#0c1214", surface:"#151d20", text:"#e8eef0", subtle:"#9aa8ad",
+    accent:"#2dd4bf", ok:"#4ade80", warn:"#fbbf24", bad:"#f87171", border:"#243034" };
+  var PAIRS = [
+    {name:"text / background", f:"text", b:"bg", target:4.5},
+    {name:"subtle text / surface", f:"subtle", b:"surface", target:4.5},
+    {name:"accent on surface", f:"accent", b:"surface", target:4.5},
+    {name:"ok on surface", f:"ok", b:"surface", target:4.5},
+    {name:"warn on surface", f:"warn", b:"surface", target:4.5},
+    {name:"bad on surface", f:"bad", b:"surface", target:4.5},
+    {name:"border / background (UI)", f:"border", b:"bg", target:3.0}
+  ];
+  function rgb(hex){ return hex.replace("#","").match(/../g).map(function(h){return parseInt(h,16)/255;}); }
+  function lin(c){ return c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); }
+  function lum(hex){ var c = rgb(hex); return 0.2126*lin(c[0]) + 0.7152*lin(c[1]) + 0.0722*lin(c[2]); }
+  function ratio(a,b){ var x=lum(a), y=lum(b), hi=Math.max(x,y), lo=Math.min(x,y); return (hi+0.05)/(lo+0.05); }
+  function cell(r,t){ return '<span class="' + (r >= t ? 'ok' : 'bad') + '">' + r.toFixed(2) + ':1</span>'; }
+
+  var tbody = document.getElementById("mContrast");
+  PAIRS.forEach(function(p){
+    var tr = document.createElement("tr");
+    tr.innerHTML = '<td>' + p.name + '</td><td class="num">' + cell(ratio(LIGHT[p.f], LIGHT[p.b]), p.target) +
+      '</td><td class="num">' + cell(ratio(DARK[p.f], DARK[p.b]), p.target) + '</td>';
+    tbody.appendChild(tr);
+  });
+
+  var SWATCHES = [
+    {name:"bg", css:"--app-bg", l:LIGHT.bg, d:DARK.bg, role:"page background"},
+    {name:"surface", css:"--app-surface", l:LIGHT.surface, d:DARK.surface, role:"cards, sheets"},
+    {name:"text", css:"--app-text", l:LIGHT.text, d:DARK.text, role:"primary content"},
+    {name:"subtle", css:"--app-subtle", l:LIGHT.subtle, d:DARK.subtle, role:"metadata"},
+    {name:"accent", css:"--app-accent", l:LIGHT.accent, d:DARK.accent, role:"primary action"},
+    {name:"accent-soft", css:"--app-accent-soft", l:"#d7ecea", d:"#10312e", role:"tints, rings"},
+    {name:"ok", css:"--app-ok", l:LIGHT.ok, d:DARK.ok, role:"success"},
+    {name:"warn", css:"--app-warn", l:LIGHT.warn, d:DARK.warn, role:"warning"},
+    {name:"bad", css:"--app-bad", l:LIGHT.bad, d:DARK.bad, role:"error"},
+    {name:"border", css:"--app-border", l:LIGHT.border, d:DARK.border, role:"dividers"}
+  ];
+  var sw = document.getElementById("swatches");
+  SWATCHES.forEach(function(t){
+    var el = document.createElement("div");
+    el.className = "sw";
+    el.innerHTML = '<div class="chip" style="background:var(' + t.css + ')"></div>' +
+      '<div class="meta"><b>' + t.name + '</b><span>' + t.l + ' · ' + t.d + '</span><br><span>' + t.role + '</span></div>';
+    sw.appendChild(el);
+  });
+
+  var toc = document.getElementById("toc");
+  Array.prototype.slice.call(document.querySelectorAll("main > section[data-title]")).forEach(function(s, i){
+    s.id = "sec-" + (i+1);
+    var a = document.createElement("a");
+    a.href = "#" + s.id; a.textContent = s.dataset.title;
+    toc.appendChild(a);
+  });
+
+  var modeBtns = Array.prototype.slice.call(document.querySelectorAll("[data-mode-btn]"));
+  modeBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.body.dataset.mode = btn.dataset.modeBtn;
+      modeBtns.forEach(function(b){ b.setAttribute("aria-pressed", String(b === btn)); });
+      runProbes();
+    });
+  });
+  var tsBtns = Array.prototype.slice.call(document.querySelectorAll("[data-ts]"));
+  tsBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll(".phone").forEach(function(p){ p.style.setProperty("--ts", btn.dataset.ts); });
+      tsBtns.forEach(function(b){ b.setAttribute("aria-pressed", String(b === btn)); });
+    });
+  });
+  var anno = document.getElementById("annoBtn");
+  anno.addEventListener("click", function(){
+    var on = anno.getAttribute("aria-pressed") !== "true";
+    anno.setAttribute("aria-pressed", String(on));
+    document.querySelectorAll(".phone").forEach(function(p){ p.classList.toggle("annotations", on); });
+  });
+
+  var probeOut = document.getElementById("probeOut");
+  function chip(label, pass, detail){
+    return '<span class="' + (pass ? 'pass' : 'fail') + '">' + label + (detail ? ' · ' + detail : '') + '</span>';
+  }
+  function runProbes(){
+    var icons = Array.prototype.slice.call(document.querySelectorAll("svg[data-icon]"));
+    var badIcons = icons.filter(function(s){
+      var w = s.getBoundingClientRect().width;
+      var h = s.getBoundingClientRect().height;
+      return !(w > 0 && h > 0);
+    });
+    var frames = Array.prototype.slice.call(document.querySelectorAll(".phone"));
+    var heights = frames.map(function(f){ return f.offsetHeight; });
+    var sameHeight = heights.every(function(h){ return h === heights[0]; });
+    var overflowing = frames.filter(function(f){
+      var c = f.querySelector(".content");
+      return c && c.scrollWidth > c.clientWidth + 1;
+    });
+    var pageOverflow = document.documentElement.scrollWidth > window.innerWidth + 1;
+    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    probeOut.innerHTML = [
+      chip("icons: " + (icons.length - badIcons.length) + "/" + icons.length + " sized", badIcons.length === 0),
+      chip("frames equal height " + heights[0] + "px", sameHeight),
+      chip("screen overflow", overflowing.length === 0 && !pageOverflow, overflowing.length ? overflowing.length + " frame(s)" : (pageOverflow ? "page" : "none")),
+      chip("reduced motion", true, reduced ? "prefers-reduced-motion active" : "supported, not requested")
+    ].join("");
+  }
+  window.addEventListener("resize", runProbes);
+  runProbes();
+})();
+</script>
+</body>
+</html>

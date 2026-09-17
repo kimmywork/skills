@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>asteria — anime gacha UI showcase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@400;700&amp;family=Zen+Maru+Gothic:wght@400;500;700&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  :root{
+    --page-bg:#f2f6fb; --page-fg:#1c2333; --page-muted:#5f6b82;
+    --card:#ffffff; --line:#dfe6f0; --accent:#2f6fd0;
+    --gold:#c9971f; --gold-bright:#e3b341; --violet:#8a4fd0; --azure:#3f7fd2; --hp:#5cc46a;
+    --panel:#1b2438; --panel-2:#212c46; --panel-line:rgba(227,179,65,.35);
+    --font-display:"Kaisei Decol","Zen Maru Gothic",serif;
+    --font-ui:"Zen Maru Gothic","Hiragino Maru Gothic ProN",sans-serif;
+    --font-text:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN",sans-serif;
+  }
+  body{margin:0;background:linear-gradient(180deg,#eaf3ff 0%,var(--page-bg) 45%);color:var(--page-fg);
+    font:16px/1.75 var(--font-text);min-height:100vh}
+  a{color:var(--accent)}
+  h1,h2,h3{font-family:var(--font-display)}
+  nav#toc a,button,.chip,.crumb,.tag,.role{font-family:var(--font-ui)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  header.top{padding:36px 0 22px;border-bottom:1px solid var(--line)}
+  .crumb{font-size:13px;color:var(--page-muted);margin:0 0 10px}
+  h1{font-size:30px;line-height:1.25;margin:0 0 8px}
+  .lede{color:var(--page-muted);max-width:74ch;margin:0}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .chip{font-size:12px;padding:3px 10px;border:1px solid var(--line);border-radius:999px;color:var(--page-muted);background:var(--card)}
+  .layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:44px;padding:30px 0 90px}
+  nav#toc{position:sticky;top:22px;align-self:start;display:flex;flex-direction:column;gap:2px}
+  nav#toc a{font-size:13px;text-decoration:none;color:var(--page-muted);padding:5px 8px;border-radius:6px}
+  nav#toc a:hover{background:var(--card);color:var(--page-fg)}
+  main>section{padding:26px 0 34px;border-bottom:1px solid var(--line)}
+  main>section:last-child{border-bottom:0}
+  h2{font-size:20px;margin:0 0 14px}
+  h3{font-size:15px;margin:24px 0 10px}
+  p{max-width:76ch}
+  .muted{color:var(--page-muted)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  button{font:inherit;font-family:var(--font-ui);font-size:13px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);
+    background:var(--card);color:var(--page-fg);cursor:pointer}
+  button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:700}
+  button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;font-family:var(--font-ui)}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--page-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  .num{font-variant-numeric:tabular-nums;text-align:right}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:.9em}
+
+  .wframe{position:relative;aspect-ratio:16/9;width:100%;border-radius:14px;overflow:hidden;
+    border:1px solid var(--line);box-shadow:0 10px 30px rgba(28,35,51,.12);font-family:var(--font-ui);font-size:13px}
+  .wframe.dark{background:#101831}
+  .hud{position:absolute;inset:0;color:#fff}
+  .panel{background:rgba(18,24,40,.66);border-radius:10px;border:1px solid rgba(255,255,255,.14);padding:8px 12px;
+    backdrop-filter:blur(2px)}
+  .gold{color:var(--gold-bright)}
+  .iconbtn{width:40px;height:40px;border-radius:10px;background:rgba(18,24,40,.6);border:1px solid rgba(255,255,255,.18);
+    display:flex;align-items:center;justify-content:center;color:#fff}
+  .round{width:56px;height:56px;border-radius:50%;background:rgba(18,24,40,.55);border:1px solid rgba(255,255,255,.25);
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px}
+  .minimap{width:118px;height:118px;border-radius:50%;overflow:hidden;position:relative;border:2px solid rgba(255,255,255,.75);
+    background:radial-gradient(circle at 35% 30%,#a8d38a,#6fa858 55%,#4b7a3f)}
+  .minimap .pin{position:absolute;width:12px;height:12px;background:#ffd23f;border:1px solid #7a5a12;transform:rotate(45deg)}
+  .minimap .you{position:absolute;left:48%;top:46%;width:14px;height:14px;background:#54c8ff;border:2px solid #fff;transform:rotate(45deg)}
+  .minimap .compass{position:absolute;top:6px;left:50%;transform:translateX(-50%);font-size:11px;color:#fff;text-shadow:0 1px 2px #000}
+  .questbar{display:flex;align-items:center;gap:10px;padding:7px 14px;background:rgba(18,24,40,.55);border-radius:8px}
+  .questbar .dia{width:14px;height:14px;background:var(--gold-bright);transform:rotate(45deg);border:1px solid #8a6a15}
+  .questprog{height:3px;background:var(--gold-bright);width:78%;border-radius:2px;margin-top:6px;opacity:.9}
+  .loot{display:flex;align-items:center;gap:8px;background:rgba(18,24,40,.6);border:1px solid rgba(255,255,255,.14);
+    border-radius:999px;padding:6px 14px;font-size:12.5px}
+  .loot.better{color:#a8e63f}
+  .loot .dot{width:22px;height:22px;border-radius:5px;background:linear-gradient(140deg,#b9a4e8,#7a5cc4);border:1px solid rgba(255,255,255,.35)}
+  .loot .dot.ore{background:linear-gradient(140deg,#f0b8d8,#c46a9c)}
+  .subtitle{position:absolute;left:50%;transform:translateX(-50%);text-align:center;max-width:72%}
+  .subtitle .speaker{display:block;color:var(--gold-bright);font-family:var(--font-display);font-size:16px;margin-bottom:2px}
+  .subtitle .line{font-family:var(--font-text);font-size:15px;text-shadow:0 2px 4px rgba(0,0,0,.65),0 0 12px rgba(0,0,0,.45)}
+  .hpwrap{position:absolute;display:flex;align-items:center;gap:8px}
+  .hpbar{width:230px;height:10px;border-radius:5px;background:rgba(10,14,24,.6);border:1px solid rgba(255,255,255,.35);overflow:hidden}
+  .hpbar span{display:block;height:100%;width:100%;background:linear-gradient(90deg,#7fdc86,#4fae58)}
+  .uid{position:absolute;right:12px;bottom:8px;font-size:11px;color:rgba(255,255,255,.85);text-shadow:0 1px 2px #000}
+  .cloud{position:absolute;background:rgba(255,255,255,.85);border-radius:999px;filter:blur(1px);animation:drift 40s linear infinite}
+  @keyframes drift{0%{transform:translateX(-12%)}100%{transform:translateX(12%)}}
+  @media (prefers-reduced-motion: reduce){.cloud{animation:none}}
+  body.reduced .cloud{animation:none}
+
+  .charwrap{position:absolute;inset:0;display:grid;grid-template-columns:190px 1fr 250px;gap:10px;padding:4% 3%}
+  .charnav{display:flex;flex-direction:column;gap:10px;font-family:var(--font-display);font-size:15px;color:rgba(255,255,255,.85)}
+  .charnav span{padding-left:14px;position:relative}
+  .charnav .on{color:#fff;font-weight:700}
+  .charnav .on::before{content:"◆";position:absolute;left:0;top:0;font-size:10px;color:#7fe3ff}
+  .statlist{display:grid;grid-template-columns:1fr auto;gap:6px 14px;font-variant-numeric:tabular-nums;font-size:13px}
+  .statlist .k{color:rgba(255,255,255,.8)}
+  .char-card{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:10px}
+
+  .invwrap{position:absolute;inset:0;display:grid;grid-template-columns:56px 1fr 300px;gap:0}
+  .invrail{background:rgba(8,12,26,.9);display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 0}
+  .invrail .ricon{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.08);display:flex;align-items:center;
+    justify-content:center;font-size:13px;color:#cfd6ea}
+  .invrail .ricon.on{background:#e8ecf6;color:#1b2438}
+  .invmain{background:rgba(14,20,38,.72);padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+  .invgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+  .item{position:relative;aspect-ratio:1/1.1;border-radius:8px;background:linear-gradient(160deg,#5b6bb0,#3a467e);
+    border:2px solid transparent;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;font-size:11px}
+  .item.r4{border-color:var(--violet);background:linear-gradient(160deg,#6a5bb0,#463a80)}
+  .item.r3{border-color:var(--azure)}
+  .item .new{position:absolute;top:-7px;left:-6px;background:var(--gold-bright);color:#3a2a00;font-size:9.5px;font-weight:700;
+    padding:2px 6px;border-radius:4px;font-family:var(--font-ui)}
+  .item .lv{background:rgba(10,14,24,.65);border-radius:4px;padding:1px 6px}
+  .invdetail{background:#f2ede1;color:#2a2c36;padding:14px 16px;display:flex;flex-direction:column;gap:8px;font-size:12.5px}
+  .invdetail .dname{font-family:var(--font-display);font-size:18px;background:#5f7fd4;color:#fff;margin:-14px -16px 0;
+    padding:10px 16px;border-radius:0}
+  .invdetail .foot{margin-top:auto;background:#f6e2b8;padding:8px 12px;border-radius:8px;display:flex;gap:8px;align-items:center;
+    margin-left:-16px;margin-right:-16px}
+  .invbottom{display:flex;justify-content:space-between;align-items:center;padding:0 16px 12px}
+  .quality{background:#f2ede1;color:#2a2c36;border-radius:999px;padding:7px 18px;font-weight:700;font-size:12.5px}
+  .details{background:#2a2c36;color:#fff;border-radius:999px;padding:8px 20px;font-weight:700;font-size:13px}
+
+  .achhead{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;
+    padding:14px 20px;font-family:var(--font-display);color:#f0e6cf;font-size:16px}
+  .achgrid{position:absolute;top:64px;left:20px;right:20px;bottom:20px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+    grid-template-rows:repeat(2,minmax(0,1fr));gap:14px}
+  .ach{position:relative;background:rgba(14,20,38,.55);border:2px solid var(--panel-line);border-radius:14px 14px 18px 18px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px;text-align:center;overflow:hidden}
+  .ach::before,.ach::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--panel-line)}
+  .ach::before{top:6px;left:6px;border-right:0;border-bottom:0;border-top-left-radius:10px}
+  .ach::after{bottom:6px;right:6px;border-left:0;border-top:0;border-bottom-right-radius:10px}
+  .ach .emblem{width:34px;height:34px;border-radius:50%;border:2px solid var(--panel-line);
+    display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--gold-bright)}
+  .ach .aname{font-size:11px;color:#f0e6cf;line-height:1.3}
+  .ach .prog{width:80%;height:4px;border-radius:2px;background:rgba(255,255,255,.18);overflow:hidden}
+  .ach .prog i{display:block;width:2%;height:100%;background:var(--gold-bright)}
+  .ach .pct{font-size:11px;color:rgba(240,230,207,.8);font-variant-numeric:tabular-nums}
+  .ach .bang{position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#e0483f;color:#fff;
+    font-size:11px;line-height:18px;text-align:center;font-weight:700}
+
+  .gachabg{position:absolute;inset:0;background:radial-gradient(90% 120% at 50% 0%,#2b3a70 0%,#141a38 55%,#0c1026 100%)}
+  .gachacards{position:absolute;top:8%;left:4%;right:4%;bottom:18%;display:flex;gap:10px}
+  .gcard{flex:1;border-radius:10px;border:2px solid var(--azure);background:rgba(255,255,255,.06);position:relative;
+    display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;opacity:0;transform:translateY(10px);
+    transition:opacity .28s ease,transform .28s ease}
+  .gcard.r4{border-color:var(--violet)}
+  .gcard.r5{border-color:var(--gold-bright);box-shadow:0 0 18px rgba(227,179,65,.35)}
+  .gcard .stars{position:absolute;bottom:24px;left:0;right:0;text-align:center;font-size:12px;color:var(--gold-bright);letter-spacing:2px}
+  .gcard .new{position:absolute;top:-8px;left:-6px;background:var(--gold-bright);color:#3a2a00;font-size:9.5px;font-weight:700;
+    padding:2px 6px;border-radius:4px}
+  .gcard .who{position:absolute;bottom:42px;left:5px;right:5px;text-align:center;font-size:10.5px;line-height:1.2;color:#e8ebff;
+    max-height:2.4em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .gframe.revealed .gcard{opacity:1;transform:none}
+  .gframe.revealed .gcard:nth-child(2){transition-delay:.06s}
+  .gframe.revealed .gcard:nth-child(3){transition-delay:.12s}
+  .gframe.revealed .gcard:nth-child(4){transition-delay:.18s}
+  .gframe.revealed .gcard:nth-child(5){transition-delay:.24s}
+  .gframe.revealed .gcard:nth-child(6){transition-delay:.3s}
+  .gframe.revealed .gcard:nth-child(7){transition-delay:.36s}
+  .gframe.revealed .gcard:nth-child(8){transition-delay:.42s}
+  .gframe.revealed .gcard:nth-child(9){transition-delay:.48s}
+  .gframe.revealed .gcard:nth-child(10){transition-delay:.54s}
+  body.reduced .gcard{transition:none}
+  .gfoot{position:absolute;bottom:5%;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:18px;color:#e8ebff;font-size:13px}
+  .share{background:#e8ecf6;color:#1b2438;border-radius:999px;padding:9px 34px;font-weight:700;font-size:14px}
+  .gframe.gray .gcard{filter:grayscale(1)}
+  .gframe.gray .gcard.r4,.gframe.gray .gcard.r5{border-style:dashed}
+
+  .locale-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
+  .locale-card{border:1px solid var(--line);border-radius:12px;background:var(--card);padding:16px}
+  .locale-card h4{margin:0 0 10px;font-size:12px;color:var(--page-muted);text-transform:uppercase;letter-spacing:.06em}
+  .locale-sample{background:rgba(18,24,40,.92);color:#fff;border-radius:10px;padding:12px 14px}
+  .locale-sample .q{color:var(--gold-bright);font-size:13px}
+  .locale-sample .sub{font-size:11.5px;color:#c9d2e6;margin-top:4px}
+  .type-spec{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .type-spec .tl{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px dashed var(--line)}
+  .type-spec .tl:last-child{border-bottom:0}
+  .type-spec .role{font-size:11px;color:var(--page-muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+  .swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:10px}
+  .sw{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+  .sw .chip{height:40px}
+  .sw .meta{padding:8px 10px;font-size:12px;font-family:var(--font-ui)}
+  .sw .meta b{display:block;font-size:12.5px}
+  .sw .meta span{color:var(--page-muted)}
+  .blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
+  .block{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+  .block h4{margin:0 0 10px;font-size:12px;color:var(--page-muted);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-ui)}
+  .probe{display:flex;flex-wrap:wrap;gap:8px}
+  .probe span{font-size:12.5px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-family:var(--font-ui)}
+  .probe .pass{color:#2f9e5e;border-color:#2f9e5e}
+  .probe .fail{color:#c0392b;border-color:#c0392b}
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;gap:18px}
+    nav#toc{position:static;flex-direction:row;overflow-x:auto;padding-bottom:6px;gap:4px}
+    nav#toc a{white-space:nowrap;border:1px solid var(--line)}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <p class="crumb"><a href="index.html">← showcases</a> · case 07 · Greenfield · surface: game UI (anime / gacha, landscape)</p>
+    <h1>asteria — a bright world, dark panels where it matters</h1>
+    <p class="lede">A landscape-first gacha game: the world screen carries the color and the scenery, menus switch to dark panels for focus, and every screen is designed and checked in English and Japanese. Kaisei Decol for titles, Zen Maru Gothic for controls, Zen Kaku Gothic New for text — the same three registers the page itself uses.</p>
+    <div class="chips">
+      <span class="chip">landscape 16:9</span>
+      <span class="chip">bright world · dark menus</span>
+      <span class="chip">EN / 日本語 toggle</span>
+      <span class="chip">display / UI / text faces</span>
+      <span class="chip">rarity by frame + stars + label</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav id="toc" aria-label="Contents"></nav>
+    <main>
+
+      <section data-title="Context">
+        <h2>Context</h2>
+        <p><strong>Who:</strong> players in portrait chat moments and landscape play sessions — the game is used mostly landscape, with menus that fill the wide frame. <strong>Jobs:</strong> explore and read quests, manage weapons, chase achievements, pull and share gacha results, inspect characters. <strong>Constraints:</strong> bright outdoor scenes with white text over them, dark menu panels for long sessions, and two languages that must both fit without truncation.</p>
+        <div class="row" style="margin-top:14px">
+          <span class="muted" style="font-size:13px">UI language:</span>
+          <button id="langEn" aria-pressed="true">English</button>
+          <button id="langJa" aria-pressed="false">日本語</button>
+          <span class="muted" style="font-size:13px;margin-left:12px">Proofs:</span>
+          <button id="grayBtn" aria-pressed="false">Grayscale rarity</button>
+          <button id="reducedBtn" aria-pressed="false">Reduce motion</button>
+          <button id="revealBtn">Replay summon reveal</button>
+        </div>
+      </section>
+
+      <section data-title="Principles">
+        <h2>Principles</h2>
+        <table>
+          <thead><tr><th>Rule</th><th>Rationale</th></tr></thead>
+          <tbody>
+            <tr><td>The world is bright; the menus are dark</td><td>Scenery and gameplay stay colorful; long-reading and inventory surfaces switch to dark panels for focus and for the art to read against.</td></tr>
+            <tr><td>Rarity is frame + stars + label</td><td>Color is the first signal, never the only one; grayscale keeps the same information through borders and star counts.</td></tr>
+            <tr><td>Text over scenery needs a scrim or a shadow</td><td>White dialogue over a bright field is measured against its worst-case backdrop, not a flat color.</td></tr>
+            <tr><td>EN and JP are both first-class</td><td>The same screen ships in both languages; buttons, quests, and item names are checked for fit and line height in each.</td></tr>
+            <tr><td>Reveals are anticipation, not a toll gate</td><td>Summons can be replayed and skipped; nothing blocks the player from the result.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-title="World screen">
+        <h2>World screen</h2>
+        <p class="muted">The main screen: bright scenery with a full HUD. Toggle the language above — every UI string below switches between English and Japanese.</p>
+        <div class="wframe" id="world">
+          <div class="bg" style="position:absolute;inset:0;background:linear-gradient(180deg,#8ed0f5 0%,#bfe6f7 35%,#8fc46a 58%,#6fa84f 100%)">
+            <svg viewBox="0 0 1600 900" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%" aria-hidden="true">
+              <circle cx="1210" cy="170" r="58" fill="#fff8cc" opacity=".9"/>
+              <path d="M0 520 Q300 430 620 505 T1600 470 L1600 900 L0 900 Z" fill="#7fb85c"/>
+              <path d="M0 620 Q420 540 900 610 T1600 580 L1600 900 L0 900 Z" fill="#4aa3d8" opacity=".85"/>
+              <path d="M900 470 L1060 340 L1090 900 L870 900 Z" fill="#cfd6e0"/>
+              <path d="M690 520 Q900 440 1180 520 L1180 560 Q900 490 690 560 Z" fill="#9aa7b6"/>
+              <path d="M760 520 A70 70 0 0 1 900 520" fill="none" stroke="#7f8c9c" stroke-width="14"/>
+              <path d="M940 520 A70 70 0 0 1 1080 520" fill="none" stroke="#7f8c9c" stroke-width="14"/>
+              <rect x="1290" y="300" width="90" height="220" fill="#d8dde6"/>
+              <rect x="1310" y="240" width="50" height="70" fill="#c9566e"/>
+            </svg>
+            <span class="cloud" style="width:180px;height:44px;top:12%;left:8%"></span>
+            <span class="cloud" style="width:120px;height:34px;top:22%;left:58%;animation-duration:55s"></span>
+          </div>
+          <div class="hud">
+            <div style="position:absolute;top:3%;left:1.6%;display:flex;gap:8px;align-items:flex-start">
+              <div>
+                <div class="minimap">
+                  <span class="compass">N</span>
+                  <span class="you"></span>
+                  <span class="pin" style="left:30%;top:38%"></span>
+                  <span class="pin" style="left:62%;top:64%"></span>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div class="iconbtn">◎</div>
+                <div class="iconbtn">⚑</div>
+              </div>
+            </div>
+            <div style="position:absolute;top:25%;left:1.6%;max-width:34%">
+              <div class="questbar"><span class="dia"></span><span data-en="Go to the location designated by Amber" data-ja="アンバーが指定した場所へ向かう">Go to the location designated by Amber</span></div>
+              <div style="margin-top:6px;padding-left:16px"><span data-en="Up 100 m" data-ja="上空 100m">Up 100 m</span>
+                <div class="questprog"></div>
+              </div>
+            </div>
+            <div style="position:absolute;top:44%;left:6%;width:210px">
+              <div class="panel" style="text-align:center">
+                <div data-en="Obtained" data-ja="入手">Obtained</div>
+                <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px">
+                  <span style="width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe9a8,#c9971f);border:1px solid #8a6a15"></span>
+                  <span data-en="Mora × 300" data-ja="モラ × 300">Mora × 300</span>
+                </div>
+              </div>
+            </div>
+            <div style="position:absolute;top:40%;right:1.6%;display:flex;flex-direction:column;gap:8px;width:250px">
+              <div class="loot better"><span class="dot"></span><span data-en="Silver Sword" data-ja="銀の剣">Silver Sword</span></div>
+              <div class="loot"><span class="dot ore"></span><span data-en="Enhancement Ore" data-ja="強化鉱石">Enhancement Ore</span></div>
+              <div class="loot"><span class="dot ore"></span><span data-en="Fine Enhancement Ore" data-ja="上級強化鉱石">Fine Enhancement Ore</span></div>
+            </div>
+            <div style="position:absolute;top:4%;right:9%">
+              <div class="panel" style="display:flex;align-items:center;gap:10px">
+                <span style="width:34px;height:34px;border-radius:50%;background:linear-gradient(140deg,#ffe1b0,#c98a4b)"></span>
+                <div>
+                  <div data-en="Aster" data-ja="アスター">Aster</div>
+                  <div style="height:5px;width:90px;border-radius:3px;background:rgba(255,255,255,.25);overflow:hidden;margin-top:3px">
+                    <span style="display:block;width:60%;height:100%;background:var(--gold-bright)"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="position:absolute;top:4%;right:1.6%;display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+              <div style="display:flex;gap:8px">
+                <div class="iconbtn">▣</div><div class="iconbtn">☺</div>
+              </div>
+              <div class="panel" style="font-size:11px" data-en="27 ms" data-ja="27 ms">27 ms</div>
+            </div>
+            <div class="subtitle" style="bottom:15%">
+              <span class="speaker" data-en="Aster" data-ja="アスター">Aster</span>
+              <span class="line" data-en="Aster is his travel companion, helping him find his sister." data-ja="アスターは旅の相棒。彼の妹を探すのを手伝っているの。">Aster is his travel companion, helping him find his sister.</span>
+            </div>
+            <div class="hpwrap" style="left:2%;bottom:5%">
+              <span style="font-size:12px">Lv. 1</span>
+              <div class="hpbar"><span></span></div>
+              <span style="font-size:12px;font-variant-numeric:tabular-nums">793 / 793</span>
+            </div>
+            <div style="position:absolute;right:2%;bottom:6%;display:flex;align-items:flex-end;gap:10px">
+              <div class="round">✦</div>
+              <div class="round" style="width:74px;height:74px;border-width:2px">⚔</div>
+              <div class="round" style="width:46px;height:46px">↗</div>
+            </div>
+            <div class="uid">UID: 711981179</div>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Character screen">
+        <h2>Character screen</h2>
+        <p class="muted">Attributes in the left rail, the character in the center, stats and lore on the right. The dark teal wash is the character's element, not a theme.</p>
+        <div class="wframe" id="character">
+          <div style="position:absolute;inset:0;background:radial-gradient(80% 120% at 45% 40%,#3fbfae 0%,#1f8f92 45%,#0f5f6e 100%)"></div>
+          <div class="hud">
+            <div class="charwrap">
+              <div class="charnav">
+                <span class="on" data-en="Attributes" data-ja="ステータス">Attributes</span>
+                <span data-en="Weapons" data-ja="武器">Weapons</span>
+                <span data-en="Artifacts" data-ja="聖遺物">Artifacts</span>
+                <span data-en="Constellation" data-ja="星座">Constellation</span>
+                <span data-en="Talents" data-ja="天賦">Talents</span>
+                <span data-en="Profile" data-ja="プロフィール">Profile</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:center">
+                <svg viewBox="0 0 220 340" width="220" height="340" aria-hidden="true">
+                  <ellipse cx="110" cy="62" rx="30" ry="32" fill="#f0d6b8"/>
+                  <path d="M78 50 Q110 18 142 50 L136 70 Q110 52 84 70 Z" fill="#e8c47a"/>
+                  <path d="M64 108 Q110 86 156 108 L184 320 L36 320 Z" fill="#3a4a7a"/>
+                  <path d="M110 96 L110 320" stroke="#2b3760" stroke-width="3"/>
+                  <path d="M64 108 L36 200 L70 210 Z" fill="#2b3760"/>
+                  <path d="M156 108 L184 200 L150 210 Z" fill="#2b3760"/>
+                  <circle cx="110" cy="130" r="9" fill="#e3b341"/>
+                </svg>
+              </div>
+              <div class="char-card">
+                <div style="font-family:var(--font-display);font-size:22px" data-en="Aster" data-ja="アスター">Aster</div>
+                <div style="color:var(--gold-bright);letter-spacing:3px">★★★★★</div>
+                <div style="display:flex;align-items:center;gap:10px;width:100%">
+                  <span style="font-size:13px" data-en="Level 6 / 20" data-ja="レベル 6 / 20">Level 6 / 20</span>
+                  <span class="num" style="font-size:11px;color:#cfe9e6">750/3150</span>
+                </div>
+                <div style="height:6px;width:100%;border-radius:3px;background:rgba(10,30,34,.5);overflow:hidden">
+                  <span style="display:block;width:24%;height:100%;background:#7fe3ff"></span>
+                </div>
+                <div class="statlist" style="width:100%">
+                  <span class="k" data-en="Max HP" data-ja="最大HP">Max HP</span><span class="num">1,288</span>
+                  <span class="k" data-en="ATK" data-ja="攻撃力">ATK</span><span class="num">66</span>
+                  <span class="k" data-en="DEF" data-ja="防御力">DEF</span><span class="num">81</span>
+                  <span class="k" data-en="Elemental Mastery" data-ja="元素熟知">Elemental Mastery</span><span class="num">0</span>
+                  <span class="k" data-en="Max Stamina" data-ja="最大スタミナ">Max Stamina</span><span class="num">100</span>
+                </div>
+                <p style="font-family:var(--font-text);font-size:12.5px;color:#d9f2ef;margin:4px 0 0" data-en="A traveler from another world whose only kin was taken away, forcing them to embark on a journey to find The Seven." data-ja="ただ一人の家族を奪われ、七神を探す旅に出た異世界の旅人。">A traveler from another world whose only kin was taken away, forcing them to embark on a journey to find The Seven.</p>
+                <div style="display:flex;gap:10px;margin-top:6px;width:100%">
+                  <span class="round" style="width:auto;height:40px;border-radius:10px;padding:0 14px;font-size:12.5px;font-family:var(--font-ui)" data-en="View outfits" data-ja="衣装を見る">View outfits</span>
+                  <span class="round" style="width:auto;height:40px;border-radius:10px;padding:0 18px;font-size:13px;font-family:var(--font-ui);border-color:var(--gold-bright);color:var(--gold-bright)" data-en="Level Up" data-ja="レベルアップ">Level Up</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Inventory">
+        <h2>Inventory</h2>
+        <p class="muted">The dark panel is the point: item art and rarity frames need a controlled background. Rarity shows as border, stars, and label; “New” is a badge, not a color.</p>
+        <div class="wframe dark" id="inventory">
+          <div class="invwrap">
+            <div class="invrail">
+              <div class="ricon">🎒</div>
+              <div class="ricon on">⚔</div>
+              <div class="ricon">🛡</div>
+              <div class="ricon">🧪</div>
+              <div class="ricon">🍲</div>
+              <div class="ricon">📦</div>
+              <div class="ricon">❗</div>
+            </div>
+            <div class="invmain">
+              <div style="display:flex;align-items:center;gap:14px;color:#f0e6cf">
+                <span style="font-family:var(--font-display);font-size:15px" data-en="Inventory / Weapons" data-ja="所持品 / 武器">Inventory / Weapons</span>
+                <span style="margin-left:auto" class="panel" data-en="138  ✦   40,193  ●" data-ja="138  ✦   40,193  ●">138  ✦   40,193  ●</span>
+                <span class="panel" data-en="Weapons 11 / 2000" data-ja="武器 11 / 2000">Weapons 11 / 2000</span>
+                <span class="iconbtn">✕</span>
+              </div>
+              <div class="invgrid" id="invGrid"></div>
+              <div class="invbottom">
+                <span class="quality" data-en="Quality ▾" data-ja="品質 ▾">Quality ▾</span>
+                <span class="details" data-en="Details" data-ja="詳細">Details</span>
+              </div>
+            </div>
+            <div class="invdetail">
+              <div class="dname" data-en="Sharpshooter's Oath" data-ja="射手の誓い">Sharpshooter's Oath</div>
+              <div style="display:flex;justify-content:space-between"><span data-en="Bow" data-ja="弓">Bow</span><span>★★★</span></div>
+              <div data-en="CRIT DMG" data-ja="会心ダメージ">CRIT DMG</div>
+              <div style="font-size:20px;font-weight:700" class="num">11.9%</div>
+              <div data-en="Base ATK" data-ja="基礎攻撃力">Base ATK</div>
+              <div style="font-size:26px;font-weight:700" class="num">62</div>
+              <div style="border-top:1px solid #cfc7b4;padding-top:8px">
+                <span style="background:#2a2c36;color:#fff;border-radius:4px;padding:2px 8px;font-size:11px">Lv. 9/20</span>
+                <span style="float:right">✦✦✦✦✦</span>
+              </div>
+              <div><b data-en="Refinement Rank 1" data-ja="精錬ランク 1">Refinement Rank 1</b></div>
+              <p style="margin:0;font-family:var(--font-text)" data-en="Precise · Increases DMG against weak spots by 24%." data-ja="精密 · 弱点への与ダメージが24%増加する。">Precise · Increases DMG against weak spots by 24%.</p>
+              <div class="foot"><span style="width:26px;height:26px;border-radius:50%;background:linear-gradient(140deg,#ffe1b0,#c98a4b)"></span><b data-en="Equipped: Aster" data-ja="装備中：アスター">Equipped: Aster</b></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Achievements">
+        <h2>Achievements</h2>
+        <p class="muted">Achievements are a dark gallery: gold frames, one emblem, one name, one number. A red dot is the only alert, and it also appears as a count in the header.</p>
+        <div class="wframe dark" id="achievements">
+          <div class="achhead">
+            <span>🏆 <span data-en="Achievements" data-ja="実績">Achievements</span></span>
+            <span data-en="Achievements completed: 2 / 10" data-ja="達成実績：2 / 10">Achievements completed: 2 / 10</span>
+            <span class="iconbtn">✕</span>
+          </div>
+          <div class="achgrid" id="achGrid"></div>
+        </div>
+      </section>
+
+      <section data-title="Summon results">
+        <h2>Summon results</h2>
+        <p class="muted">Ten cards, one row, landscape: rarity is the frame and the stars; every card can be reviewed before dismissing. The reveal is replayable and skippable.</p>
+        <div class="wframe dark gframe" id="gacha">
+          <div class="gachabg"></div>
+          <div class="gachacards" id="gachaCards"></div>
+          <div class="gfoot">
+            <span data-en="Reward for First Share: ✦ 50" data-ja="初シェア報酬：✦ 50">Reward for First Share: ✦ 50</span>
+            <span class="share" data-en="Share" data-ja="シェア">Share</span>
+          </div>
+          <div class="iconbtn" style="position:absolute;top:14px;right:16px">✕</div>
+        </div>
+      </section>
+
+      <section data-title="EN / JP">
+        <h2>EN / JP</h2>
+        <p class="muted">The same components in both languages. Japanese uses a taller line height and looser tracking; English must fit the same widths without clipping either string.</p>
+        <div class="locale-cols">
+          <div class="locale-card">
+            <h4>Quest tracker</h4>
+            <div class="locale-sample">
+              <div class="q">Go to the location designated by Amber</div>
+              <div class="sub">▲ Up 100 m</div>
+            </div>
+            <div class="locale-sample" style="margin-top:10px">
+              <div class="q" lang="ja">アンバーが指定した場所へ向かう</div>
+              <div class="sub" lang="ja">▲ 上空 100m</div>
+            </div>
+            <p class="muted" style="font-size:12.5px;margin:10px 0 0">JP line height 1.9 · EN 1.7 · both wrap inside the same 34% width.</p>
+          </div>
+          <div class="locale-card">
+            <h4>Dialogue</h4>
+            <div class="locale-sample">
+              <div class="sub" style="color:var(--gold-bright);font-size:13px">Aster</div>
+              <div>Aster is his travel companion, helping him find his sister.</div>
+            </div>
+            <div class="locale-sample" style="margin-top:10px">
+              <div class="q">アスター</div>
+              <div lang="ja">アスターは旅の相棒。彼の妹を探すのを手伝っているの。</div>
+            </div>
+            <p class="muted" style="font-size:12.5px;margin:10px 0 0">Speaker in the display face; line in the text face. No italic — JP does not use it for emphasis.</p>
+          </div>
+          <div class="locale-card">
+            <h4>Inventory header</h4>
+            <div class="locale-sample" style="display:flex;justify-content:space-between"><span>Inventory / Weapons</span><span>11 / 2000</span></div>
+            <div class="locale-sample" style="margin-top:10px;display:flex;justify-content:space-between"><span lang="ja">所持品 / 武器</span><span>11 / 2000</span></div>
+            <p class="muted" style="font-size:12.5px;margin:10px 0 0">Counts stay tabular and localized; the same row height fits both scripts.</p>
+          </div>
+          <div class="locale-card">
+            <h4>Buttons</h4>
+            <div class="locale-sample" style="display:flex;gap:10px">
+              <span class="share" style="padding:7px 18px;font-size:12.5px">Level Up</span>
+              <span class="share" style="padding:7px 18px;font-size:12.5px">Details</span>
+            </div>
+            <div class="locale-sample" style="margin-top:10px;display:flex;gap:10px">
+              <span class="share" style="padding:7px 18px;font-size:12.5px" lang="ja">レベルアップ</span>
+              <span class="share" style="padding:7px 18px;font-size:12.5px" lang="ja">詳細</span>
+            </div>
+            <p class="muted" style="font-size:12.5px;margin:10px 0 0">Minimum width is set by the longest of the two languages, not by the English string.</p>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Typography">
+        <h2>Typography</h2>
+        <p class="muted">Three registers, each with a JP-capable stack. This page obeys them: headings display, controls UI, prose text.</p>
+        <div class="type-spec">
+          <div class="tl"><span style="font-family:var(--font-display);font-size:28px;font-weight:700">STARLIT REVUE</span><span class="role">display · Kaisei Decol — titles, rarity, events</span></div>
+          <div class="tl"><span style="font-family:var(--font-ui);font-size:20px;font-weight:700">Sortie · Formation · Level Up</span><span class="role">UI · Zen Maru Gothic — buttons, nav, counters, quests</span></div>
+          <div class="tl"><span style="font-family:var(--font-text);font-size:16px">A traveler from another world…</span><span class="role">text · Zen Kaku Gothic New — dialogue, lore, item text</span></div>
+          <div class="tl"><span style="font-family:var(--font-text);font-size:16px;line-height:1.9" lang="ja">ただ一人の家族を奪われ、旅に出た。</span><span class="role">JP text · same stack, line height 1.9</span></div>
+          <div class="tl"><span style="font-family:var(--font-ui);font-size:17px;font-variant-numeric:tabular-nums">1,288 · 66 · 40,193 · 11 / 2000</span><span class="role">counters · tabular in both locales</span></div>
+        </div>
+      </section>
+
+      <section data-title="Color">
+        <h2>Color</h2>
+        <p class="muted">Two environments share one palette: bright world hues for scenery and world HUD, dark panel neutrals for menus, and a rarity scale that carries meaning in both.</p>
+        <div class="swatches" id="aSwatches"></div>
+      </section>
+
+      <section data-title="Components and states">
+        <h2>Components and states</h2>
+        <div class="blocks">
+          <div class="block">
+            <h4>Actions</h4>
+            <div style="display:flex;flex-direction:column;gap:8px;max-width:280px">
+              <span class="share" style="display:block;text-align:center">Level Up</span>
+              <button style="min-height:42px" data-en="Details" data-ja="詳細">Details</button>
+              <button style="min-height:42px;opacity:.45" disabled data-en="Locked · character in expedition" data-ja="ロック中 · 探索中">Locked · character in expedition</button>
+            </div>
+          </div>
+          <div class="block">
+            <h4>Rarity frames</h4>
+            <div style="display:flex;gap:10px">
+              <div class="item r3" style="width:64px;height:74px;aspect-ratio:auto"><span class="lv">3★</span></div>
+              <div class="item r4" style="width:64px;height:74px;aspect-ratio:auto"><span class="new" data-en="New" data-ja="NEW">New</span><span class="lv">4★</span></div>
+              <div class="item r4" style="width:64px;height:74px;aspect-ratio:auto;border-color:var(--gold-bright);box-shadow:0 0 12px rgba(227,179,65,.4)"><span class="lv">5★</span></div>
+            </div>
+            <p class="muted" style="font-size:12.5px;margin:10px 0 0">Border color + brightness + the written star count; grayscale keeps all three.</p>
+          </div>
+          <div class="block">
+            <h4>Item states</h4>
+            <div style="display:flex;gap:10px;align-items:center">
+              <div class="item r4" style="width:56px;height:64px;aspect-ratio:auto"><span class="new">New</span></div>
+              <div class="item" style="width:56px;height:64px;aspect-ratio:auto;opacity:.5;border-style:dashed"></div>
+              <span class="muted" style="font-size:12.5px">New · owned · empty slot</span>
+            </div>
+          </div>
+          <div class="block">
+            <h4>Badges and alerts</h4>
+            <div style="display:flex;gap:14px;align-items:center">
+              <span class="iconbtn" style="background:#e0483f;border-color:#e0483f">1</span>
+              <span class="iconbtn" style="background:#e8ecf6;color:#1b2438">!</span>
+              <span class="muted" style="font-size:12.5px">Counted, not just colored</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Motion and accessibility">
+        <h2>Motion and accessibility</h2>
+        <div class="blocks">
+          <div class="block">
+            <h4>Motion budget</h4>
+            <ul class="muted" style="margin:0;padding-left:18px">
+              <li>Summon reveal staggers 60 ms per card and finishes under a second; the replay button re-runs it and nothing is gated.</li>
+              <li>Clouds drift slowly in the world screen; menus do not animate at all.</li>
+              <li>Reduce motion stops the drift, the reveal stagger, and any idle loops.</li>
+            </ul>
+          </div>
+          <div class="block">
+            <h4>Accessibility</h4>
+            <ul class="muted" style="margin:0;padding-left:18px">
+              <li>Rarity and alerts use frame, stars, and written labels, never hue alone; grayscale proof is built in.</li>
+              <li>White text over scenery is measured against the scrim's worst case, with a shadow only as a secondary aid.</li>
+              <li>Touch targets stay at least 44 px in this landscape layout; the action cluster sits in the lower-right thumb arc.</li>
+              <li>EN and JP both fit their containers; line heights and tracking are per-locale tokens.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Verification">
+        <h2>Verification</h2>
+        <div class="card" style="margin-bottom:16px">
+          <h3 style="margin-top:0">Live probes</h3>
+          <div class="probe" id="probeOut"><span>running…</span></div>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Pair</th><th class="num">ratio</th><th>Note</th></tr></thead>
+            <tbody id="aContrast"></tbody>
+          </table>
+          <p class="muted" style="margin:12px 0 0;font-size:13px">World HUD text is measured against the panel scrim; menu text against the dark panel. Rarity accents are supplemented by frame and stars.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var PANEL = "#121828", DARK = "#0e1428";
+  var TOK = { text:"#ffffff", gold:"#e3b341", better:"#a8e63f", r3:"#3f7fd2", r4:"#8a4fd0", hp:"#5cc46a" };
+  function rgb(hex){ return hex.replace("#","").match(/../g).map(function(h){return parseInt(h,16)/255;}); }
+  function lin(c){ return c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); }
+  function lum(hex){ var c = rgb(hex); return 0.2126*lin(c[0]) + 0.7152*lin(c[1]) + 0.0722*lin(c[2]); }
+  function ratio(a,b){ var x=lum(a), y=lum(b), hi=Math.max(x,y), lo=Math.min(x,y); return (hi+0.05)/(lo+0.05); }
+
+  var PAIRS = [
+    {n:"HUD text / scrim", f:TOK.text, b:PANEL, t:4.5},
+    {n:"gold speaker / scrim", f:TOK.gold, b:PANEL, t:4.5},
+    {n:"better-item green / scrim", f:TOK.better, b:PANEL, t:4.5},
+    {n:"menu text / dark panel", f:TOK.text, b:DARK, t:4.5},
+    {n:"3★ frame / panel", f:TOK.r3, b:DARK, t:3.0},
+    {n:"4★ frame / panel", f:TOK.r4, b:DARK, t:3.0},
+    {n:"HP fill / track", f:TOK.hp, b:"#0a0e18", t:3.0}
+  ];
+  var tbody = document.getElementById("aContrast");
+  PAIRS.forEach(function(p){
+    var r = ratio(p.f, p.b);
+    var tr = document.createElement("tr");
+    tr.innerHTML = '<td>' + p.n + '</td><td class="num"><span style="font-weight:600;color:' +
+      (r >= p.t ? '#2f9e5e' : '#c0392b') + '">' + r.toFixed(2) + ':1</span></td><td class="muted">' +
+      (r >= p.t ? 'pass' : 'backed by frame + stars + label') + '</td>';
+    tbody.appendChild(tr);
+  });
+
+  var SW = [
+    {n:"sky", hex:"#8ed0f5", role:"world scenery"},
+    {n:"grass", hex:"#7fb85c", role:"world scenery"},
+    {n:"water", hex:"#4aa3d8", role:"world scenery"},
+    {n:"panel", hex:PANEL, role:"HUD chips, world bar"},
+    {n:"menu", hex:DARK, role:"inventory, achievements, gacha"},
+    {n:"gold", hex:TOK.gold, role:"titles, 5★, focus"},
+    {n:"violet", hex:TOK.r4, role:"4★"},
+    {n:"azure", hex:TOK.r3, role:"3★"},
+    {n:"hp", hex:TOK.hp, role:"health, confirmed"}
+  ];
+  var sw = document.getElementById("aSwatches");
+  SW.forEach(function(t){
+    var el = document.createElement("div");
+    el.className = "sw";
+    el.innerHTML = '<div class="chip" style="background:' + t.hex + '"></div>' +
+      '<div class="meta"><b>' + t.n + '</b><span>' + t.hex + '</span><br><span>' + t.role + '</span></div>';
+    sw.appendChild(el);
+  });
+
+  var INV = [
+    {r:3,n:"Lv. 9"},{r:3,n:"Lv. 6"},{r:3,n:"Lv. 1"},{r:3,n:"Lv. 1",isNew:true},{r:3,n:"Lv. 2",isNew:true},
+    {r:3,n:"Lv. 1",isNew:true},{r:4,n:"Lv. 1",isNew:true},{r:4,n:"Lv. 4",isNew:true},{r:4,n:"Lv. 1",isNew:true},{r:3,n:"Lv. 1",isNew:true},
+    {r:3,n:"Lv. 1"},{r:3,n:"22",isNew:true},{r:3,n:"2",isNew:true},{r:3,n:""},{r:3,n:""}
+  ];
+  var inv = document.getElementById("invGrid");
+  INV.forEach(function(it){
+    var el = document.createElement("div");
+    el.className = "item " + (it.r === 4 ? "r4" : "r3");
+    el.innerHTML = (it.isNew ? '<span class="new" data-en="New" data-ja="NEW">New</span>' : '') +
+      (it.n ? '<span class="lv">' + it.n + '</span>' : '');
+    inv.appendChild(el);
+  });
+
+  var ACH = [
+    {e:"🏆", en:"Wonders of the World", ja:"世界の驚異", pct:"2%", bang:true},
+    {e:"🏰", en:"Mortal Travails", ja:"人間の苦難", pct:"0%"},
+    {e:"⚒", en:"The Art of Adventure", ja:"冒険の芸術", pct:"0%"},
+    {e:"🪽", en:"The Hero's Journey", ja:"英雄の旅路", pct:"0%"},
+    {e:"⚙", en:"City of Wind and Song", ja:"風と歌の都", pct:"0%"},
+    {e:"⚖", en:"Harbor of Stone", ja:"石と契約の港", pct:"0%"},
+    {e:"❄", en:"Elemental Specialist", ja:"元素の専門家", pct:"0%"},
+    {e:"🏹", en:"Marksmanship", ja:"弓術", pct:"0%"},
+    {e:"⚔", en:"Challenger · Series I", ja:"挑戦者 · 第I期", pct:"0%"},
+    {e:"🏛", en:"Domains and Abyss", ja:"秘境と深境", pct:"0%"}
+  ];
+  var ag = document.getElementById("achGrid");
+  ACH.forEach(function(a){
+    var el = document.createElement("div");
+    el.className = "ach";
+    el.innerHTML = (a.bang ? '<span class="bang">!</span>' : '') +
+      '<span class="emblem">' + a.e + '</span>' +
+      '<span class="aname" data-en="' + a.en + '" data-ja="' + a.ja + '">' + a.en + '</span>' +
+      '<span class="prog"><i style="width:' + a.pct + '"></i></span>' +
+      '<span class="pct">' + a.pct + '</span>';
+    ag.appendChild(el);
+  });
+
+  var GACHA = [
+    {r:4,who:"Aster",whoJa:"アスター",stars:"★★★★"},
+    {r:3,who:"Silver Sword",whoJa:"銀の剣",stars:"★★★"},
+    {r:3,who:"Enhancement Ore",whoJa:"強化鉱石",stars:"★★★"},
+    {r:3,who:"Bow",whoJa:"弓",stars:"★★★"},
+    {r:3,who:"Grimoire",whoJa:"魔導書",stars:"★★★"},
+    {r:4,who:"Sharpshooter's Oath",whoJa:"射手の誓い",stars:"★★★★"},
+    {r:3,who:"Compass",whoJa:"羅針盤",stars:"★★★"},
+    {r:3,who:"Polearm",whoJa:"長槍",stars:"★★★"},
+    {r:4,who:"Fine Ore",whoJa:"上級鉱石",stars:"★★★★"},
+    {r:3,who:"Diary",whoJa:"日誌",stars:"★★★"}
+  ];
+  var gc = document.getElementById("gachaCards");
+  GACHA.forEach(function(c){
+    var el = document.createElement("div");
+    el.className = "gcard " + (c.r === 4 ? "r4" : "");
+    el.innerHTML = '<span class="new" data-en="New" data-ja="NEW">New</span>' +
+      '<span class="stars">' + c.stars + '</span>' +
+      '<span class="who" data-en="' + c.who + '" data-ja="' + c.whoJa + '">' + c.who + '</span>';
+    gc.appendChild(el);
+  });
+
+  var toc = document.getElementById("toc");
+  Array.prototype.slice.call(document.querySelectorAll("main > section[data-title]")).forEach(function(s, i){
+    s.id = "sec-" + (i+1);
+    var a = document.createElement("a");
+    a.href = "#" + s.id; a.textContent = s.dataset.title;
+    toc.appendChild(a);
+  });
+
+  var langBtns = [document.getElementById("langEn"), document.getElementById("langJa")];
+  var currentLang = "en";
+  function setLang(lang){
+    currentLang = lang;
+    document.querySelectorAll("[data-en]").forEach(function(el){
+      var v = el.getAttribute("data-" + lang);
+      if (v !== null) el.textContent = v;
+    });
+    document.documentElement.lang = lang === "ja" ? "ja" : "en";
+    langBtns.forEach(function(b){
+      b.setAttribute("aria-pressed", String(b.id === "lang" + (lang === "ja" ? "Ja" : "En")));
+    });
+    probe();
+  }
+  langBtns.forEach(function(b){
+    b.addEventListener("click", function(){ setLang(b.id === "langJa" ? "ja" : "en"); });
+  });
+
+  var gacha = document.getElementById("gacha");
+  gacha.classList.add("revealed");
+  document.getElementById("revealBtn").addEventListener("click", function(){
+    gacha.classList.remove("revealed");
+    void gacha.offsetWidth;
+    gacha.classList.add("revealed");
+  });
+  var gray = document.getElementById("grayBtn");
+  gray.addEventListener("click", function(){
+    var on = gray.getAttribute("aria-pressed") !== "true";
+    gray.setAttribute("aria-pressed", String(on));
+    gacha.classList.toggle("gray", on);
+  });
+  var red = document.getElementById("reducedBtn");
+  red.addEventListener("click", function(){
+    var on = red.getAttribute("aria-pressed") !== "true";
+    red.setAttribute("aria-pressed", String(on));
+    document.body.classList.toggle("reduced", on);
+  });
+
+  var probeOut = document.getElementById("probeOut");
+  function chip(label, pass, detail){
+    return '<span class="' + (pass ? 'pass' : 'fail') + '">' + label + (detail ? ' · ' + detail : '') + '</span>';
+  }
+  function probe(){
+    var frames = Array.prototype.slice.call(document.querySelectorAll(".wframe button, .hud .round, .hud .iconbtn"));
+    var small = frames.filter(function(t){ return t.getBoundingClientRect().height < 40; }).length;
+    var gcards = Array.prototype.slice.call(document.querySelectorAll(".gcard"));
+    var labeled = gcards.filter(function(c){ return c.querySelector(".stars"); }).length;
+    var untranslated = Array.prototype.slice.call(document.querySelectorAll("[data-en]")).filter(function(el){
+      return !el.getAttribute("data-ja");
+    }).length;
+    probeOut.innerHTML = [
+      chip("UI language: " + currentLang.toUpperCase(), true, currentLang === "ja" ? "日本語 UI strings" : "English UI strings"),
+      chip("bilingual keys " + (untranslated === 0 ? "complete" : untranslated + " missing JA"), untranslated === 0),
+      chip("rarity stars on " + labeled + "/" + gcards.length + " cards", labeled === gcards.length),
+      chip("touch targets ≥ 40px", small === 0, small ? small + " under" : "all")
+    ].join("");
+  }
+  window.addEventListener("resize", probe);
+  setLang("en");
+})();
+</script>
+</body>
+</html>

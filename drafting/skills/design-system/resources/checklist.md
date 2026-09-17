@@ -46,7 +46,7 @@ For each principle: derive the product-specific question, and record an answer a
 
 Beyond the frameworks, every design system has to answer these aspects. They name **areas to examine, not questions to ask** — derive the actual questions from the product, and add aspects this list misses.
 
-- **States** — empty, loading, error, partial, over-full. Usually the states that get skipped, and the ones users hit first.
+- **States** — empty, loading, error, partial, over-full, each shown in the form it actually appears (inline, whole panel, whole screen), never one generic box. Usually the states that get skipped, and the ones users hit first.
 - **Extremes** — one item, thousands, a single unbroken string, a huge number, missing media.
 - **Data versus decoration** — which values belong to the user's records and must not move when the theme changes.
 - **Interaction states** — default, hover, focus, active, disabled, for every clickable thing.
@@ -57,16 +57,17 @@ Beyond the frameworks, every design system has to answer these aspects. They nam
 - **Motion** — what is allowed to move, and what never moves.
 - **Long-form reading** — how it differs from interface chrome.
 - **Reversibility** — which destructive actions can be undone and which need confirmation.
-- **Naming parity** — the same concept across code, specification, and screen.
+- **Naming parity** — the same concept across code, specification, and screen; axis names (scheme, mode, density) must not reuse vocabulary the product already uses for something else.
 - **Extensibility** — what it costs to absorb a new surface or host.
+- **Host-owned surfaces** — terminals and OS high-contrast modes where the app cannot read or set the palette; state what the app still controls (weight, dim, layout, glyphs) and how meaning survives without color.
 - **Non-visual use** — color, motion, and pointer independence.
 
 ## 2. Foundations coverage
 
 Each foundation must state both its tokens and its rules.
 
-- **Color** — schemes and modes as separate axes; surface and elevation tokens; borders; semantic roles (warning, error, success, info) that follow mode rather than scheme; an explicit note on which colors are data rather than decoration.
-- **Typography** — UI face versus long-form face; locale-dependent faces; a fixed type scale with role names; reading size tiers exposed as variables.
+- **Color** — schemes and modes as separate axes; surface and elevation tokens; borders; semantic roles (warning, error, success, info) that follow mode rather than scheme; an explicit note on which colors are data rather than decoration. When a host owns the palette (terminal, OS, third party), tokens are roles, not values; no meaning may depend on a host color; any high-contrast choice declares the background it assumes; and the escape hatch is the host's default foreground plus weight, never a brighter host color.
+- **Typography** — UI face versus long-form face; locale-dependent faces; a fixed type scale with role names; reading size tiers exposed as variables. Where the surface has expressive moments, a display/effect face is a separate token with a stated register — it never carries instructions or body text, and changing values use tabular numerals.
 - **Copy** — the term table; tone; empty, loading, and error phrasing.
 - **Layout** — base unit; page gutters; reading measure; column widths; breakpoints and exactly what collapses.
 - **Components** — ordered atomic → layout → interactive; each with a properties table, its rules, and its rationale; density variants named.
@@ -75,9 +76,14 @@ Each foundation must state both its tokens and its rules.
 
 ## 3. Verification
 
-- **Contrast** — compute every foreground/background pair for every scheme × mode combination. Report the numbers; fix the tokens that fail rather than the report.
-- **Drift** — parse the specification and the showcase and fail the check when a token name or value disagrees.
+- **Contrast** — for controlled surfaces, enumerate the pairs components actually render: every foreground against every plane it lands on, plus focus rings and meaningful boundaries, for every scheme × mode. Report the numbers and fix the tokens that fail. For host-owned palettes, report advisory numbers against a named reference palette and prove the structural fallback instead.
+- **Drift** — parse the specification and the showcase and fail the check when a token name or value disagrees, or when a surface references another surface's token that was not declared shared.
+- **Coverage** — a check covers exactly the classes it claims (tokens, colors, lengths, cross-surface references). Where possible, generate the specification and the showcase from one token source so drift is impossible rather than merely detectable.
+- **Checkers are tested** — mutate the artifact and confirm the check fails; a green check with untested coverage is not evidence.
 - **Blur** — mark designed values as designed. Mark recovered values with the file they came from.
 - **Interactions** — exercise the showcase's real controls (theme, scheme, tabs, navigation), not just its rendering.
+- **Structure** — the table of contents and section ids come from what actually rendered, not from a list maintained beside it; no hidden placeholders or string-level structural edits.
+- **Fit** — the showcase does not overflow horizontally at its narrowest target width; wide tables scroll inside their container; inline assets carry explicit sizes; derived colors are computed from tokens.
+- **Scenes** — every whole-use scene renders in every scheme and mode; check layout, not only token values.
 - **Naming** — if the stylesheet is injected into pages you do not own, prefix every variable and never emit root-level declarations; if tokens are mapped onto a framework's theme, avoid keys the framework already defines and confirm the emitted CSS.
 - **Scale** — check the type scale, radii, hit targets, and durations for values that are off the declared scale.

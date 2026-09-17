@@ -4,7 +4,7 @@ github:
   private: false
   source:
     branch: "master"
-    path: "/docs"
+    path: "/"
   repository_url: "https://github.com/kimmywork/skills"
 
 exclude:

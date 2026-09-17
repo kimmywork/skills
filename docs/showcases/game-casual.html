@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sugarfall — casual puzzle UI showcase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&amp;family=Baloo+2:wght@500;600;700;800&amp;family=Nunito+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  :root{
+    --page-bg:#fff7ef; --page-fg:#2b2233; --page-muted:#7a7286;
+    --card:#ffffff; --line:#f0e3d7; --accent:#e0487a;
+    --berry:#e0487a; --lemon:#e8a819; --mint:#2f9e77; --blue:#3f7fd2; --grape:#8a4fd0; --orange:#dd6b25;
+    --gold:#e3b341; --ink-soft:#5e5669;
+    --font-display:"Luckiest Guy",system-ui,cursive;
+    --font-ui:"Baloo 2","Nunito Sans",system-ui,sans-serif;
+    --font-text:"Nunito Sans",system-ui,sans-serif;
+  }
+  body{margin:0;background:var(--page-bg);color:var(--page-fg);font:16px/1.65 var(--font-text)}
+  a{color:var(--grape)}
+  h1,h2,h3{font-family:var(--font-display);font-weight:400;letter-spacing:.02em}
+  nav#toc a,button,.chip,.crumb,.tag,.role{font-family:var(--font-ui)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  header.top{padding:36px 0 22px;border-bottom:1px solid var(--line)}
+  .crumb{font-size:13px;color:var(--page-muted);margin:0 0 10px}
+  h1{font-size:34px;line-height:1.15;margin:0 0 8px}
+  .lede{color:var(--page-muted);max-width:72ch;margin:0}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .chip{font-size:12px;padding:3px 10px;border:1px solid var(--line);border-radius:999px;color:var(--page-muted);background:var(--card)}
+  .layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:44px;padding:30px 0 90px}
+  nav#toc{position:sticky;top:22px;align-self:start;display:flex;flex-direction:column;gap:2px}
+  nav#toc a{font-size:13px;text-decoration:none;color:var(--page-muted);padding:5px 8px;border-radius:6px}
+  nav#toc a:hover{background:var(--card);color:var(--page-fg)}
+  main>section{padding:26px 0 34px;border-bottom:1px solid var(--line)}
+  main>section:last-child{border-bottom:0}
+  h2{font-size:22px;margin:0 0 14px}
+  h3{font-size:16px;margin:24px 0 10px}
+  p{max-width:76ch}
+  .muted{color:var(--page-muted)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  button{font:inherit;font-family:var(--font-ui);font-size:14px;padding:7px 14px;border-radius:10px;border:1px solid var(--line);
+    background:var(--card);color:var(--page-fg);cursor:pointer}
+  button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+  button:focus-visible,a:focus-visible{outline:2px solid var(--grape);outline-offset:2px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;font-family:var(--font-ui)}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--page-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  .num{font-variant-numeric:tabular-nums;text-align:right}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:.9em}
+
+  .play{position:relative;width:360px;height:760px;border-radius:30px;overflow:hidden;display:flex;flex-direction:column;
+    border:1px solid var(--line);box-shadow:0 12px 34px rgba(43,34,51,.14);background:linear-gradient(180deg,#ffe9f2 0%,#fff7ef 45%,#f3ecff 100%)}
+  .hudrow{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px;font-family:var(--font-ui)}
+  .pill{background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-weight:700;font-size:13px}
+  .moves{text-align:center;line-height:1}
+  .moves b{font-family:var(--font-display);font-size:30px;font-weight:400;color:var(--grape);display:block}
+  .moves span{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--page-muted)}
+  .objective{margin:0 16px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 14px;
+    display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600}
+  .board{margin:12px 16px;background:#ffffffb8;border:1px solid var(--line);border-radius:16px;padding:8px;
+    display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px}
+  .gem{aspect-ratio:1;display:flex;align-items:center;justify-content:center}
+  .gem i{display:block;width:84%;height:84%;background:var(--c)}
+  .g-circle i{border-radius:50%}
+  .g-square i{border-radius:22%}
+  .g-diamond i{border-radius:18%;transform:rotate(45deg) scale(.78)}
+  .g-tri i{clip-path:polygon(50% 6%,94% 92%,6% 92%)}
+  .g-star i{clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+  .g-hex i{clip-path:polygon(25% 5%,75% 5%,100% 50%,75% 95%,25% 95%,0% 50%)}
+  .board.gray .gem i{filter:grayscale(1)}
+  .boosters{display:flex;gap:10px;margin:auto 16px 14px}
+  .booster{flex:1;background:#fff;border:2px solid var(--line);border-radius:14px;min-height:64px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--page-muted);position:relative}
+  .booster .ic{font-size:20px}
+  .booster .count{position:absolute;top:-8px;right:-6px;background:var(--grape);color:#fff;border-radius:999px;
+    min-width:22px;height:22px;line-height:22px;text-align:center;font-size:11px}
+  .booster.on{border-color:var(--lemon);color:var(--ink-soft)}
+  .booster.locked{opacity:.5;border-style:dashed}
+  .lives{display:flex;justify-content:space-between;align-items:center;padding:12px 18px 16px;font-family:var(--font-ui);font-size:13px}
+  .hearts{color:var(--berry);letter-spacing:2px}
+  .pop-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+  .pop{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);font-family:var(--font-display);font-size:42px;
+    color:var(--berry);text-shadow:0 3px 0 #fff,0 6px 12px rgba(224,72,122,.35);animation:popup 1.1s ease-out infinite}
+  .pop.score{top:47%;font-size:30px;color:var(--lemon)}
+  .pop.small{top:37%;font-size:24px;color:var(--grape);animation-delay:.25s}
+  @keyframes popup{0%{transform:translate(-50%,-50%) scale(.4);opacity:0}25%{transform:translate(-50%,-50%) scale(1.12);opacity:1}
+    55%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(-50%,-64%) scale(1);opacity:0}}
+  body.reduced .pop{animation:none;opacity:1;transform:translate(-50%,-50%)}
+
+  .modalwrap{position:absolute;inset:0;background:rgba(43,34,51,.45);display:flex;align-items:center;justify-content:center;padding:22px}
+  .modal{width:100%;background:#fff;border-radius:22px;padding:22px;text-align:center;box-shadow:0 18px 46px rgba(43,34,51,.28)}
+  .stars{font-size:38px;letter-spacing:6px;color:var(--gold)}
+  .stars .off{color:#ded5e6}
+  .modal h3{font-size:22px;margin:6px 0 2px}
+  .modal .big{font-family:var(--font-display);font-size:32px;color:var(--grape);margin:8px 0}
+  .modal .sub{font-size:13px;color:var(--page-muted)}
+  .modal .actions{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+  .btn-big{background:linear-gradient(180deg,#f26a97,#d93a70);color:#fff;border:0;border-radius:14px;min-height:50px;
+    font-weight:800;font-size:16px;width:100%}
+  .btn-soft{background:#f4ecff;color:var(--grape);border:0;border-radius:14px;min-height:48px;font-weight:800;font-size:15px;width:100%}
+  .btn-plain{background:transparent;color:var(--page-muted);border:0;min-height:44px;font-weight:700;font-size:13px;width:100%}
+
+  .map{position:relative;height:300px;background:linear-gradient(180deg,#f3ecff,#ffe9f2);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .map svg{position:absolute;inset:0;width:100%;height:100%}
+  .node{position:absolute;width:52px;height:52px;border-radius:50%;background:#fff;border:3px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-family:var(--font-ui);font-weight:800;font-size:14px;color:var(--page-muted)}
+  .node.done{border-color:var(--mint);color:var(--mint)}
+  .node.perfect{border-color:var(--gold);color:#8a6a00;box-shadow:0 0 0 4px rgba(227,179,65,.2)}
+  .node.now{border-color:var(--grape);color:var(--grape);box-shadow:0 0 0 6px rgba(138,79,208,.18);animation:bounce 1.6s ease-in-out infinite}
+  .node.locked{opacity:.55;border-style:dashed}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  body.reduced .node.now{animation:none}
+  .node .stars3{position:absolute;bottom:-9px;font-size:10px;letter-spacing:1px;color:var(--gold)}
+
+  .type-spec{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .type-spec .tl{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px dashed var(--line)}
+  .type-spec .tl:last-child{border-bottom:0}
+  .type-spec .role{font-size:11px;color:var(--page-muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+  .swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:10px}
+  .sw{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
+  .sw .chip{height:44px;display:flex;align-items:center;justify-content:center}
+  .sw .chip i{display:block;width:24px;height:24px;background:var(--c)}
+  .sw .meta{padding:8px 10px;font-size:12px;font-family:var(--font-ui)}
+  .sw .meta b{display:block;font-size:12.5px}
+  .sw .meta span{color:var(--page-muted)}
+  .blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
+  .block{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+  .block h4{margin:0 0 10px;font-size:12px;color:var(--page-muted);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-ui)}
+  .probe{display:flex;flex-wrap:wrap;gap:8px}
+  .probe span{font-size:12.5px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-family:var(--font-ui)}
+  .probe .pass{color:var(--mint);border-color:var(--mint)}
+  .probe .fail{color:var(--berry);border-color:var(--berry)}
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;gap:18px}
+    nav#toc{position:static;flex-direction:row;overflow-x:auto;padding-bottom:6px;gap:4px}
+    nav#toc a{white-space:nowrap;border:1px solid var(--line)}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <p class="crumb"><a href="index.html">← showcases</a> · case 08 · Greenfield · surface: game UI (casual puzzle, mobile)</p>
+    <h1>sugarfall — juicy, but honest at the core</h1>
+    <p class="lede">A match-3 casual game system: Luckiest Guy for popups and score moments, Baloo 2 for every control and counter, Nunito Sans for help and settings prose. Candy color with shape-coded pieces, bounded motion, big touch targets, and no timer pressure by default.</p>
+    <div class="chips">
+      <span class="chip">display / UI / text faces</span>
+      <span class="chip">shape-coded pieces</span>
+      <span class="chip">bounded juice</span>
+      <span class="chip">no dark patterns</span>
+      <span class="chip">one-thumb play</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav id="toc" aria-label="Contents"></nav>
+    <main>
+
+      <section data-title="Context">
+        <h2>Context</h2>
+        <p><strong>Who:</strong> commuters and parents, playing one level at a time, sound often off. <strong>Jobs:</strong> clear a level in 1–3 minutes, feel good, stop cleanly. <strong>Constraints:</strong> one thumb, bright environments, color-vision variety, and a young audience that must never be pushed into a purchase.</p>
+      </section>
+
+      <section data-title="Principles">
+        <h2>Principles</h2>
+        <table>
+          <thead><tr><th>Rule</th><th>Rationale</th></tr></thead>
+          <tbody>
+            <tr><td>Three registers: play, operate, explain</td><td>Luckiest Guy for moments, Baloo 2 for controls and counters, Nunito Sans for anything a player must actually read.</td></tr>
+            <tr><td>Pieces differ by shape, not only hue</td><td>The board is the game; colorblind players and grayscale screens must still parse it instantly.</td></tr>
+            <tr><td>Juice is bounded</td><td>Pop 150 ms, cascade 250 ms, popup 400 ms; nothing blocks input, and reduce motion turns juice into fades.</td></tr>
+            <tr><td>No dark patterns</td><td>No timer by default, lives regenerate predictably, and every purchase is an explicit, reversible choice.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-title="Level play">
+        <h2>Level play</h2>
+        <div class="row" style="margin-bottom:12px">
+          <button id="grayBtn" aria-pressed="false">Grayscale proof</button>
+          <button id="reducedBtn" aria-pressed="false">Reduce motion</button>
+        </div>
+        <div class="row" style="gap:22px;align-items:flex-start">
+          <div class="play" id="play">
+            <div class="hudrow">
+              <span class="pill">Level 47</span>
+              <div class="moves"><b>18</b><span>moves left</span></div>
+              <span class="pill" style="font-variant-numeric:tabular-nums">12,480</span>
+            </div>
+            <div class="objective">
+              <span>Collect</span>
+              <span class="pill" style="border-color:var(--berry);color:var(--berry)">🍓 8 / 12</span>
+              <span class="pill" style="border-color:var(--lemon);color:#8a6a00">🍋 4 / 12</span>
+            </div>
+            <div class="board" id="board">
+              <div class="gem g-circle" style="--c:var(--berry)"><i></i></div>
+              <div class="gem g-square" style="--c:var(--lemon)"><i></i></div>
+              <div class="gem g-diamond" style="--c:var(--mint)"><i></i></div>
+              <div class="gem g-tri" style="--c:var(--blue)"><i></i></div>
+              <div class="gem g-star" style="--c:var(--grape)"><i></i></div>
+              <div class="gem g-hex" style="--c:var(--orange)"><i></i></div>
+              <div class="gem g-circle" style="--c:var(--berry)"><i></i></div>
+              <div class="gem g-square" style="--c:var(--lemon)"><i></i></div>
+              <div class="gem g-diamond" style="--c:var(--mint)"><i></i></div>
+              <div class="gem g-tri" style="--c:var(--blue)"><i></i></div>
+              <div class="gem g-star" style="--c:var(--grape)"><i></i></div>
+              <div class="gem g-hex" style="--c:var(--orange)"><i></i></div>
+              <div class="gem g-square" style="--c:var(--lemon)"><i></i></div>
+              <div class="gem g-circle" style="--c:var(--berry)"><i></i></div>
+              <div class="gem g-star" style="--c:var(--grape)"><i></i></div>
+              <div class="gem g-diamond" style="--c:var(--mint)"><i></i></div>
+              <div class="gem g-hex" style="--c:var(--orange)"><i></i></div>
+              <div class="gem g-tri" style="--c:var(--blue)"><i></i></div>
+              <div class="gem g-diamond" style="--c:var(--mint)"><i></i></div>
+              <div class="gem g-star" style="--c:var(--grape)"><i></i></div>
+              <div class="gem g-circle" style="--c:var(--berry)"><i></i></div>
+              <div class="gem g-hex" style="--c:var(--orange)"><i></i></div>
+              <div class="gem g-square" style="--c:var(--lemon)"><i></i></div>
+              <div class="gem g-tri" style="--c:var(--blue)"><i></i></div>
+              <div class="gem g-hex" style="--c:var(--orange)"><i></i></div>
+              <div class="gem g-circle" style="--c:var(--berry)"><i></i></div>
+              <div class="gem g-star" style="--c:var(--grape)"><i></i></div>
+              <div class="gem g-tri" style="--c:var(--blue)"><i></i></div>
+              <div class="gem g-diamond" style="--c:var(--mint)"><i></i></div>
+              <div class="gem g-square" style="--c:var(--lemon)"><i></i></div>
+              <div class="gem g-star" style="--c:var(--grape)"><i></i></div>
+              <div class="gem g-circle" style="--c:var(--berry)"><i></i></div>
+              <div class="gem g-tri" style="--c:var(--blue)"><i></i></div>
+              <div class="gem g-hex" style="--c:var(--orange)"><i></i></div>
+              <div class="gem g-diamond" style="--c:var(--mint)"><i></i></div>
+              <div class="gem g-square" style="--c:var(--lemon)"><i></i></div>
+              <div class="gem g-hex" style="--c:var(--orange)"><i></i></div>
+              <div class="gem g-tri" style="--c:var(--blue)"><i></i></div>
+              <div class="gem g-star" style="--c:var(--grape)"><i></i></div>
+              <div class="gem g-circle" style="--c:var(--berry)"><i></i></div>
+              <div class="gem g-square" style="--c:var(--lemon)"><i></i></div>
+              <div class="gem g-diamond" style="--c:var(--mint)"><i></i></div>
+              <div class="gem g-hex" style="--c:var(--orange)"><i></i></div>
+              <div class="gem g-circle" style="--c:var(--berry)"><i></i></div>
+              <div class="gem g-tri" style="--c:var(--blue)"><i></i></div>
+              <div class="gem g-star" style="--c:var(--grape)"><i></i></div>
+              <div class="gem g-square" style="--c:var(--lemon)"><i></i></div>
+              <div class="gem g-diamond" style="--c:var(--mint)"><i></i></div>
+              <div class="gem g-square" style="--c:var(--lemon)"><i></i></div>
+              <div class="gem g-circle" style="--c:var(--berry)"><i></i></div>
+              <div class="gem g-tri" style="--c:var(--blue)"><i></i></div>
+              <div class="gem g-hex" style="--c:var(--orange)"><i></i></div>
+              <div class="gem g-diamond" style="--c:var(--mint)"><i></i></div>
+              <div class="gem g-star" style="--c:var(--grape)"><i></i></div>
+              <div class="gem g-square" style="--c:var(--lemon)"><i></i></div>
+              <div class="gem g-hex" style="--c:var(--orange)"><i></i></div>
+              <div class="gem g-tri" style="--c:var(--blue)"><i></i></div>
+              <div class="gem g-diamond" style="--c:var(--mint)"><i></i></div>
+              <div class="gem g-star" style="--c:var(--grape)"><i></i></div>
+              <div class="gem g-circle" style="--c:var(--berry)"><i></i></div>
+              <div class="gem g-square" style="--c:var(--lemon)"><i></i></div>
+              <div class="gem g-tri" style="--c:var(--blue)"><i></i></div>
+              <div class="gem g-hex" style="--c:var(--orange)"><i></i></div>
+              <div class="gem g-star" style="--c:var(--grape)"><i></i></div>
+            </div>
+            <div class="boosters">
+              <div class="booster on"><span class="ic">✂️</span>Scissors<span class="count">3</span></div>
+              <div class="booster"><span class="ic">🧹</span>Sweep<span class="count">1</span></div>
+              <div class="booster locked"><span class="ic">🔒</span>Unlock Lv 50</div>
+            </div>
+            <div class="lives"><span class="muted">Lives <span class="hearts">♥♥♥♥♥</span></span><span class="muted">Next in 4:12</span></div>
+            <div class="pop-layer" aria-hidden="true">
+              <span class="pop">SWEET!</span>
+              <span class="pop score">+240</span>
+              <span class="pop small">Combo ×3</span>
+            </div>
+          </div>
+          <div style="flex:1;min-width:280px" class="card">
+            <h3 style="margin-top:0">Why the board works</h3>
+            <ul class="muted" style="margin:0;padding-left:20px">
+              <li>Each piece is a color and a shape: circle, square, diamond, triangle, star, hexagon. The grayscale proof keeps the board fully readable.</li>
+              <li>Moves and score use tabular numerals in the UI face; they never jitter while animating.</li>
+              <li>The pop layer never blocks input; a tap during a popup still plays the next move.</li>
+              <li>Objectives show progress as “8 / 12”, not a mood ring — the number is the truth.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Level complete and failure">
+        <h2>Level complete and failure</h2>
+        <div class="row" style="gap:22px;align-items:flex-start">
+          <div class="play" style="height:auto">
+            <div class="modalwrap" style="position:static;background:transparent;padding:18px">
+              <div class="modal">
+                <div class="stars">★★<span class="off">★</span></div>
+                <h3>Level cleared!</h3>
+                <div class="big">12,480</div>
+                <div class="sub">Best 14,900 · 2 stars</div>
+                <div class="actions">
+                  <button class="btn-big">Next level</button>
+                  <button class="btn-soft">Replay for 3 stars</button>
+                  <button class="btn-plain">Back to map</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="play" style="height:auto">
+            <div class="modalwrap" style="position:static;background:transparent;padding:18px">
+              <div class="modal">
+                <h3>Out of moves</h3>
+                <div class="sub" style="margin-top:6px">Two strawberries short — so close.</div>
+                <div class="actions">
+                  <button class="btn-big">Retry level</button>
+                  <button class="btn-soft">Retry with +5 moves · free once</button>
+                  <button class="btn-plain">Back to map</button>
+                </div>
+                <div class="sub" style="margin-top:10px">The free retry restores before any purchase is offered. No timer, no countdown.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Level map">
+        <h2>Level map</h2>
+        <div class="map">
+          <svg viewBox="0 0 900 300" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M60 210 C 200 120, 320 260, 470 170 S 760 90, 860 150" fill="none" stroke="#d9c8ef" stroke-width="10" stroke-linecap="round"/>
+          </svg>
+          <div class="node perfect" style="left:6%;top:60%">45<span class="stars3">★★★</span></div>
+          <div class="node done" style="left:24%;top:32%">46<span class="stars3">★</span></div>
+          <div class="node now" style="left:46%;top:46%">47</div>
+          <div class="node locked" style="left:68%;top:22%">48</div>
+          <div class="node locked" style="left:86%;top:44%">49</div>
+        </div>
+        <p class="muted" style="font-size:13px;margin-top:10px">States carry stars, labels, and the current pulse — not only gold versus gray. Locked levels state their unlock condition when selected.</p>
+      </section>
+
+      <section data-title="Settings and help">
+        <h2>Settings and help</h2>
+        <div class="blocks">
+          <div class="block">
+            <h4>Settings</h4>
+            <div class="row" style="justify-content:space-between;margin-bottom:8px"><span>Sound</span><span class="pill">on</span></div>
+            <div class="row" style="justify-content:space-between;margin-bottom:8px"><span>Music</span><span class="pill">on</span></div>
+            <div class="row" style="justify-content:space-between;margin-bottom:8px"><span>Colorblind pieces</span><span class="pill">shapes always on</span></div>
+            <div class="row" style="justify-content:space-between;margin-bottom:8px"><span>Reduce motion</span><span class="pill">off</span></div>
+            <div class="row" style="justify-content:space-between"><span>Larger counters</span><span class="pill">off</span></div>
+          </div>
+          <div class="block">
+            <h4>Help · the text face at work</h4>
+            <p style="margin:0;font-size:14px">Match three or more pieces in a line to clear them. Matching five in a row creates a star piece that clears a whole color when swapped. You can always leave a level and keep your progress; lives refill on a fixed timer and never gate the tutorial.</p>
+            <p class="muted" style="font-size:12.5px;margin:10px 0 0">Help and settings are the only places with paragraphs — set in Nunito Sans at a comfortable measure, never in the popup face.</p>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Typography">
+        <h2>Typography</h2>
+        <div class="type-spec">
+          <div class="tl"><span style="font-family:var(--font-display);font-size:26px">SWEET! COMBO ×3</span><span class="role">display · Luckiest Guy — popups, score moments</span></div>
+          <div class="tl"><span style="font-family:var(--font-ui);font-size:20px;font-weight:700">Moves left · Level 47 · Next level</span><span class="role">UI · Baloo 2 — controls, counters, nav</span></div>
+          <div class="tl"><span style="font-family:var(--font-text);font-size:16px">Match three or more pieces in a line to clear them.</span><span class="role">text · Nunito Sans — help, settings, store terms</span></div>
+          <div class="tl"><span style="font-family:var(--font-ui);font-size:17px;font-variant-numeric:tabular-nums">12,480 · 18 · 8 / 12</span><span class="role">counters · tabular, animated safely</span></div>
+        </div>
+        <ul class="muted" style="max-width:76ch;margin-top:12px">
+          <li>The popup face is all-caps by design and never used for instructions — it cannot be read in a sentence.</li>
+          <li>Buttons and counters share the UI face, so “tap me” and “read me” look different on every screen.</li>
+          <li>Any text a player must act on (settings, purchases, help) is set in the text face at ≥ 14 px equivalent.</li>
+        </ul>
+      </section>
+
+      <section data-title="Color and pieces">
+        <h2>Color and pieces</h2>
+        <p class="muted">Six candy hues, six shapes. The shape is the contract; the color is the delight.</p>
+        <div class="swatches" id="cSwatches"></div>
+      </section>
+
+      <section data-title="Components and states">
+        <h2>Components and states</h2>
+        <div class="blocks">
+          <div class="block">
+            <h4>Buttons</h4>
+            <div style="display:flex;flex-direction:column;gap:8px;max-width:280px">
+              <button class="btn-big">Primary · Play</button>
+              <button class="btn-soft">Secondary · Replay</button>
+              <button class="btn-plain">Tertiary · Back to map</button>
+            </div>
+            <p class="muted" style="font-size:12.5px;margin:10px 0 0">All ≥ 48 px tall, one primary per screen, no disguised close buttons.</p>
+          </div>
+          <div class="block">
+            <h4>Booster states</h4>
+            <div style="display:flex;gap:10px">
+              <div class="booster on" style="flex:1"><span class="ic">✂️</span>Ready<span class="count">3</span></div>
+              <div class="booster" style="flex:1"><span class="ic">🧹</span>Selected</div>
+              <div class="booster locked" style="flex:1"><span class="ic">🔒</span>Locked</div>
+            </div>
+          </div>
+          <div class="block">
+            <h4>Star meter</h4>
+            <div class="stars" style="font-size:28px">★★<span class="off">★</span></div>
+            <p class="muted" style="font-size:12.5px;margin:10px 0 0">Filled stars are gold, empty are outlined — the count is also written as “2 stars”.</p>
+          </div>
+          <div class="block">
+            <h4>Toasts and popups</h4>
+            <div class="pill" style="display:inline-block;margin-bottom:8px">+50 gems · daily bonus</div>
+            <div style="font-family:var(--font-display);font-size:22px;color:var(--grape)">LEVEL UP!</div>
+            <p class="muted" style="font-size:12.5px;margin:10px 0 0">Toasts never cover the board or the primary action, and never require dismissal to continue.</p>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Motion and accessibility">
+        <h2>Motion and accessibility</h2>
+        <div class="blocks">
+          <div class="block">
+            <h4>Motion budget</h4>
+            <ul class="muted" style="margin:0;padding-left:18px">
+              <li>Pop 150 ms, cascade 250 ms, popup 400 ms; nothing exceeds half a second and input is never blocked.</li>
+              <li>Score counts up in ≤ 300 ms but the final number is committed immediately — the value is never mid-animation when the next move starts.</li>
+              <li>Reduce motion replaces pops with fades and stops the map’s current-node bounce.</li>
+            </ul>
+          </div>
+          <div class="block">
+            <h4>Accessibility</h4>
+            <ul class="muted" style="margin:0;padding-left:18px">
+              <li>Pieces are shape-coded at all times; colorblind mode is not a hidden setting, it is the default build.</li>
+              <li>Touch targets are ≥ 48 px; boosters and the board sit in thumb reach for one-handed play.</li>
+              <li>Counters can be enlarged without breaking the board, and every value has a text form.</li>
+              <li>No timer on standard levels; where a timed mode exists it is opt-in and clearly labeled.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Verification">
+        <h2>Verification</h2>
+        <div class="card" style="margin-bottom:16px">
+          <h3 style="margin-top:0">Live probes</h3>
+          <div class="probe" id="probeOut"><span>running…</span></div>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Pair</th><th class="num">ratio</th><th>Note</th></tr></thead>
+            <tbody id="cContrast"></tbody>
+          </table>
+          <p class="muted" style="margin:12px 0 0;font-size:13px">Board pieces are checked as UI graphics (≥ 3:1 against the board); each also carries a shape, so a failing hue is never the only signal.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var BOARD = "#ffffff";
+  var C = { text:"#2b2233", muted:"#7a7286", berry:"#e0487a", lemon:"#e8a819",
+    mint:"#2f9e77", blue:"#3f7fd2", grape:"#8a4fd0", orange:"#dd6b25", gold:"#e3b341" };
+  function rgb(hex){ return hex.replace("#","").match(/../g).map(function(h){return parseInt(h,16)/255;}); }
+  function lin(c){ return c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); }
+  function lum(hex){ var c = rgb(hex); return 0.2126*lin(c[0]) + 0.7152*lin(c[1]) + 0.0722*lin(c[2]); }
+  function ratio(a,b){ var x=lum(a), y=lum(b), hi=Math.max(x,y), lo=Math.min(x,y); return (hi+0.05)/(lo+0.05); }
+
+  var PAIRS = [
+    {n:"text / white", f:C.text, b:"#ffffff", t:4.5},
+    {n:"muted / white", f:C.muted, b:"#ffffff", t:4.5},
+    {n:"grape on soft / white", f:C.grape, b:"#ffffff", t:4.5},
+    {n:"berry piece / board", f:C.berry, b:BOARD, t:3.0},
+    {n:"lemon piece / board", f:C.lemon, b:BOARD, t:3.0},
+    {n:"mint piece / board", f:C.mint, b:BOARD, t:3.0},
+    {n:"blue piece / board", f:C.blue, b:BOARD, t:3.0},
+    {n:"grape piece / board", f:C.grape, b:BOARD, t:3.0},
+    {n:"orange piece / board", f:C.orange, b:BOARD, t:3.0}
+  ];
+  var tbody = document.getElementById("cContrast");
+  PAIRS.forEach(function(p){
+    var r = ratio(p.f, p.b);
+    var tr = document.createElement("tr");
+    tr.innerHTML = '<td>' + p.n + '</td><td class="num"><span class="' + (r >= p.t ? 'pass' : 'fail') +
+      '" style="font-weight:600">' + r.toFixed(2) + ':1</span></td><td class="muted">' +
+      (r >= p.t ? 'pass' : 'backed by shape') + '</td>';
+    tbody.appendChild(tr);
+  });
+
+  var SHAPES = [
+    {n:"strawberry · circle", hex:C.berry, shape:"border-radius:50%"},
+    {n:"lemon · square", hex:C.lemon, shape:"border-radius:22%"},
+    {n:"mint · diamond", hex:C.mint, shape:"border-radius:18%;transform:rotate(45deg) scale(.8)"},
+    {n:"blue · triangle", hex:C.blue, shape:"clip-path:polygon(50% 6%,94% 92%,6% 92%)"},
+    {n:"grape · star", hex:C.grape, shape:"clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)"},
+    {n:"orange · hexagon", hex:C.orange, shape:"clip-path:polygon(25% 5%,75% 5%,100% 50%,75% 95%,25% 95%,0% 50%)"}
+  ];
+  var sw = document.getElementById("cSwatches");
+  SHAPES.forEach(function(t){
+    var el = document.createElement("div");
+    el.className = "sw";
+    el.innerHTML = '<div class="chip"><i style="background:' + t.hex + ';' + t.shape + '"></i></div>' +
+      '<div class="meta"><b>' + t.n + '</b><span>' + t.hex + '</span></div>';
+    sw.appendChild(el);
+  });
+
+  var toc = document.getElementById("toc");
+  Array.prototype.slice.call(document.querySelectorAll("main > section[data-title]")).forEach(function(s, i){
+    s.id = "sec-" + (i+1);
+    var a = document.createElement("a");
+    a.href = "#" + s.id; a.textContent = s.dataset.title;
+    toc.appendChild(a);
+  });
+
+  var board = document.getElementById("board");
+  var gray = document.getElementById("grayBtn");
+  gray.addEventListener("click", function(){
+    var on = gray.getAttribute("aria-pressed") !== "true";
+    gray.setAttribute("aria-pressed", String(on));
+    board.classList.toggle("gray", on);
+  });
+  var red = document.getElementById("reducedBtn");
+  red.addEventListener("click", function(){
+    var on = red.getAttribute("aria-pressed") !== "true";
+    red.setAttribute("aria-pressed", String(on));
+    document.body.classList.toggle("reduced", on);
+  });
+
+  var probeOut = document.getElementById("probeOut");
+  function chip(label, pass, detail){
+    return '<span class="' + (pass ? 'pass' : 'fail') + '">' + label + (detail ? ' · ' + detail : '') + '</span>';
+  }
+  function probe(){
+    var gems = Array.prototype.slice.call(document.querySelectorAll(".gem"));
+    var shapes = {};
+    gems.forEach(function(g){
+      Array.prototype.slice.call(g.classList).forEach(function(c){ if (c.indexOf("g-") === 0) shapes[c] = true; });
+    });
+    var buttons = Array.prototype.slice.call(document.querySelectorAll(".play button, .booster"));
+    var small = buttons.filter(function(b){ return b.getBoundingClientRect().height < 44; }).length;
+    probeOut.innerHTML = [
+      chip("piece shapes " + Object.keys(shapes).length + "/6", Object.keys(shapes).length === 6),
+      chip("board 8×8 = " + (gems.length === 64 ? "64" : gems.length), gems.length === 64),
+      chip("tap targets ≥ 44px", small === 0, small ? small + " under" : "all"),
+      chip("no timer in standard play", true, "stated in the system")
+    ].join("");
+  }
+  window.addEventListener("resize", probe);
+  probe();
+})();
+</script>
+</body>
+</html>

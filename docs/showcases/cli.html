@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>relay — CLI surface showcase</title>
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  :root{
+    --page-bg:#faf9fd; --page-fg:#191a21; --page-muted:#61646f;
+    --card:#ffffff; --line:#e5e3ee; --accent:#6d4bd8;
+    --ok:#1a7f37; --warn:#8a6100; --bad:#b3261e;
+    --cli-bg:#12121a; --cli-fg:#d9d9e3; --cli-dim:#8a8a9c;
+    --cli-accent:#a78bfa; --cli-ok:#5dd47e; --cli-warn:#e3b341; --cli-bad:#f4807c;
+  }
+  body{margin:0;background:var(--page-bg);color:var(--page-fg);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  a{color:var(--accent)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  header.top{padding:36px 0 22px;border-bottom:1px solid var(--line)}
+  .crumb{font-size:13px;color:var(--page-muted);margin:0 0 10px}
+  h1{font-size:30px;line-height:1.2;margin:0 0 8px;letter-spacing:-.01em}
+  .lede{color:var(--page-muted);max-width:70ch;margin:0}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .chip{font-size:12px;padding:3px 10px;border:1px solid var(--line);border-radius:999px;color:var(--page-muted);background:var(--card)}
+  .layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:44px;padding:30px 0 90px}
+  nav#toc{position:sticky;top:22px;align-self:start;display:flex;flex-direction:column;gap:2px}
+  nav#toc a{font-size:13px;text-decoration:none;color:var(--page-muted);padding:5px 8px;border-radius:6px}
+  nav#toc a:hover{background:var(--card);color:var(--page-fg)}
+  main>section{padding:26px 0 34px;border-bottom:1px solid var(--line)}
+  main>section:last-child{border-bottom:0}
+  h2{font-size:20px;margin:0 0 14px;letter-spacing:-.01em}
+  h3{font-size:15px;margin:24px 0 10px}
+  p{max-width:76ch}
+  .muted{color:var(--page-muted)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  button{font:inherit;font-size:13px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);
+    background:var(--card);color:var(--page-fg);cursor:pointer}
+  button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+  button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--page-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  .num{font-variant-numeric:tabular-nums;text-align:right}
+  .ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}.warn{color:var(--warn);font-weight:600}
+  code,kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em}
+  .term{background:var(--cli-bg);color:var(--cli-fg);border-radius:10px;padding:14px 16px;
+    overflow-x:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+    font-size:12.5px;line-height:1.55;
+    width:min(100%, calc(var(--cols,80) * 1ch + 32px))}
+  .term .line{display:block;white-space:pre-wrap;word-break:break-word}
+  .term .cmd{color:#ffffff;font-weight:600}
+  .term .a{color:var(--cli-accent)}.term .g{color:var(--cli-ok)}.term .y{color:var(--cli-warn)}.term .r{color:var(--cli-bad)}
+  .term .d{color:var(--cli-dim)}
+  .terms[data-mode="pipe"] .term .a,.terms[data-mode="pipe"] .term .g,
+  .terms[data-mode="pipe"] .term .y,.terms[data-mode="pipe"] .term .r,
+  .terms[data-mode="nocolor"] .term .a,.terms[data-mode="nocolor"] .term .g,
+  .terms[data-mode="nocolor"] .term .y,.terms[data-mode="nocolor"] .term .r,
+  .terms[data-mode="ci"] .term .a,.terms[data-mode="ci"] .term .g,
+  .terms[data-mode="ci"] .term .y,.terms[data-mode="ci"] .term .r{color:var(--cli-fg)}
+  .terms .ci-only{display:none}
+  .terms[data-mode="ci"] .ci-only{display:block}
+  .terms[data-mode="ci"] .spin{display:none}
+  .terms[data-mode="pipe"] .spin{display:none}
+  .stack{display:flex;flex-direction:column;gap:16px}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--page-muted)}
+  .cols-out{font-family:ui-monospace,Menlo,monospace;font-size:13px;color:var(--accent);min-width:5ch}
+  input[type=range]{width:220px;accent-color:var(--accent)}
+  .blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
+  .block{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
+  .block h4{margin:0 0 10px;font-size:12px;color:var(--page-muted);text-transform:uppercase;letter-spacing:.05em}
+  .spinner{display:inline-block;width:11px;height:11px;border:2px solid var(--cli-dim);border-top-color:var(--cli-accent);
+    border-radius:50%;animation:spin .9s linear infinite;vertical-align:-1px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion: reduce){.spinner{animation:none;border-top-color:var(--cli-fg)}}
+  .specimen{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.8;
+    background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto}
+  .specimen .lab{display:inline-block;width:11ch;color:var(--page-muted);font-family:-apple-system,sans-serif;font-size:11px;
+    text-transform:uppercase;letter-spacing:.05em}
+  .a11y{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px}
+  .a11y div{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--card);font-size:13.5px}
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;gap:18px}
+    nav#toc{position:static;flex-direction:row;overflow-x:auto;padding-bottom:6px;gap:4px}
+    nav#toc a{white-space:nowrap;border:1px solid var(--line)}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <p class="crumb"><a href="index.html">← showcases</a> · case 02 · Greenfield · surface: CLI</p>
+    <h1>relay — output is the interface</h1>
+    <p class="lede">A deployment CLI with a documented output grammar: stdout carries data, stderr carries diagnostics, color and width are runtime facts, and every error ends with the next command. Components here are output blocks, not widgets.</p>
+    <div class="chips">
+      <span class="chip">stdout / stderr contract</span>
+      <span class="chip">TTY · pipe · NO_COLOR · CI</span>
+      <span class="chip">width is runtime</span>
+      <span class="chip">exit codes as interface</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav id="toc" aria-label="Contents"></nav>
+    <main>
+
+      <section data-title="Context">
+        <h2>Context</h2>
+        <p><strong>Who:</strong> developers deploying services, often from a laptop, a CI runner, or a pipe into another tool. <strong>Jobs:</strong> deploy, check status, read failures, script the same operations. <strong>Constraints:</strong> the terminal may be interactive or a pipe, ANSI may be disabled, and the width is unknown until runtime. The CLI controls the colors it sets — but only when it is allowed to set them.</p>
+      </section>
+
+      <section data-title="Principles">
+        <h2>Principles</h2>
+        <table>
+          <thead><tr><th>Rule</th><th>Rationale</th></tr></thead>
+          <tbody>
+            <tr><td>stdout is data, stderr is commentary</td><td>Piped output stays parseable; progress and warnings never corrupt the data stream.</td></tr>
+            <tr><td>Color is a runtime decision</td><td>TTY, <code>NO_COLOR</code>, CI, and dumb terminals each change what is honest to emit; meaning never depends on color anyway.</td></tr>
+            <tr><td>Width is read, not assumed</td><td>Wrapping and truncation follow the real terminal; 80 columns is a guess, not a contract.</td></tr>
+            <tr><td>An error ends with the next command</td><td>Recovery is part of the interface; “what happened / why / next” is one block.</td></tr>
+            <tr><td>Exit codes are a public API</td><td>Scripts branch on them; they are specified and tested like any other contract.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-title="Sessions">
+        <h2>Sessions</h2>
+        <p class="muted">Whole-use transcripts: a success, a failure, and a pipe. These are the CLI's “scenes”.</p>
+        <div class="terms" data-mode="tty">
+          <div class="stack">
+            <div class="term">
+              <div class="line"><span class="d">$</span> <span class="cmd">relay deploy --env staging</span></div>
+              <div class="line"><span class="a">relay</span> · staging · app=checkout sha=4f3c2b1</div>
+              <div class="line"></div>
+              <div class="line"><span class="a">→</span> build     docker buildx … <span class="g">done</span> in 42s</div>
+              <div class="line"><span class="a">→</span> push      registry.relay.dev/checkout:4f3c2b1  <span class="g">done</span> in 9s</div>
+              <div class="line"><span class="a">→</span> migrate   3 migrations applied</div>
+              <div class="line"><span class="a">→</span> release   canary 10% <span class="d">→</span> 50% <span class="d">→</span> 100%</div>
+              <div class="line"></div>
+              <div class="line"><span class="g">✓</span> deployed in 1m 58s</div>
+              <div class="line d">next: relay logs --env staging --follow</div>
+              <div class="line ci-only"><span class="d">2026-09-17T09:12:04Z relay deploy env=staging sha=4f3c2b1 result=success</span></div>
+            </div>
+            <div class="term">
+              <div class="line"><span class="d">$</span> <span class="cmd">relay deploy --env prod</span></div>
+              <div class="line"><span class="r">✗</span> preflight failed: branch main is 12 commits behind origin/main</div>
+              <div class="line"></div>
+              <div class="line"><span class="d">what happened</span>  deploy stopped before any change</div>
+              <div class="line"><span class="d">why</span>            preflight requires an up-to-date branch</div>
+              <div class="line"><span class="d">next</span>           git pull --rebase origin main &amp;&amp; relay deploy --env prod</div>
+              <div class="line ci-only"><span class="d">2026-09-17T09:14:31Z relay deploy env=prod result=preflight-failed exit=2</span></div>
+            </div>
+            <div class="term">
+              <div class="line"><span class="d">$</span> <span class="cmd">relay status --env staging | jq -r '.services[].name'</span></div>
+              <div class="line">api</div>
+              <div class="line">worker</div>
+              <div class="line">postgres</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Color modes">
+        <h2>Color modes</h2>
+        <p class="muted">Switch the rendering context; the same transcripts adapt. In <strong>CI</strong>, progress spinners disappear and machine-readable log lines appear instead.</p>
+        <div class="row" style="margin-bottom:12px">
+          <button data-mode="tty" aria-pressed="true">Auto (TTY)</button>
+          <button data-mode="pipe" aria-pressed="false">Piped</button>
+          <button data-mode="nocolor" aria-pressed="false">NO_COLOR</button>
+          <button data-mode="ci" aria-pressed="false">CI</button>
+        </div>
+        <div class="legend">
+          <span><strong>Auto</strong> — color when stdout is a TTY and the terminal is capable.</span>
+          <span><strong>Piped</strong> — color off, spinners off, data only.</span>
+          <span><strong>NO_COLOR</strong> — color off, layout unchanged.</span>
+          <span><strong>CI</strong> — color off, timestamps and result fields on, spinners off.</span>
+        </div>
+      </section>
+
+      <section data-title="Width">
+        <h2>Width</h2>
+        <p class="muted">The CLI reads the terminal width; slide to see help and output re-wrap. Nothing is designed for one magic width.</p>
+        <div class="row" style="margin-bottom:14px">
+          <label for="cols" style="font-size:13px" class="muted">Terminal width</label>
+          <input id="cols" type="range" min="40" max="120" value="80" aria-label="Terminal width in columns">
+          <span class="cols-out" id="colsOut">80</span>
+        </div>
+        <div class="terms" data-mode="tty" id="widthTerms">
+          <div class="term">
+            <div class="line"><span class="d">$</span> <span class="cmd">relay deploy --help</span></div>
+            <div class="line"></div>
+            <div class="line">usage: relay deploy [flags]</div>
+            <div class="line"></div>
+            <div class="line">deploy the current revision to an environment</div>
+            <div class="line"></div>
+            <div class="line">examples:</div>
+            <div class="line">  relay deploy --env staging</div>
+            <div class="line">  relay deploy --env prod --canary 10</div>
+            <div class="line"></div>
+            <div class="line">flags:</div>
+            <div class="line">  --env &lt;name&gt;      target environment (staging, prod)  <span class="y">[required]</span></div>
+            <div class="line">  --canary &lt;pct&gt;    start at this traffic percentage   <span class="d">[default: 10]</span></div>
+            <div class="line">  --dry-run         print the plan, change nothing</div>
+            <div class="line">  --timeout &lt;dur&gt;   abort after this duration          <span class="d">[default: 10m]</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Errors and exit codes">
+        <h2>Errors and exit codes</h2>
+        <div class="card">
+          <h3 style="margin-top:0">Error anatomy</h3>
+          <ol style="margin:0;padding-left:20px" class="muted">
+            <li><strong>What happened</strong> — one line, past tense, no jargon.</li>
+            <li><strong>Why</strong> — the rule or state that caused it.</li>
+            <li><strong>Next</strong> — a runnable command or a named owner.</li>
+          </ol>
+          <h3>Exit codes</h3>
+          <table>
+            <thead><tr><th class="num">Code</th><th>Meaning</th><th>Typical cause</th></tr></thead>
+            <tbody>
+              <tr><td class="num"><code>0</code></td><td>success</td><td>operation completed</td></tr>
+              <tr><td class="num"><code>1</code></td><td>usage error</td><td>unknown flag or missing argument</td></tr>
+              <tr><td class="num"><code>2</code></td><td>preflight failed</td><td>environment refused the deploy</td></tr>
+              <tr><td class="num"><code>3</code></td><td>runtime failure</td><td>remote system failed mid-operation</td></tr>
+              <tr><td class="num"><code>4</code></td><td>timeout</td><td>operation exceeded <code>--timeout</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section data-title="Machine mode">
+        <h2>Machine mode</h2>
+        <p class="muted"><code>--json</code> is a documented contract, not a debug dump: closed state vocabulary, ISO-8601 UTC timestamps, no diagnostics on stdout, and the same exit codes.</p>
+        <div class="terms" data-mode="tty">
+          <div class="term">
+            <div class="line"><span class="d">$</span> <span class="cmd">relay status --env staging --json</span></div>
+            <div class="line">{</div>
+            <div class="line">  "env": "staging",</div>
+            <div class="line">  "revision": "4f3c2b1",</div>
+            <div class="line">  "checked_at": "2026-09-17T09:20:11Z",</div>
+            <div class="line">  "services": [</div>
+            <div class="line">    { "name": "api",      "state": "healthy", "replicas": "3/3" },</div>
+            <div class="line">    { "name": "worker",   "state": "healthy", "replicas": "2/2" },</div>
+            <div class="line">    { "name": "postgres", "state": "degraded", "replicas": "1/1" }</div>
+            <div class="line">  ]</div>
+            <div class="line">}</div>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Typography">
+        <h2>Typography</h2>
+        <p class="muted">The terminal owns the font. The CLI cannot choose a face, so it owns alignment, weight, and case instead — and columns are computed in characters, never in pixels.</p>
+        <div class="specimen">
+          <div><span class="lab">command</span><b>$ relay deploy --env staging</b>        <span class="d">bold, the only emphasis</span></div>
+          <div><span class="lab">data</span>api  worker  postgres              <span class="d">regular, tabular columns</span></div>
+          <div><span class="lab">metadata</span><span class="d">next: relay logs --follow            dim, still legible</span></div>
+          <div><span class="lab">failure</span><span class="r">✗ preflight failed</span>                    <span class="d">color + glyph + word</span></div>
+          <div><span class="lab">emphasis</span>relay <b>status</b> --env staging           <span class="d">no italics — some fonts lack them</span></div>
+        </div>
+        <ul class="muted" style="max-width:76ch;margin-top:12px">
+          <li>One size, one fixed-pitch face; there is no font axis to design with.</li>
+          <li>Never align with spaces alone when a pipe is possible — provide a column or table mode.</li>
+          <li>Case is content, not emphasis: do not SHOUT commands or status.</li>
+        </ul>
+      </section>
+
+      <section data-title="Components and states">
+        <h2>Components and states</h2>
+        <p class="muted">The components of a CLI are output blocks. Each has defined states, and every state is reachable through the mode matrix above.</p>
+        <div class="blocks">
+          <div class="block">
+            <h4>Step line · running / done / failed</h4>
+            <div class="term" style="--cols:64">
+              <div class="line"><span class="a">→</span> build     docker buildx … <span class="d"><span class="spinner" aria-hidden="true"></span> running</span></div>
+              <div class="line"><span class="a">→</span> push      registry.relay.dev/checkout:4f3c2b1  <span class="g">done</span> in 9s</div>
+              <div class="line"><span class="r">✗</span> release   canary aborted at 10%           <span class="d">failed</span></div>
+            </div>
+          </div>
+          <div class="block">
+            <h4>Result line · success / skipped</h4>
+            <div class="term" style="--cols:64">
+              <div class="line"><span class="g">✓</span> deployed in 1m 58s</div>
+              <div class="line"><span class="d">–</span> migrate skipped (no change)   <span class="d">safe to skip, says so</span></div>
+            </div>
+          </div>
+          <div class="block">
+            <h4>Interactive prompt · waiting / confirmed</h4>
+            <div class="term" style="--cols:64">
+              <div class="line">Roll back checkout to 9ab3210? <span class="d">[y/N]</span></div>
+              <div class="line"><span class="cmd">y</span></div>
+              <div class="line"><span class="g">✓</span> rollback queued · <span class="d">relay watch --env staging</span></div>
+            </div>
+          </div>
+          <div class="block">
+            <h4>Table · two widths of the same data</h4>
+            <div class="term" style="--cols:64">
+              <div class="line"><span class="d">service   state     replicas</span></div>
+              <div class="line">api       healthy   3/3</div>
+              <div class="line">worker    healthy   2/2</div>
+              <div class="line">postgres  degraded  1/1</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section data-title="Motion and accessibility">
+        <h2>Motion and accessibility</h2>
+        <div class="blocks" style="margin-bottom:16px">
+          <div class="block">
+            <h4>Motion budget</h4>
+            <ul class="muted" style="margin:0;padding-left:18px">
+              <li>Spinners and progress bars are the only motion; result lines never animate.</li>
+              <li>Non-TTY, <code>NO_COLOR</code>, and CI disable spinners and animated progress entirely.</li>
+              <li><code>prefers-reduced-motion</code> freezes the spinner at a static frame.</li>
+            </ul>
+          </div>
+          <div class="block">
+            <h4>Accessibility</h4>
+            <ul class="muted" style="margin:0;padding-left:18px">
+              <li>Every status keeps a word or glyph, so a screen reader hears meaning without color.</li>
+              <li>Output is a linear stream: no cursor-addressing, no two-column layout that breaks reading order.</li>
+              <li>Errors are complete sentences with the next command, not codes alone.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="a11y">
+          <div><strong>Width</strong><br><span class="muted">Wraps to the real terminal and never assumes 80 columns.</span></div>
+          <div><strong>Keyboard</strong><br><span class="muted">Every interactive prompt has a default answer and an escape.</span></div>
+          <div><strong>Exit codes</strong><br><span class="muted">A closed, documented set that scripts can branch on.</span></div>
+        </div>
+      </section>
+
+      <section data-title="Contrast">
+        <h2>Contrast</h2>
+        <p class="muted">When the CLI is allowed to colorize, it controls the palette and the pairs are computed for both common background assumptions. If a pair fails, the token changes — not the report.</p>
+        <div class="card">
+          <table>
+            <thead><tr><th>Role</th><th>Value</th><th class="num">on dark terminal</th><th class="num">on light terminal</th></tr></thead>
+            <tbody id="cliContrast"></tbody>
+          </table>
+          <p class="muted" style="margin:12px 0 0;font-size:13px">Both assumptions are shipped because the CLI cannot detect the background reliably; every role also carries a word or symbol.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var PALETTE = { bgDark:"#12121a", bgLight:"#ffffff",
+    accent:"#a78bfa", ok:"#5dd47e", warn:"#e3b341", bad:"#f4807c", dim:"#8a8a9c", fg:"#d9d9e3" };
+  var ROLES = [
+    {name:"accent / step", value:PALETTE.accent, use:"→ prefixes"},
+    {name:"success", value:PALETTE.ok, use:"✓, done"},
+    {name:"warning", value:PALETTE.warn, use:"[required], defaults"},
+    {name:"danger", value:PALETTE.bad, use:"✗, failures"},
+    {name:"muted", value:PALETTE.dim, use:"metadata, next hints"}
+  ];
+  function rgb(hex){ return hex.replace("#","").match(/../g).map(function(h){return parseInt(h,16)/255;}); }
+  function lin(c){ return c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); }
+  function lum(hex){ var c = rgb(hex); return 0.2126*lin(c[0]) + 0.7152*lin(c[1]) + 0.0722*lin(c[2]); }
+  function ratio(a,b){ var x=lum(a), y=lum(b), hi=Math.max(x,y), lo=Math.min(x,y); return (hi+0.05)/(lo+0.05); }
+  function badge(r,target){ return '<span class="' + (r >= target ? 'ok' : 'bad') + '">' + r.toFixed(2) + ':1</span>'; }
+
+  var tbody = document.getElementById("cliContrast");
+  ROLES.forEach(function(role){
+    var tr = document.createElement("tr");
+    tr.innerHTML = '<td>' + role.name + '</td><td><code>' + role.value + '</code>' +
+      '</td><td class="num">' + badge(ratio(role.value, PALETTE.bgDark), 4.5) +
+      '</td><td class="num">' + badge(ratio(role.value, PALETTE.bgLight), 4.5) + '</td>';
+    tbody.appendChild(tr);
+  });
+
+  var toc = document.getElementById("toc");
+  Array.prototype.slice.call(document.querySelectorAll("main > section[data-title]")).forEach(function(s, i){
+    s.id = "sec-" + (i+1);
+    var a = document.createElement("a");
+    a.href = "#" + s.id; a.textContent = s.dataset.title;
+    toc.appendChild(a);
+  });
+
+  var modeBtns = Array.prototype.slice.call(document.querySelectorAll("button[data-mode]"));
+  modeBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll(".terms").forEach(function(t){ t.dataset.mode = btn.dataset.mode; });
+      modeBtns.forEach(function(b){ b.setAttribute("aria-pressed", String(b === btn)); });
+    });
+  });
+
+  var cols = document.getElementById("cols");
+  var colsOut = document.getElementById("colsOut");
+  function applyCols(){
+    var v = cols.value;
+    colsOut.textContent = v;
+    document.querySelectorAll(".term").forEach(function(t){ t.style.setProperty("--cols", v); });
+  }
+  cols.addEventListener("input", applyCols);
+  applyCols();
+})();
+</script>
+</body>
+</html>

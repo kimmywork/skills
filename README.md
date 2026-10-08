@@ -32,7 +32,7 @@ claude plugin install utility@kimmywork-skills
 
 ## Skills
 
-### Drafting (10 skills)
+### Drafting (12 skills)
 
 [Drafting skills](drafting/README.md).
 
@@ -61,6 +61,9 @@ Independent, general-purpose skills for exploring, planning, executing, research
 
 #### `worklog`
 > Record completed workspace changes as traceable daily log entries and maintain a current workstate snapshot.
+
+#### `parkinglot`
+> Park out-of-scope issues in `PARKING_LOT.md` instead of fixing them immediately, then review them in batches to find shared causes.
 
 #### `restraint`
 > Do what the user actually wants, and nothing more; avoid over-engineering.

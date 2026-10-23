@@ -17,7 +17,7 @@ Touch-first, portrait-baseline, and dependent on OS chrome and sensors. Read thi
 - Status is redundantly encoded (color + icon + text), never color alone.
 - One primary action per screen; interruptions must relate to the core value and be reversible.
 - Discrete data changes discretely; never tween a value that is not continuous. Reserve motion for guidance and transitions.
-- Touch targets are at least 48×48; primary actions sit in thumb reach; the bottom bar is the stable navigation slot.
+- Touch targets are at least 48×48, the mobile convention; the WCAG 2.5.8 floor is 24×24, but this surface declares the stricter target. Primary actions sit in thumb reach; the bottom bar is the stable navigation slot.
 - Support system font scaling to 2.0× without truncation; do not assume the desktop type rules hold.
 - Orientation is a declared decision: which screens support landscape, and what changes.
 - External content (legal, medical disclaimers, third-party embeds) is named as owned by someone else and not silently restyled.

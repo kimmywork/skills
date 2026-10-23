@@ -24,6 +24,7 @@ claude plugin marketplace add kimmywork/skills
 
 # Install plugins
 claude plugin install drafting@kimmywork-skills
+claude plugin install design@kimmywork-skills
 claude plugin install loop@kimmywork-skills
 claude plugin install utility@kimmywork-skills
 ```
@@ -32,7 +33,7 @@ claude plugin install utility@kimmywork-skills
 
 ## Skills
 
-### Drafting (12 skills)
+### Drafting (11 skills)
 
 [Drafting skills](drafting/README.md).
 
@@ -71,8 +72,19 @@ Independent, general-purpose skills for exploring, planning, executing, research
 #### `prune`
 > Subtract what is unnecessary — obsolete workspace clutter and overgrowth in a drafted design or plan — keeping the smallest necessary and sufficient set.
 
-#### `design-system`
-> Build, extract, or rebuild a design system and deliver it as a showcase plus a token-complete specification.
+---
+
+### Design (2 skills)
+
+[Design skills](design/README.md).
+
+Build or govern a design system, review a product or design artifact with evidence, and present ideas to an audience.
+
+#### `design`
+> Build, extract, rebuild, or govern a design system; review a product or design artifact and produce an issue register, fix plan, and guard rules.
+
+#### `presentation`
+> Create a live, written, or hybrid presentation — talk, sharing session, demo, panel, pitch, workshop, report, or one-pager — with narrative, language, timing, visual, and accessibility discipline.
 
 ---
 
@@ -113,7 +125,7 @@ Create, validate, and execute permission-bounded recurring workflows.
 
 ## Showcases
 
-Example outputs of the `design-system` skill, one per surface class. Each is a single self-contained HTML file; typography demos load webfonts with system fallbacks:
+Example outputs of the `design` skill, one per surface class. Each is a single self-contained HTML file; typography demos load webfonts with system fallbacks:
 
 | Case | Surface | Demonstrates |
 |---|---|---|
@@ -126,4 +138,4 @@ Example outputs of the `design-system` skill, one per surface class. Each is a s
 | [game-casual](docs/showcases/game-casual.html) | Game UI · casual puzzle | Shape-coded pieces, bounded motion, one-thumb targets, no dark patterns |
 | [print](docs/showcases/print.html) | Print | Fixed canvas, shared grid, grayscale proof, print color values |
 
-Gallery: [`docs/showcases/index.html`](docs/showcases/index.html). Install the skill: `npx skills add kimmywork/skills --skill design-system` · Skill doc: [SKILL.md](https://skills.kimmy.fun/drafting/skills/design-system/SKILL.html).
+Gallery: [`docs/showcases/index.html`](docs/showcases/index.html). Install the skill: `npx skills add kimmywork/skills --skill design` · Skill doc: [SKILL.md](https://skills.kimmy.fun/design/skills/design/SKILL.html).

@@ -11,6 +11,11 @@
       "source": "./drafting/"
     },
     {
+      "name": "design",
+      "description": "Design system building, design review, and presentation craft",
+      "source": "./design/"
+    },
+    {
       "name": "utility",
       "description": "Utility skills for daily work",
       "source": "./utility/"

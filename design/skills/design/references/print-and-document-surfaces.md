@@ -2,6 +2,8 @@
 
 The canvas is fixed and the artifact cannot respond. Posters, reports, one-pagers, and exports such as PDF share this surface. Read this with the main skill and the checklist.
 
+Authoring a slide deck or report is a separate communication task; this reference covers the fixed-canvas print surface that such artifacts consume.
+
 ## Canvas and grid
 
 - Fix the canvas first — A4, A2, a slide, or a named pixel size — and design to it. Nothing may reflow.

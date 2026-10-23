@@ -2,6 +2,8 @@
 
 Three sweeps to run before calling a design system finished. Everything here is **reference material for deriving your own decisions** — none of it is meant to be copied into the deliverable or applied mechanically.
 
+This checklist is for **System mode**. In Review mode, use `references/review.md`; for accessibility detail, use `references/accessibility.md`.
+
 ## 1. Principles sweep
 
 Walk the established frameworks below. **Treat every line as a reference, not a script.** The point is to understand what the principle protects and then derive questions that fit this product — they will usually be more specific and more useful than the examples here. Do not march through the list asking each one in turn.

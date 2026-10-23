@@ -1,0 +1,37 @@
+{
+  "name": "design",
+  "version": "1.0.0",
+  "description": "Design system building, design review, and audience-facing presentation craft",
+  "author": {
+    "name": "Kimmy Liu"
+  },
+  "homepage": "https://github.com/kimmywork/skills",
+  "repository": "https://github.com/kimmywork/skills",
+  "license": "MIT",
+  "keywords": [
+    "design",
+    "design-system",
+    "design-review",
+    "ux",
+    "accessibility",
+    "presentation",
+    "report"
+  ],
+  "skills": "skills",
+  "interface": {
+    "displayName": "Design",
+    "shortDescription": "Design systems, design review, and presentation craft",
+    "longDescription": "Skills for building or governing a design system, reviewing a product or design artifact with evidence, and presenting ideas to an audience in live, written, or hybrid form.",
+    "developerName": "Kimmy Liu",
+    "category": "Design",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Build a design system with tokens, a showcase, and a drift check",
+      "Review this product experience and tell me what to fix first",
+      "Turn this material into a talk or a written report"
+    ]
+  }
+}

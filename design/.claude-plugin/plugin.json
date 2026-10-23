@@ -1,0 +1,19 @@
+{
+  "name": "design",
+  "description": "Design system building, design review, and audience-facing presentation craft",
+  "version": "1.0.0",
+  "homepage": "https://github.com/kimmywork/skills",
+  "repository": "https://github.com/kimmywork/skills",
+  "keywords": [
+    "design",
+    "design-system",
+    "design-review",
+    "ux",
+    "accessibility",
+    "presentation",
+    "report"
+  ],
+  "skills": [
+    "./skills/"
+  ]
+}

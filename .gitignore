@@ -1,3 +1,6 @@
+# Local review/proposal inputs and outputs
+/reference/
+
 #.agents/
 .pi/
 skills-lock.json

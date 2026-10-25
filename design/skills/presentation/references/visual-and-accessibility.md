@@ -39,7 +39,7 @@ Read this when the content is ready to be seen. Projection and paper are differe
 
 ## Verification
 
-Render every slide or page. Check at presentation size and at reading size; check in grayscale; check the printed sheet; check the offline file; check that the source outline and the artifact agree. Fix what fails before delivery.
+Render every slide or page. Batch screenshots and a contact sheet first; inspect individual slides only after the sheet. Check at presentation size and at reading size; check in grayscale; check the printed sheet; check the offline file; check that the source outline and the artifact agree. Fix what fails before delivery.
 
 ## Anti-patterns
 

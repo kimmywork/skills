@@ -19,6 +19,10 @@ If the takeaway needs a paragraph, the presentation is not ready.
 - **Assertion–evidence (Alley).** For technical work, make the headline a sentence that states the claim, and make the body visual evidence. Replace topic labels and bullet walls.
 - **Three acts.** For talks, use a setup, a turn, and a resolution. Two turning points are enough; more is a plot.
 
+## Evidence
+
+Match the comparison to the claim. A 58mm prime cannot prove what a 24–240mm zoom can; choose the object that makes the argument valid.
+
 ## Three registers
 
 | Register | Shape | Failure |

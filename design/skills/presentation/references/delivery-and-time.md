@@ -10,6 +10,7 @@ Read this when the content is chosen and the question is whether it fits the roo
 - **Change the mode every five to seven minutes:** story, data, demonstration, interaction, question. Attention drops when the mode stays flat.
 - **Use checkpoint slides** ("where we are, where we are going") only when the talk is long enough to need them.
 - **Keep a must-cut list.** When time runs short, cut from the list, not from the argument.
+- **Store the budget per slide** (`data-budget`) and sum it after edits; the must-cut list lives in the notes.
 - **Put a visible timer in the room.** Rehearse to a hard stop, not to "about right".
 
 ## Q&A

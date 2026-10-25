@@ -139,3 +139,9 @@ Example outputs of the `design` skill, one per surface class. Each is a single s
 | [print](docs/showcases/print.html) | Print | Fixed canvas, shared grid, grayscale proof, print color values |
 
 Gallery: [`docs/showcases/index.html`](docs/showcases/index.html). Install the skill: `npx skills add kimmywork/skills --skill design` · Skill doc: [SKILL.md](https://skills.kimmy.fun/design/skills/design/SKILL.html).
+
+### Presentation decks
+
+Eight fictional decks from the `presentation` skill: academic defense, Series A pitch, incident postmortem, architecture review, keynote, workshop, business review, and product launch. Each is a self-contained HTML deck with speaker notes, a time budget, and an inferred requirements document.
+
+[Presentation deck gallery](docs/presentations/index.html).

@@ -1,241 +1,794 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system showcases</title>
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Design is a skill for building design systems, reviewing the experience, and keeping the two honest. Eight surface proofs, one self-contained web case.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23161616'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-size='18' fill='%23f4f1e9'%3ED%3C/text%3E%3C/svg%3E">
+<title>Design — systems that hold up</title>
 <style>
-  *{box-sizing:border-box}
   :root{
-    --bg:#f4f4f2; --fg:#17181b; --muted:#5f6470; --card:#ffffff; --line:#e3e3df;
-    --accent:#3f3f46;
+    --paper:#f4f1e9; --paper-2:#ece7db; --card:#fbf9f4;
+    --ink:#161616; --muted:#5e5a52; --line:#d8d1c3; --line-strong:#b9b1a1;
+    --accent:#0b5d4f; --accent-ink:#f4f1e9; --accent-soft:#dcebe6;
+    --warm:#9a4508; --warm-soft:#f3e3d2;
+    --code-bg:#171918; --code-fg:#f2efe7; --code-muted:#a6a298;
+    --shadow:0 24px 60px rgba(30,26,18,.14); --shadow-soft:0 10px 30px rgba(30,26,18,.08);
+    --radius:18px; --radius-sm:12px; --max:1180px; --pad:24px;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   }
-  body{margin:0;background:var(--bg);color:var(--fg);
-    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  [data-theme="dark"]{
+    --paper:#101211; --paper-2:#171b18; --card:#161a17;
+    --ink:#f2efe7; --muted:#aaa49a; --line:#2a302b; --line-strong:#3b433c;
+    --accent:#6ee7d0; --accent-ink:#101211; --accent-soft:#12332d;
+    --warm:#fbbf24; --warm-soft:#3a2a10;
+    --code-bg:#0a0c0b; --code-fg:#f2efe7; --code-muted:#8f948b;
+    --shadow:0 24px 60px rgba(0,0,0,.45); --shadow-soft:0 10px 30px rgba(0,0,0,.3);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{animation:none!important;transition:none!important}
+  }
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:64px 64px;opacity:.16;
+    -webkit-mask-image:linear-gradient(to bottom,#000,transparent 72%);
+    mask-image:linear-gradient(to bottom,#000,transparent 72%);
+  }
   a{color:inherit}
-  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
-  header{padding:64px 0 30px}
-  .kicker{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 12px}
-  h1{font-size:36px;line-height:1.15;letter-spacing:-.02em;margin:0 0 14px;max-width:22ch}
-  .lede{color:var(--muted);max-width:72ch;margin:0}
-  .note{margin-top:22px;padding:14px 18px;background:var(--card);border:1px solid var(--line);border-radius:12px;
-    color:var(--muted);font-size:14px;max-width:80ch}
-  .install{margin-top:14px;padding:14px 18px;background:var(--card);border:1px solid var(--line);border-radius:12px;
-    display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;max-width:80ch}
-  .install-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px}
-  .cmd{display:inline-block;background:#17181b;color:#f2f2ef;border-radius:8px;padding:8px 12px;font-size:12.5px;
-    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-x:auto;max-width:100%}
-  .install-actions{display:flex;gap:8px;align-items:center}
-  .install-actions button,.install-actions a{font:inherit;font-size:13px;font-weight:700;padding:8px 14px;border-radius:8px;
-    border:1px solid var(--line);background:#f6f6f4;color:var(--fg);cursor:pointer;text-decoration:none}
-  .install-actions a{background:#17181b;color:#fff;border-color:#17181b}
-  .install-actions button:focus-visible,.install-actions a:focus-visible{outline:2px solid #17181b;outline-offset:2px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px;padding:26px 0 40px}
-  .case{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;
-    overflow:hidden;text-decoration:none;transition:transform .12s ease,box-shadow .12s ease}
-  .case:hover,.case:focus-visible{transform:translateY(-2px);box-shadow:0 12px 30px rgba(20,22,26,.10);outline:none}
-  .case:focus-visible{outline:2px solid #17181b;outline-offset:2px}
-  .preview{height:150px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line);
-    background:#ececea;position:relative;overflow:hidden}
-  .tag{position:absolute;top:10px;left:12px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
-    color:#5f6470;font-weight:700}
-  .case .body{padding:16px 18px 20px;display:flex;flex-direction:column;gap:10px;flex:1}
-  .case h2{font-size:17px;margin:0;letter-spacing:-.01em}
-  .case p{margin:0;font-size:13.5px;color:var(--muted);flex:1}
-  .facts{display:flex;flex-wrap:wrap;gap:6px}
-  .facts span{font-size:11px;padding:2px 8px;border:1px solid var(--line);border-radius:999px;color:var(--muted)}
-  .open{font-size:13px;font-weight:700;color:var(--fg)}
-  .open::after{content:" →"}
-  /* mini previews */
-  .pv-term{width:190px;height:96px;background:#101317;border-radius:8px;padding:9px 11px;display:flex;flex-direction:column;gap:5px}
-  .pv-term i{display:block;height:5px;border-radius:2px;background:#39414f}
-  .pv-term i:nth-child(1){width:60%;background:#2ad4d4}
-  .pv-term i:nth-child(2){width:82%}
-  .pv-term i:nth-child(4){width:46%;background:#d9b04a}
-  .pv-cli{width:190px;height:96px;background:#12121a;border-radius:8px;padding:9px 11px;display:flex;flex-direction:column;gap:5px}
-  .pv-cli i{display:block;height:5px;border-radius:2px;background:#3a3a4a}
-  .pv-cli i:nth-child(1){width:38%;background:#a78bfa}
-  .pv-cli i:nth-child(3){width:74%;background:#5dd47e}
-  .pv-mobile{display:flex;gap:10px;align-items:center}
-  .pv-mobile .ph{width:52px;height:104px;border-radius:10px;border:3px solid #2c2f36;background:linear-gradient(180deg,#fff 30%,#eef1f4)}
-  .pv-mobile .ph.dark{background:linear-gradient(180deg,#151d20 30%,#0c1214)}
-  .pv-mobile .ph i{display:block;margin:8px 6px 0;height:4px;border-radius:2px;background:#c9cfd6}
-  .pv-mobile .ph.dark i{background:#3a464c}
-  .pv-game{width:200px;height:112px;border-radius:8px;background:linear-gradient(180deg,#0d1b2e,#17324a 45%,#0e1a24);position:relative;overflow:hidden}
-  .pv-game .hud{position:absolute;inset:0}
-  .pv-game .bar{position:absolute;left:10px;bottom:12px;width:64px;height:6px;border-radius:3px;background:#1f2937;overflow:hidden}
+  img,svg{max-width:100%}
+  :root{--topbar:64px}
+  html{scroll-padding-top:var(--topbar)}
+  .screen{min-height:100dvh;display:flex;flex-direction:column;justify-content:center;padding-block:clamp(20px,3vh,40px)}
+  .screen > .split{margin-block:0}
+  .screen .principle-row{margin-top:clamp(20px,4vh,40px)}
+  ::selection{background:var(--accent);color:var(--accent-ink)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  .skip{
+    position:fixed;left:12px;top:12px;z-index:100;min-height:44px;display:inline-flex;align-items:center;
+    padding:10px 14px;border-radius:8px;background:var(--ink);color:var(--paper);text-decoration:none;
+    transform:translateY(-200%);transition:transform .15s ease;
+  }
+  .skip:focus{transform:none}
+  .wrap{width:min(100% - 2*var(--pad),var(--max));margin-inline:auto}
+  .kicker{
+    margin:0 0 12px;font:700 11px/1.2 var(--sans);letter-spacing:.18em;
+    text-transform:uppercase;color:var(--accent);
+  }
+  .lede{color:var(--muted);max-width:64ch;font-size:17px}
+  .mono{font-family:var(--mono)}
+  .sr-only{
+    position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+    clip:rect(0 0 0 0);white-space:nowrap;border:0;
+  }
+
+  /* top bar */
+  .topbar{
+    position:sticky;top:0;z-index:50;border-bottom:1px solid var(--line);
+    background:var(--paper);
+  }
+  .topbar-inner{display:flex;align-items:center;gap:26px;min-height:64px}
+  .brand{
+    display:inline-flex;align-items:center;gap:10px;min-height:44px;text-decoration:none;
+    font:600 18px/1 var(--serif);letter-spacing:-.01em;
+  }
+  .brand-mark{
+    width:22px;height:22px;border-radius:6px;background:var(--ink);color:var(--paper);
+    display:grid;place-items:center;font:700 12px/1 var(--mono);
+  }
+  .nav{display:flex;gap:22px;margin-left:8px}
+  .nav a{
+    display:inline-flex;align-items:center;min-height:44px;text-decoration:none;color:var(--muted);
+    font-size:13px;font-weight:600;padding:8px 0;border-bottom:2px solid transparent;
+  }
+  .nav a:hover{color:var(--ink);border-bottom-color:var(--line-strong)}
+  .topbar-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--line-strong);
+    background:transparent;color:var(--ink);text-decoration:none;font:600 13px/1 var(--sans);
+    cursor:pointer;transition:transform .12s ease,background .12s ease,border-color .12s ease;
+  }
+  .btn:hover{transform:translateY(-1px);border-color:var(--ink)}
+  .btn-primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .btn-primary:hover{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .btn-small{min-height:44px;padding:0 14px;font-size:12px}
+  .icon-btn{
+    width:44px;height:44px;border-radius:50%;border:1px solid var(--line-strong);
+    background:transparent;color:var(--ink);cursor:pointer;display:grid;place-items:center;
+    font:600 17px/1 var(--sans);
+  }
+  .icon-btn:hover{border-color:var(--ink);background:var(--paper-2)}
+
+  /* hero */
+  .hero{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);gap:56px;align-items:center;padding:76px 0 54px;min-height:100dvh}
+  .hero > *{min-width:0}
+  .hero h1{
+    margin:0 0 18px;font:600 clamp(48px,7.2vw,92px)/.94 var(--serif);
+    letter-spacing:-.045em;max-width:10ch;
+  }
+  .hero h1 em{font-style:italic;color:var(--accent)}
+  .hero .lede{font-size:18px;max-width:50ch}
+  .hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin:28px 0 30px}
+  .hero-meta{
+    display:flex;flex-wrap:wrap;gap:10px 26px;padding-top:20px;border-top:1px solid var(--line);
+    color:var(--muted);font-size:12px;letter-spacing:.02em;
+  }
+  .hero-meta strong{color:var(--ink);font:600 15px/1 var(--mono);margin-right:4px}
+  .hero-art{position:relative;min-height:440px}
+  .art-stack{position:relative;height:440px}
+  .art-card{
+    position:absolute;overflow:hidden;border-radius:14px;border:1px solid var(--line);
+    box-shadow:var(--shadow);background:var(--card);
+  }
+  .art-terminal{left:0;top:8px;width:310px;height:196px;transform:rotate(-3deg);background:#101317;border-color:#2a3140}
+  .art-phone{right:18px;top:72px;width:158px;height:310px;transform:rotate(4deg);border-radius:26px;background:var(--paper);border-color:var(--line-strong)}
+  .art-game{left:52px;bottom:6px;width:268px;height:158px;transform:rotate(2deg);background:#0d1b2e;border-color:#203449}
+  .art-print{right:6px;bottom:22px;width:176px;height:228px;transform:rotate(-6deg);background:#fbf9f4;border-color:#d9d3c6}
+  .art-caption{
+    position:absolute;left:2px;bottom:-6px;color:var(--muted);font:600 10.5px/1.4 var(--mono);
+    letter-spacing:.08em;text-transform:uppercase;
+  }
+  .term-top{display:flex;gap:5px;padding:10px 12px;border-bottom:1px solid #252b36;background:#0b0e13}
+  .term-top i{width:8px;height:8px;border-radius:50%;background:#3a4354;display:block}
+  .term-top i:first-child{background:#f06a6a}.term-top i:nth-child(2){background:#d9b04a}.term-top i:nth-child(3){background:#4ec46a}
+  .term-body{padding:12px 14px;font:11.5px/1.9 var(--mono);color:#d7dce2}
+  .term-body .dim{color:#7d8794}.term-body .c{color:#2ad4d4}.term-body .g{color:#4ec46a}.term-body .y{color:#d9b04a}.term-body .r{color:#f06a6a}
+  .phone-top{height:18px;display:flex;align-items:center;justify-content:center}
+  .phone-notch{width:54px;height:5px;border-radius:999px;background:var(--line-strong)}
+  .phone-body{padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+  .phone-title{font:700 15px/1.2 var(--sans);letter-spacing:-.01em}
+  .phone-line{height:7px;border-radius:999px;background:var(--line)}
+  .phone-line.short{width:62%}
+  .phone-tile{margin-top:4px;border:1px solid var(--line);border-radius:10px;padding:9px;background:var(--card)}
+  .phone-num{font:700 24px/1 var(--sans);letter-spacing:-.03em}
+  .phone-cap{font-size:9px;color:var(--muted);margin-top:3px}
+  .game-grid{position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,rgba(94,234,212,.14),transparent 42%),linear-gradient(180deg,#0d1b2e,#17324a 45%,#0e1a24)}
+  .game-obj{position:absolute;left:14px;top:14px;font:700 8px/1 var(--mono);letter-spacing:.12em;color:#5eead4}
+  .game-bar{position:absolute;left:14px;bottom:16px;width:96px;height:8px;border-radius:999px;background:#1f2937;overflow:hidden}
+  .game-bar::after{content:"";display:block;width:72%;height:100%;background:#4ade80}
+  .game-hp{position:absolute;left:14px;bottom:28px;font:700 7.5px/1 var(--mono);letter-spacing:.1em;color:#e8eaf0}
+  .game-ret{position:absolute;left:52%;top:44%;width:20px;height:20px;border:2px solid #fff;border-radius:50%;margin:-10px 0 0 -10px}
+  .game-ret::before,.game-ret::after{content:"";position:absolute;background:#fff}
+  .game-ret::before{left:9px;top:-6px;width:1px;height:4px}.game-ret::after{left:9px;bottom:-6px;width:1px;height:4px}
+  .game-chip{position:absolute;right:12px;top:12px;padding:3px 7px;border-radius:999px;background:rgba(8,10,14,.62);border:1px solid rgba(94,234,212,.4);font:600 7.5px/1 var(--mono);color:#5eead4}
+  .print-kicker{position:absolute;left:18px;top:18px;font:700 7px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#0b5d4f}
+  .print-title{position:absolute;left:18px;top:34px;right:18px;font:600 18px/1.05 var(--serif);letter-spacing:-.02em;color:#17181a}
+  .print-rule{position:absolute;left:18px;right:18px;top:84px;height:1px;background:#c9c3b6}
+  .print-line{position:absolute;left:18px;right:18px;height:4px;border-radius:2px;background:#d9d3c6}
+  .print-line.l1{top:96px}.print-line.l2{top:106px;right:54px}.print-line.l3{top:120px}.print-line.l4{top:130px;right:38px}
+  .print-fig{position:absolute;left:18px;right:18px;bottom:18px;height:72px;border:1px solid #c9c3b6;background:linear-gradient(135deg,#e9dcc0,#fbf9f4)}
+  .print-fig::after{content:"";position:absolute;left:12px;right:12px;bottom:12px;height:22px;border-top:2px solid #0b5d4f;transform:skewY(-6deg)}
+
+  /* surfaces strip */
+  .surfaces{border-block:1px solid var(--line);padding:16px 0;margin:26px auto 0}
+  .surface-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .surface{
+    display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border:1px solid var(--line);
+    border-radius:999px;color:var(--muted);font:600 11px/1 var(--sans);letter-spacing:.04em;
+  }
+  .surface b{color:var(--ink);font-weight:700}
+  .surface.here{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .surface-note{margin-left:auto;color:var(--muted);font-size:11.5px}
+
+  /* sections */
+  section{padding:78px 0}
+  .section-head{max-width:720px;margin-bottom:22px}
+  .section-head h2{
+    margin:0 0 12px;font:600 clamp(32px,4.6vw,56px)/.98 var(--serif);
+    letter-spacing:-.035em;
+  }
+  .section-head p{margin:0;color:var(--muted);font-size:17px;max-width:62ch}
+  .split{display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);gap:54px;align-items:start}
+  .split > *{min-width:0}
+  .split h2{margin:0 0 16px;font:600 clamp(34px,4.4vw,54px)/.98 var(--serif);letter-spacing:-.035em}
+  .split p{color:var(--muted);font-size:17px;max-width:44ch}
+  .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .mode-card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px;box-shadow:var(--shadow-soft);
+  }
+  .mode-num{font:600 11px/1 var(--mono);color:var(--accent);letter-spacing:.12em}
+  .mode-card h3{margin:14px 0 8px;font:600 24px/1.05 var(--serif);letter-spacing:-.02em}
+  .mode-card p{margin:0 0 16px;color:var(--muted);font-size:14px}
+  .mode-tag{
+    display:inline-block;margin:0 6px 6px 0;padding:4px 8px;border:1px solid var(--line);
+    border-radius:6px;font:600 10.5px/1 var(--mono);color:var(--muted);
+  }
+  .mode-output{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+  .mode-output b{color:var(--ink);font-weight:700}
+
+  /* cases */
+  .case-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .case{
+    display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-soft);
+    transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
+  }
+  .case:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--line-strong)}
+  .case-preview{
+    display:block;height:104px;position:relative;overflow:hidden;border-bottom:1px solid var(--line);
+    background:var(--paper-2);
+  }
+  .case-preview:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+  .case-tag{
+    position:absolute;left:12px;top:11px;z-index:2;padding:3px 8px;border-radius:999px;
+    background:rgba(22,22,22,.72);color:#fff;font:700 9.5px/1 var(--sans);
+    letter-spacing:.1em;text-transform:uppercase;
+  }
+  .case-body{padding:10px 10px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
+  .case-top{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--muted);font:600 9px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+  .case-body h3{margin:0;font:600 17px/1.06 var(--serif);letter-spacing:-.02em}
+  .case-body h3 a{text-decoration:none}
+  .case-body h3 a:hover{color:var(--accent)}
+  .case-body p{margin:0;color:var(--muted);font-size:11.5px;line-height:1.4;flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .facts{display:flex;flex-wrap:wrap;gap:5px}
+  .facts span{font-size:9px;padding:2px 6px;border:1px solid var(--line);border-radius:999px;color:var(--muted)}
+  .case-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:2px}
+  .case-actions a{display:inline-flex;align-items:center;min-height:44px;font:700 12px/1 var(--sans);text-decoration:none}
+  .case-actions a:first-child{color:var(--accent)}
+  .case-actions a:last-child{color:var(--muted)}
+  .case-actions a:hover{text-decoration:underline;text-underline-offset:3px}
+
+  /* previews */
+  .pv-term{position:absolute;inset:18px;border-radius:9px;background:#101317;border:1px solid #2a3140;overflow:hidden;box-shadow:0 10px 22px rgba(0,0,0,.2)}
+  .pv-term .bar{display:flex;gap:4px;padding:7px 9px;background:#0b0e13;border-bottom:1px solid #252b36}
+  .pv-term .bar i{width:5px;height:5px;border-radius:50%;background:#3a4354}
+  .pv-term .bar i:first-child{background:#f06a6a}.pv-term .bar i:nth-child(2){background:#d9b04a}.pv-term .bar i:nth-child(3){background:#4ec46a}
+  .pv-term .lines{padding:9px 10px;display:flex;flex-direction:column;gap:5px}
+  .pv-term .lines i{display:block;height:4px;border-radius:2px;background:#39414f}
+  .pv-term .lines i:nth-child(1){width:38%;background:#2ad4d4}
+  .pv-term .lines i:nth-child(2){width:78%}
+  .pv-term .lines i:nth-child(3){width:62%;background:#4ec46a}
+  .pv-term .lines i:nth-child(4){width:84%;background:#39414f}
+  .pv-term .lines i:nth-child(5){width:46%;background:#d9b04a}
+  .pv-cli{position:absolute;inset:18px;border-radius:9px;background:#12121a;border:1px solid #2a2a3a;overflow:hidden;box-shadow:0 10px 22px rgba(0,0,0,.2)}
+  .pv-cli .lines{padding:14px 12px;display:flex;flex-direction:column;gap:6px}
+  .pv-cli .lines i{display:block;height:4px;border-radius:2px;background:#3a3a4a}
+  .pv-cli .lines i:nth-child(1){width:34%;background:#a78bfa}
+  .pv-cli .lines i:nth-child(2){width:68%}
+  .pv-cli .lines i:nth-child(3){width:76%;background:#5dd47e}
+  .pv-cli .lines i:nth-child(4){width:52%;background:#e3b341}
+  .pv-cli .lines i:nth-child(5){width:62%;background:#3a3a4a}
+  .pv-cli .lines i:nth-child(6){width:28%;background:#f4807c}
+  .pv-mobile{position:absolute;inset:16px;display:flex;gap:12px;align-items:center;justify-content:center}
+  .pv-phone{width:58px;height:118px;border-radius:12px;border:3px solid #2c2f36;background:linear-gradient(180deg,#fff 30%,#eef1f4);padding:7px 6px;display:flex;flex-direction:column;gap:5px}
+  .pv-phone.dark{background:linear-gradient(180deg,#151d20 30%,#0c1214);border-color:#3a464c}
+  .pv-phone i{display:block;height:4px;border-radius:2px;background:#c9cfd6}
+  .pv-phone.dark i{background:#3a464c}
+  .pv-phone i:first-child{width:64%;background:#0f766e}.pv-phone.dark i:first-child{background:#2dd4bf}
+  .pv-game{position:absolute;inset:16px;border-radius:9px;background:linear-gradient(180deg,#0d1b2e,#17324a 45%,#0e1a24);overflow:hidden;border:1px solid #203449}
+  .pv-game .obj{position:absolute;left:12px;top:11px;width:58px;height:4px;border-radius:2px;background:#5eead4}
+  .pv-game .bar{position:absolute;left:12px;bottom:14px;width:66px;height:6px;border-radius:3px;background:#1f2937;overflow:hidden}
   .pv-game .bar::after{content:"";display:block;width:72%;height:100%;background:#4ade80}
-  .pv-game .obj{position:absolute;left:10px;top:10px;width:56px;height:5px;border-radius:2px;background:#5eead4}
   .pv-game .ret{position:absolute;left:50%;top:46%;width:14px;height:14px;margin:-7px 0 0 -7px;border:2px solid #fff;border-radius:50%}
-  .pv-print{position:relative;width:168px;height:112px}
-  .pv-print .paper{position:absolute;width:78px;height:110px;background:#fbf9f4;border:1px solid #d9d3c6;border-radius:3px;
-    box-shadow:0 4px 10px rgba(30,28,24,.14);padding:8px 9px}
-  .pv-print .paper:first-child{left:2px;top:2px}
-  .pv-print .paper:last-child{right:2px;top:2px;transform:rotate(2.5deg)}
-  .pv-print i{display:block;height:3px;border-radius:2px;background:#c9c3b6;margin-bottom:5px}
-  .pv-print i:first-child{width:70%;background:#0b5d4f;height:5px}
-  footer{border-top:1px solid var(--line);padding:22px 0 60px;color:var(--muted);font-size:13.5px;display:flex;
-    flex-wrap:wrap;gap:8px 22px;justify-content:space-between}
-  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em}
+  .pv-rpg{position:absolute;inset:16px;border-radius:9px;border:1px solid rgba(201,162,39,.55);background:linear-gradient(160deg,#2c2417,#171310);padding:13px;overflow:hidden}
+  .pv-rpg .title{font:600 12px/1 var(--serif);color:#c9a227;letter-spacing:.1em}
+  .pv-rpg .bars{display:flex;gap:5px;margin-top:10px}
+  .pv-rpg .bars i{display:block;height:6px;border-radius:3px}
+  .pv-rpg .bars i:first-child{width:54px;background:#a8342c}.pv-rpg .bars i:nth-child(2){width:34px;background:#3f6bc4}.pv-rpg .bars i:nth-child(3){width:26px;background:#4f8f3f}
+  .pv-rpg .medal{position:absolute;right:12px;bottom:12px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(201,162,39,.6);background:radial-gradient(circle at 40% 35%,#d8c9a3,#b4a37c)}
+  .pv-anime{position:absolute;inset:16px;border-radius:9px;background:linear-gradient(180deg,#8ed0f5 0%,#bfe6f7 40%,#7fb85c 62%,#5f9445 100%);overflow:hidden}
+  .pv-anime .hud{position:absolute;left:10px;top:10px;right:10px;display:flex;flex-direction:column;gap:5px}
+  .pv-anime .hud i{display:block;height:5px;border-radius:3px;background:rgba(18,24,40,.55)}
+  .pv-anime .hud i:first-child{width:46%}.pv-anime .hud i:nth-child(2){width:64%}
+  .pv-anime .panel{position:absolute;right:10px;bottom:10px;width:74px;height:46px;border-radius:6px;background:rgba(18,24,40,.8);border:1px solid rgba(227,179,65,.45);padding:6px}
+  .pv-anime .panel i{display:block;height:3px;border-radius:2px;background:#e3b341;margin-bottom:4px}
+  .pv-anime .panel i:nth-child(2){width:62%;background:#8a4fd0}
+  .pv-casual{position:absolute;inset:16px;display:grid;grid-template-columns:repeat(4,26px);gap:6px;align-content:center;justify-content:center}
+  .pv-casual span{width:26px;height:26px;display:block}
+  .pv-casual .circle{border-radius:50%;background:#e0487a}
+  .pv-casual .square{border-radius:6px;background:#e8a819}
+  .pv-casual .diamond{width:22px;height:22px;border-radius:4px;background:#2f9e77;transform:rotate(45deg)}
+  .pv-casual .triangle{background:#3f7fd2;clip-path:polygon(50% 6%,94% 92%,6% 92%)}
+  .pv-casual .star{background:#8a4fd0;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+  .pv-casual .hex{background:#dd6b25;clip-path:polygon(25% 5%,75% 5%,100% 50%,75% 95%,25% 95%,0% 50%)}
+  .pv-print{position:absolute;inset:16px;display:flex;align-items:center;justify-content:center}
+  .pv-sheet{width:78px;height:122px;background:#fbf9f4;border:1px solid #d9d3c6;border-radius:3px;box-shadow:0 6px 14px rgba(30,28,24,.16);padding:9px}
+  .pv-sheet:first-child{transform:translateX(10px) rotate(-3deg)}
+  .pv-sheet:last-child{transform:translateX(-10px) rotate(3deg)}
+  .pv-sheet i{display:block;height:3px;border-radius:2px;background:#c9c3b6;margin-bottom:5px}
+  .pv-sheet i:first-child{width:66%;height:4px;background:#0b5d4f}
+  .pv-sheet i:nth-child(2){width:90%}.pv-sheet i:nth-child(3){width:78%}.pv-sheet i:nth-child(4){width:84%}
+
+  /* proof grid */
+  .proof-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:14px}
+  .proof{
+    padding:18px 18px 16px;border:1px solid var(--line);border-radius:var(--radius-sm);
+    background:var(--card);text-decoration:none;display:flex;flex-direction:column;gap:8px;
+    min-height:132px;transition:border-color .12s ease,transform .12s ease;
+  }
+  .proof:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .proof-num{font:600 10px/1 var(--mono);letter-spacing:.12em;color:var(--accent)}
+  .proof h3{margin:0;font:600 19px/1.1 var(--serif);letter-spacing:-.01em}
+  .proof p{margin:0;color:var(--muted);font-size:13px}
+  .proof span{margin-top:auto;font:700 11px/1 var(--sans);color:var(--accent)}
+
+  /* principles strip */
+  .principle-row{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding-top:18px;border-top:1px solid var(--line)}
+  .principle{display:flex;flex-direction:column;gap:4px}
+  .principle b{font:600 12px/1.2 var(--sans);letter-spacing:.02em}
+  .principle span{color:var(--muted);font-size:11.5px;line-height:1.45}
+
+  /* requirements */
+  .req-layout{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:46px;align-items:start}
+  .req-layout > *{min-width:0}
+  .req-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .req-link{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;
+    border:1px solid var(--line);border-radius:8px;text-decoration:none;background:var(--card);
+    font-size:12.5px;font-weight:600;
+  }
+  .req-link span{color:var(--muted);font:600 10px/1 var(--mono)}
+  .req-link:hover{border-color:var(--accent);color:var(--accent)}
+  .req-note{margin-top:16px;color:var(--muted);font-size:13px}
+
+  /* install */
+  .install-panel{
+    --panel-bg:#161616; --panel-fg:#f4f1e9; --panel-muted:rgba(244,241,233,.72);
+    --panel-line:rgba(244,241,233,.18); --panel-accent:#6ee7d0; --panel-hover:rgba(244,241,233,.08);
+    --panel-code-bg:rgba(0,0,0,.28);
+    background:var(--panel-bg);color:var(--panel-fg);border-radius:26px;padding:clamp(26px,5vw,54px);
+    display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:40px;align-items:center;
+    box-shadow:var(--shadow);min-width:0;
+  }
+  [data-theme="dark"] .install-panel{
+    --panel-bg:#f2efe7; --panel-fg:#101211; --panel-muted:rgba(16,18,17,.72);
+    --panel-line:rgba(16,18,17,.18); --panel-accent:#0b5d4f; --panel-hover:rgba(16,18,17,.06);
+    --panel-code-bg:rgba(16,18,17,.06);
+  }
+  .install-panel > *{min-width:0}
+  .install-panel .kicker{color:var(--panel-accent)}
+  .install-panel h2{margin:0 0 12px;font:600 clamp(32px,4.6vw,52px)/.98 var(--serif);letter-spacing:-.035em;color:var(--panel-fg)}
+  .install-panel p{margin:0;color:var(--panel-muted);font-size:15px;max-width:48ch}
+  .install-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+  .install-panel .btn{border-color:var(--panel-line);color:var(--panel-fg)}
+  .install-panel .btn:hover{border-color:var(--panel-fg);background:var(--panel-hover)}
+  .install-panel .btn-primary{background:var(--panel-accent);color:var(--panel-bg);border-color:var(--panel-accent)}
+  .install-panel .btn-primary:hover{background:var(--panel-fg);color:var(--panel-bg);border-color:var(--panel-fg)}
+  .cmd-box{min-width:0;background:var(--panel-code-bg);border:1px solid var(--panel-line);border-radius:12px;overflow:hidden}
+  .cmd-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-bottom:1px solid var(--panel-line);font:600 10px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--panel-muted)}
+  .copy-btn{
+    min-height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--panel-line);
+    background:transparent;color:var(--panel-fg);font:700 11px/1 var(--sans);cursor:pointer;
+  }
+  .copy-btn:hover{border-color:var(--panel-fg)}
+  .cmd{display:block;max-width:100%;padding:16px 14px;overflow-x:auto;font:12.5px/1.7 var(--mono);color:var(--panel-fg);white-space:nowrap}
+  .cmd em{color:var(--panel-accent);font-style:normal}
+  .install-note{margin-top:12px;color:var(--panel-muted);font-size:11.5px}
+  .sr-status{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+  footer{border-top:1px solid var(--line);padding:30px 0 54px;color:var(--muted);font-size:12.5px}
+  .footer-inner{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between;align-items:flex-start}
+  .footer-links{display:flex;flex-wrap:wrap;gap:8px 18px}
+  .footer-links a{display:inline-flex;align-items:center;min-height:44px;text-decoration:none;color:var(--ink);font-weight:600}
+  .footer-links a:hover{color:var(--accent)}
+  .footer-meta{max-width:52ch;line-height:1.6}
+  .footer-meta code{font-family:var(--mono);font-size:.92em}
+
+  @media (max-width:1100px){
+    .case-grid{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:720px){
+    :root{--topbar:58px}
+  }
+  @media (max-width:700px){
+    .case-grid{grid-template-columns:1fr}
+  }
+  @media (max-width:960px){
+    .hero{grid-template-columns:1fr;gap:30px;padding-top:54px}
+    .hero-art{min-height:0}
+    .art-stack{display:grid;grid-template-columns:1fr 1fr;gap:12px;height:auto}
+    .art-card{position:static;width:auto;height:170px;transform:none}
+    .art-phone{height:170px;border-radius:16px}
+    .art-print{height:170px}
+    .art-caption{position:static;margin-top:12px}
+    .split,.req-layout{grid-template-columns:1fr;gap:26px}
+    .install-panel{grid-template-columns:1fr}
+    .principle-row{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:720px){
+    :root{--pad:18px}
+    .nav{display:none}
+    .topbar-inner{min-height:58px}
+    .hero h1{font-size:clamp(46px,13vw,72px)}
+    .hero-meta{gap:8px 18px}
+    .mode-grid{grid-template-columns:1fr}
+    .section-head h2{font-size:clamp(30px,8vw,44px)}
+    .split h2{font-size:clamp(30px,8vw,44px)}
+    .case-grid{grid-template-columns:1fr}
+    .req-list{grid-template-columns:1fr}
+    .principle-row{grid-template-columns:1fr}
+    .surface-note{margin-left:0;width:100%}
+    .hero-actions .btn{flex:1 1 auto}
+  }
+  @media (max-width:420px){
+    .topbar-actions .btn-small{display:none}
+    .hero-meta{font-size:11px}
+    .art-card{height:140px}
+  }
+  @media (max-width:330px){
+    .art-stack{grid-template-columns:1fr}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <p class="kicker">design · example outputs</p>
-    <h1>Eight systems, eight surfaces, eight self-contained proofs</h1>
-    <p class="lede">Each case is a showcase artifact produced by the <code>design</code> skill for a different surface class: terminal, CLI, mobile app, four game genres, and print. Every page is a single HTML file, obeys its own system, and renders its whole-use scenes on the target canvas — not a component sampler.</p>
-    <div class="note">The gallery never injects a theme into the cases; a surface's system is isolated, and only vocabulary is shared. Game and document cases load webfonts from Google Fonts to demonstrate their type registers, and fall back to system faces offline; everything else is inline. Open a case directly to see its own controls, token tables, and verification probes.</div>
-    <div class="install">
-      <div>
-        <div class="install-label">Install the skill</div>
-        <code class="cmd" id="installCmd">npx skills add kimmywork/skills --skill design</code>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="#top" aria-label="Design home">
+      <span class="brand-mark" aria-hidden="true">D</span>
+      <span>design</span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="#system">System</a>
+      <a href="#cases">Cases</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#requirements">Requirements</a>
+    </nav>
+    <div class="topbar-actions">
+      <a class="btn btn-small" href="#install">Install</a>
+      <button class="icon-btn" id="themeBtn" type="button" aria-pressed="false">
+        <span aria-hidden="true" id="themeIcon">☾</span>
+        <span class="sr-only" id="themeLabel">Switch to dark theme</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero wrap" id="top">
+    <div class="hero-copy">
+      <p class="kicker">Design skill · Web surface</p>
+      <h1>Systems that <em>hold up.</em></h1>
+      <p class="lede">A design system is a promise. This skill builds the system, reviews whether the experience keeps it, and leaves checks that make the promise hard to break.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#cases">Explore the cases</a>
+        <a class="btn" href="https://skills.kimmy.fun/design/skills/design/SKILL.html">Read the skill</a>
       </div>
-      <div class="install-actions">
-        <button id="copyBtn" type="button">Copy</button>
-        <a href="https://skills.kimmy.fun/design/skills/design/SKILL.html" target="_blank" rel="noopener">Read SKILL.md ↗</a>
+      <div class="hero-meta">
+        <span><strong>2</strong> modes</span>
+        <span><strong>8</strong> cases</span>
+        <span><strong>6</strong> surface classes</span>
+        <span><strong>1</strong> self-contained page</span>
       </div>
     </div>
-  </header>
-
-  <div class="grid">
-    <a class="case" href="terminal.html">
-      <div class="preview"><span class="tag">TUI + Web</span>
-        <div class="pv-term" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-      </div>
-      <div class="body">
-        <h2>orbit — agent console</h2>
-        <p>Host-owned palette, ANSI roles, monochrome high-contrast path, and a live isolation check that a web theme never moves a TUI pixel.</p>
-        <div class="facts"><span>advisory contrast</span><span>glyph table</span><span>surface isolation</span></div>
-        <span class="open">Open case</span>
-      </div>
-    </a>
-
-    <a class="case" href="cli.html">
-      <div class="preview"><span class="tag">CLI</span>
-        <div class="pv-cli" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      </div>
-      <div class="body">
-        <h2>relay — deployment CLI</h2>
-        <p>stdout/stderr grammar, exit codes as interface, runtime color and width, and whole transcripts including failure and pipe sessions.</p>
-        <div class="facts"><span>NO_COLOR / CI</span><span>width slider</span><span>--json contract</span></div>
-        <span class="open">Open case</span>
-      </div>
-    </a>
-
-    <a class="case" href="mobile.html">
-      <div class="preview"><span class="tag">Mobile app</span>
-        <div class="pv-mobile" aria-hidden="true">
-          <div class="ph"><i></i><i></i><i></i></div>
-          <div class="ph dark"><i></i><i></i><i></i></div>
-        </div>
-      </div>
-      <div class="body">
-        <h2>pulse — health app</h2>
-        <p>Six whole-screen scenes, independent light and dark schemes, 48dp targets, dynamic type to 2.0×, and probes that run on the page.</p>
-        <div class="facts"><span>360×760 frames</span><span>overlays in context</span><span>live probes</span></div>
-        <span class="open">Open case</span>
-      </div>
-    </a>
-
-    <a class="case" href="game.html">
-      <div class="preview"><span class="tag">Game UI · sci-fi</span>
-        <div class="pv-game" aria-hidden="true">
-          <div class="hud">
-            <span class="obj"></span><span class="bar"></span><span class="ret"></span>
+    <div class="hero-art" aria-hidden="true">
+      <div class="art-stack">
+        <div class="art-card art-terminal">
+          <div class="term-top"><i></i><i></i><i></i></div>
+          <div class="term-body">
+            <div><span class="dim">›</span> refactor the token checker</div>
+            <div><span class="g">✓</span> read <span class="dim">docs/design/check-tokens.mjs</span></div>
+            <div><span class="c">⠿</span> run <span class="dim">node check-tokens.mjs --strict</span></div>
+            <div><span class="y">◆</span> permission <span class="dim">· apply edit?</span></div>
+            <div><span class="r">✗</span> dawn standard: text/subtle <span class="dim">4.41:1</span></div>
+            <div><span class="dim">[a] allow once</span> <span class="dim">[d] deny</span></div>
           </div>
         </div>
-      </div>
-      <div class="body">
-        <h2>drift — action game HUD</h2>
-        <p>Safe-zone containment, controller-first prompts, redundant status encoding, grayscale and colorblind proofs, motion and flash limits, handheld in both orientations.</p>
-        <div class="facts"><span>Chakra Petch · IBM Plex Sans</span><span>reduce motion / flash</span><span>portrait + landscape</span></div>
-        <span class="open">Open case</span>
-      </div>
-    </a>
-
-    <a class="case" href="game-rpg.html">
-      <div class="preview" style="background:#191510"><span class="tag" style="color:#9d937f">Game UI · fantasy RPG</span>
-        <div style="width:180px;height:104px;border-radius:8px;border:1px solid rgba(201,162,39,.6);background:linear-gradient(160deg,#2c2417,#171310);padding:12px;position:relative">
-          <div style="font-family:Georgia,serif;color:#c9a227;font-size:13px;letter-spacing:.08em">EMBERHOLD</div>
-          <div style="display:flex;gap:6px;margin-top:10px">
-            <span style="width:70px;height:7px;border-radius:4px;background:#a8342c"></span>
-            <span style="width:42px;height:7px;border-radius:4px;background:#3f6bc4"></span>
+        <div class="art-card art-phone">
+          <div class="phone-top"><span class="phone-notch"></span></div>
+          <div class="phone-body">
+            <div class="phone-title">Today</div>
+            <div class="phone-line short"></div>
+            <div class="phone-tile"><div class="phone-num">72</div><div class="phone-cap">calm · 6.4h</div></div>
+            <div class="phone-line"></div>
+            <div class="phone-line short"></div>
           </div>
-          <div style="position:absolute;right:10px;bottom:10px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(201,162,39,.6);background:radial-gradient(circle at 40% 35%,#d8c9a3,#b4a37c)"></div>
+        </div>
+        <div class="art-card art-game">
+          <div class="game-grid">
+            <div class="game-obj">OBJECTIVE · REACH THE RELAY</div>
+            <div class="game-chip">◈ 86</div>
+            <div class="game-ret"></div>
+            <div class="game-hp">HEALTH 086 · SHIELD 064</div>
+            <div class="game-bar"></div>
+          </div>
+        </div>
+        <div class="art-card art-print">
+          <div class="print-kicker">Field Station · A2</div>
+          <div class="print-title">Nine months after the dike breach</div>
+          <div class="print-rule"></div>
+          <div class="print-line l1"></div>
+          <div class="print-line l2"></div>
+          <div class="print-line l3"></div>
+          <div class="print-line l4"></div>
+          <div class="print-fig"></div>
         </div>
       </div>
-      <div class="body">
-        <h2>emberhold — fantasy RPG</h2>
-        <p>Parchment panels and gold rules over a three-register type system, dialogue as real prose at a proper measure, inventory rarity that survives grayscale, quest and combat states.</p>
-        <div class="facts"><span>Cinzel · Alegreya Sans · Spectral</span><span>dialogue measure</span><span>rarity by frame</span></div>
-        <span class="open">Open case</span>
-      </div>
-    </a>
+      <div class="art-caption">tokens → surfaces → scenes → verification</div>
+    </div>
+  </section>
 
-    <a class="case" href="game-anime.html">
-      <div class="preview" style="background:linear-gradient(180deg,#8ed0f5 0%,#bfe6f7 40%,#7fb85c 62%,#5f9445 100%)"><span class="tag" style="color:#2b3a55">Game UI · anime gacha</span>
-        <div style="position:relative;width:190px;height:100px">
-          <span style="position:absolute;top:6px;left:4px;width:44px;height:44px;border-radius:50%;border:2px solid #fff;background:radial-gradient(circle at 35% 30%,#a8d38a,#4b7a3f)"></span>
-          <span style="position:absolute;top:14px;left:60px;width:74px;height:9px;border-radius:5px;background:rgba(18,24,40,.55)"></span>
-          <span style="position:absolute;top:30px;left:60px;width:52px;height:9px;border-radius:5px;background:rgba(18,24,40,.45)"></span>
-          <span style="position:absolute;bottom:8px;left:4px;width:96px;height:7px;border-radius:4px;background:linear-gradient(90deg,#7fdc86,#4fae58)"></span>
-          <span style="position:absolute;bottom:8px;right:4px;width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.8);background:rgba(18,24,40,.55)"></span>
-        </div>
-      </div>
-      <div class="body">
-        <h2>asteria — anime gacha</h2>
-        <p>Landscape 16:9 throughout: bright world screens, dark panels for inventory, achievements, and summons, a live English/日本語 toggle, and rarity that survives grayscale.</p>
-        <div class="facts"><span>Kaisei Decol · Zen Maru · Zen Kaku</span><span>EN / JP toggle</span><span>world · character · inventory · achievements · gacha</span></div>
-        <span class="open">Open case</span>
-      </div>
-    </a>
+  <section class="surfaces wrap" aria-label="Surfaces covered">
+    <div class="surface-row">
+      <span class="surface"><b>TUI</b> host-owned</span>
+      <span class="surface"><b>CLI</b> pipe-safe</span>
+      <span class="surface"><b>Mobile</b> whole screens</span>
+      <span class="surface"><b>Game</b> safe zones</span>
+      <span class="surface"><b>Print</b> fixed canvas</span>
+      <span class="surface here"><b>Web</b> this page</span>
+      <span class="surface-note">Eight cases. Six surface classes. One system of evidence.</span>
+    </div>
+  </section>
 
-    <a class="case" href="game-casual.html">
-      <div class="preview" style="background:#fff1f6"><span class="tag" style="color:#7a7286">Game UI · casual puzzle</span>
-        <div style="display:grid;grid-template-columns:repeat(4,26px);gap:6px">
-          <span style="width:26px;height:26px;border-radius:50%;background:#e0487a"></span>
-          <span style="width:26px;height:26px;border-radius:6px;background:#e8a819"></span>
-          <span style="width:22px;height:22px;border-radius:4px;background:#2f9e77;transform:rotate(45deg)"></span>
-          <span style="width:26px;height:26px;background:#3f7fd2;clip-path:polygon(50% 6%,94% 92%,6% 92%)"></span>
-          <span style="width:26px;height:26px;background:#8a4fd0;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)"></span>
-          <span style="width:26px;height:26px;background:#dd6b25;clip-path:polygon(25% 5%,75% 5%,100% 50%,75% 95%,25% 95%,0% 50%)"></span>
-          <span style="width:26px;height:26px;border-radius:50%;background:#e0487a"></span>
-          <span style="width:26px;height:26px;border-radius:6px;background:#e8a819"></span>
-        </div>
-      </div>
-      <div class="body">
-        <h2>sugarfall — casual puzzle</h2>
-        <p>Shape-coded pieces that stay readable in grayscale, bounded juice with a reduced-motion build, big one-thumb targets, and failure states that never pressure a purchase.</p>
-        <div class="facts"><span>Luckiest Guy · Baloo 2 · Nunito Sans</span><span>shape-coded board</span><span>no dark patterns</span></div>
-        <span class="open">Open case</span>
-      </div>
-    </a>
+  <section class="screen wrap" id="system">
+    <div class="split">
+    <div>
+      <p class="kicker">One skill, two directions</p>
+      <h2>Build the system.<br>Judge the experience.</h2>
+      <p>The same standards govern both. System work produces tokens, scenes, and a drift check. Review work produces an evidence-graded issue register, a fix plan, and guard rules.</p>
+    </div>
+    <div class="mode-grid" id="review">
+      <article class="mode-card">
+        <div class="mode-num">01 · SYSTEM</div>
+        <h3>Make it coherent.</h3>
+        <p>Extract, rebuild, greenfield, or govern. The system is the source of truth; the showcase proves it.</p>
+        <span class="mode-tag">Extract</span><span class="mode-tag">Rebuild</span><span class="mode-tag">Greenfield</span><span class="mode-tag">Govern</span>
+        <div class="mode-output"><b>Output</b> · showcase · specification · drift check</div>
+      </article>
+      <article class="mode-card">
+        <div class="mode-num">02 · REVIEW</div>
+        <h3>Make it honest.</h3>
+        <p>Review a product, an artifact, or the system itself. Evidence over taste; protect what works; prioritize what changes the decision.</p>
+        <span class="mode-tag">Product</span><span class="mode-tag">Artifact</span><span class="mode-tag">System</span>
+        <div class="mode-output"><b>Output</b> · review report · issue register · fix plan · guard rules</div>
+      </article>
+    </div>
+    </div>
+    <div class="principle-row">
+      <div class="principle"><b>Evidence over invention</b><span>Read the real source. Quote the value. Mark what is designed.</span></div>
+      <div class="principle"><b>Reasoning is traceable</b><span>Stance → principle → rule → token → check. No orphan decisions.</span></div>
+      <div class="principle"><b>Accessibility is a foundation</b><span>Contrast, focus, targets, motion, and assistive tech are part of the system.</span></div>
+      <div class="principle"><b>Adopt before inventing</b><span>Use a mature convention when it fits, and record every deviation.</span></div>
+    </div>
+  </section>
 
-    <a class="case" href="print.html">
-      <div class="preview"><span class="tag">Print</span>
-        <div class="pv-print" aria-hidden="true">
-          <div class="paper"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <div class="paper"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <section class="screen wrap" id="cases">
+    <div class="section-head">
+      <p class="kicker">The cases</p>
+      <h2>Eight proofs, one system.</h2>
+      <p>Each case is a whole-use scene, not a component sampler. Open one to see its tokens, states, and verification probes. The requirements behind each case are linked below it.</p>
+    </div>
+    <div class="case-grid">
+      <article class="case">
+        <a class="case-preview" href="terminal.html" tabindex="-1" aria-hidden="true">
+          <span class="case-tag">TUI + Web</span>
+          <div class="pv-term"><div class="bar"><i></i><i></i><i></i></div><div class="lines"><i></i><i></i><i></i><i></i><i></i></div></div>
+        </a>
+        <div class="case-body">
+          <div class="case-top"><span>Case 01</span><span>Greenfield</span></div>
+          <h3><a href="terminal.html">orbit — agent console</a></h3>
+          <p>Host-owned palette, ANSI roles, monochrome high-contrast path, and a live isolation check that a web theme never moves a TUI pixel.</p>
+          <div class="facts"><span>advisory contrast</span><span>glyph table</span><span>surface isolation</span></div>
+          <div class="case-actions"><a href="terminal.html">Open case →</a><a href="requirement/terminal.html">Requirements</a></div>
+        </div>
+      </article>
+
+      <article class="case">
+        <a class="case-preview" href="cli.html" tabindex="-1" aria-hidden="true">
+          <span class="case-tag">CLI</span>
+          <div class="pv-cli"><div class="lines"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+        </a>
+        <div class="case-body">
+          <div class="case-top"><span>Case 02</span><span>Greenfield</span></div>
+          <h3><a href="cli.html">relay — deployment CLI</a></h3>
+          <p>stdout and stderr as a grammar, exit codes as a public API, runtime color and width, and whole transcripts including failure and pipe sessions.</p>
+          <div class="facts"><span>NO_COLOR / CI</span><span>width slider</span><span>--json contract</span></div>
+          <div class="case-actions"><a href="cli.html">Open case →</a><a href="requirement/cli.html">Requirements</a></div>
+        </div>
+      </article>
+
+      <article class="case">
+        <a class="case-preview" href="mobile.html" tabindex="-1" aria-hidden="true">
+          <span class="case-tag">Mobile app</span>
+          <div class="pv-mobile"><div class="pv-phone"><i></i><i></i><i></i><i></i></div><div class="pv-phone dark"><i></i><i></i><i></i><i></i></div></div>
+        </a>
+        <div class="case-body">
+          <div class="case-top"><span>Case 03</span><span>Rebuild</span></div>
+          <h3><a href="mobile.html">pulse — health app</a></h3>
+          <p>Six whole-screen scenes, independent light and dark schemes, 48dp targets, dynamic type to 2.0×, and probes that run on the page.</p>
+          <div class="facts"><span>360×760 frames</span><span>overlays in context</span><span>live probes</span></div>
+          <div class="case-actions"><a href="mobile.html">Open case →</a><a href="requirement/mobile.html">Requirements</a></div>
+        </div>
+      </article>
+
+      <article class="case">
+        <a class="case-preview" href="game.html" tabindex="-1" aria-hidden="true">
+          <span class="case-tag">Game UI · sci-fi</span>
+          <div class="pv-game"><span class="obj"></span><span class="bar"></span><span class="ret"></span></div>
+        </a>
+        <div class="case-body">
+          <div class="case-top"><span>Case 04</span><span>Greenfield</span></div>
+          <h3><a href="game.html">drift — action game HUD</a></h3>
+          <p>Safe-zone containment, controller-first prompts, redundant status encoding, grayscale and colorblind proofs, and motion and flash limits.</p>
+          <div class="facts"><span>Chakra Petch · IBM Plex Sans</span><span>reduce motion / flash</span><span>portrait + landscape</span></div>
+          <div class="case-actions"><a href="game.html">Open case →</a><a href="requirement/game.html">Requirements</a></div>
+        </div>
+      </article>
+
+      <article class="case">
+        <a class="case-preview" href="print.html" tabindex="-1" aria-hidden="true">
+          <span class="case-tag">Print</span>
+          <div class="pv-print"><div class="pv-sheet"><i></i><i></i><i></i><i></i></div><div class="pv-sheet"><i></i><i></i><i></i><i></i></div></div>
+        </a>
+        <div class="case-body">
+          <div class="case-top"><span>Case 05</span><span>Greenfield</span></div>
+          <h3><a href="print.html">fieldstation — poster and report</a></h3>
+          <p>Fixed canvas at true proportion, one shared typographic grid, a grayscale hierarchy proof, and color tokens with print values.</p>
+          <div class="facts"><span>A2 / A4</span><span>grid overlay</span><span>CMYK preview</span></div>
+          <div class="case-actions"><a href="print.html">Open case →</a><a href="requirement/print.html">Requirements</a></div>
+        </div>
+      </article>
+
+      <article class="case">
+        <a class="case-preview" href="game-rpg.html" tabindex="-1" aria-hidden="true">
+          <span class="case-tag">Game UI · RPG</span>
+          <div class="pv-rpg"><div class="title">EMBERHOLD</div><div class="bars"><i></i><i></i><i></i></div><div class="medal"></div></div>
+        </a>
+        <div class="case-body">
+          <div class="case-top"><span>Case 06</span><span>Greenfield</span></div>
+          <h3><a href="game-rpg.html">emberhold — fantasy RPG</a></h3>
+          <p>Parchment panels and gold rules over a three-register type system, dialogue as real prose at a proper measure, and rarity that survives grayscale.</p>
+          <div class="facts"><span>Cinzel · Alegreya Sans · Spectral</span><span>dialogue measure</span><span>rarity by frame</span></div>
+          <div class="case-actions"><a href="game-rpg.html">Open case →</a><a href="requirement/game-rpg.html">Requirements</a></div>
+        </div>
+      </article>
+
+      <article class="case">
+        <a class="case-preview" href="game-anime.html" tabindex="-1" aria-hidden="true">
+          <span class="case-tag">Game UI · gacha</span>
+          <div class="pv-anime"><div class="hud"><i></i><i></i></div><div class="panel"><i></i><i></i></div></div>
+        </a>
+        <div class="case-body">
+          <div class="case-top"><span>Case 07</span><span>Greenfield</span></div>
+          <h3><a href="game-anime.html">asteria — anime gacha</a></h3>
+          <p>Bright world screens, dark panels for inventory and summons, a live English/日本語 toggle, and rarity that keeps its meaning in grayscale.</p>
+          <div class="facts"><span>Kaisei Decol · Zen Maru</span><span>EN / JP toggle</span><span>landscape-first</span></div>
+          <div class="case-actions"><a href="game-anime.html">Open case →</a><a href="requirement/game-anime.html">Requirements</a></div>
+        </div>
+      </article>
+
+      <article class="case">
+        <a class="case-preview" href="game-casual.html" tabindex="-1" aria-hidden="true">
+          <span class="case-tag">Game UI · casual</span>
+          <div class="pv-casual"><span class="circle"></span><span class="square"></span><span class="diamond"></span><span class="triangle"></span><span class="star"></span><span class="hex"></span><span class="circle"></span><span class="square"></span></div>
+        </a>
+        <div class="case-body">
+          <div class="case-top"><span>Case 08</span><span>Greenfield</span></div>
+          <h3><a href="game-casual.html">sugarfall — casual puzzle</a></h3>
+          <p>Shape-coded pieces that stay readable in grayscale, bounded juice with a reduced-motion build, big one-thumb targets, and no dark patterns.</p>
+          <div class="facts"><span>Luckiest Guy · Baloo 2</span><span>shape-coded board</span><span>no dark patterns</span></div>
+          <div class="case-actions"><a href="game-casual.html">Open case →</a><a href="requirement/game-casual.html">Requirements</a></div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section class="screen wrap" id="evidence">
+    <div class="section-head">
+      <p class="kicker">What they prove</p>
+      <h2>Evidence, not decoration.</h2>
+      <p>Each case is built to be inspected. These are the claims the system is willing to be judged on.</p>
+    </div>
+    <div class="proof-grid">
+      <a class="proof" href="terminal.html"><span class="proof-num">TUI</span><h3>Host-owned palettes</h3><p>Roles, not RGB; a monochrome path that survives the terminal.</p><span>orbit →</span></a>
+      <a class="proof" href="cli.html"><span class="proof-num">CLI</span><h3>Output as interface</h3><p>stdout, stderr, width, exit codes, and a machine contract.</p><span>relay →</span></a>
+      <a class="proof" href="mobile.html"><span class="proof-num">Mobile</span><h3>Whole screens, both modes</h3><p>States in context, 48dp targets, 2.0× reflow, motion tokens.</p><span>pulse →</span></a>
+      <a class="proof" href="game.html"><span class="proof-num">Game</span><h3>Safe zones and input</h3><p>HUD containment, controller prompts, redundant status.</p><span>drift →</span></a>
+      <a class="proof" href="game-rpg.html"><span class="proof-num">RPG</span><h3>Three registers</h3><p>Display, UI, and text each do one job; lore never borrows display.</p><span>emberhold →</span></a>
+      <a class="proof" href="game-anime.html"><span class="proof-num">Anime</span><h3>Bright world, dark panels</h3><p>Scenery, menu focus, and a bilingual layout that fits both scripts.</p><span>asteria →</span></a>
+      <a class="proof" href="game-casual.html"><span class="proof-num">Casual</span><h3>Shape-coded play</h3><p>Color is delight; shape is the contract. No dark patterns.</p><span>sugarfall →</span></a>
+      <a class="proof" href="print.html"><span class="proof-num">Print</span><h3>Fixed canvas</h3><p>True proportion, one grid, CMYK assumptions, grayscale survival.</p><span>fieldstation →</span></a>
+    </div>
+  </section>
+
+  <section class="screen wrap" id="requirements">
+    <div class="req-layout">
+      <div>
+        <p class="kicker">Context</p>
+        <h2>The cases have requirements, not just screenshots.</h2>
+        <p class="lede">Each case is backed by an inferred requirements document: context, principles, tokens, states, accessibility, and verification. Read it before a redesign or a review, so the next version does not lose what the case was proving.</p>
+        <p class="req-note"><a href="requirement/README.html">Read the review verdict and coverage matrix →</a></p>
+        <p class="req-note">This page is the web case: <a href="requirement/index.html">read its requirements →</a></p>
+      </div>
+      <div class="req-list">
+        <a class="req-link" href="requirement/terminal.html">orbit · terminal <span>01</span></a>
+        <a class="req-link" href="requirement/cli.html">relay · CLI <span>02</span></a>
+        <a class="req-link" href="requirement/mobile.html">pulse · mobile <span>03</span></a>
+        <a class="req-link" href="requirement/game.html">drift · game <span>04</span></a>
+        <a class="req-link" href="requirement/print.html">fieldstation · print <span>05</span></a>
+        <a class="req-link" href="requirement/game-rpg.html">emberhold · RPG <span>06</span></a>
+        <a class="req-link" href="requirement/game-anime.html">asteria · gacha <span>07</span></a>
+        <a class="req-link" href="requirement/game-casual.html">sugarfall · casual <span>08</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen wrap" id="install">
+    <div class="install-panel">
+      <div>
+        <p class="kicker">Use it</p>
+        <h2>Install the skill.</h2>
+        <p>Build the system, review the experience, and leave checks behind. The bundle also includes <code>presentation</code> for talks, sharing sessions, demos, and written reports.</p>
+        <div class="install-actions">
+          <a class="btn btn-primary" href="https://skills.kimmy.fun/design/skills/design/SKILL.html">Read SKILL.md</a>
+          <a class="btn" href="https://github.com/kimmywork/skills">GitHub</a>
+          <a class="btn" href="requirement/README.html">Requirements</a>
         </div>
       </div>
-      <div class="body">
-        <h2>fieldstation — poster and report</h2>
-        <p>Fixed canvas at true proportion, shared typographic grid, grayscale hierarchy proof, and color tokens with print values.</p>
-        <div class="facts"><span>A2 / A4</span><span>grid overlay</span><span>CMYK preview</span></div>
-        <span class="open">Open case</span>
+      <div>
+        <div class="cmd-box">
+          <div class="cmd-head"><span>npx</span><button class="copy-btn" id="copyBtn" type="button" aria-describedby="copyStatus">Copy</button></div>
+          <span class="sr-only" id="copyStatus" aria-live="polite"></span>
+          <code class="cmd" id="installCmd">npx skills add kimmywork/skills --skill design</code>
+        </div>
+        <div class="cmd-box" style="margin-top:10px">
+          <div class="cmd-head"><span>Claude plugin</span></div>
+          <code class="cmd">claude plugin install design@kimmywork-skills</code>
+        </div>
+        <p class="install-note">Each case is one self-contained HTML file. No build step; system fallbacks keep it readable offline.</p>
       </div>
-    </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div>
+      <div class="footer-links">
+        <a href="#system">System</a>
+        <a href="#cases">Cases</a>
+        <a href="#evidence">Evidence</a>
+        <a href="requirement/README.html">Requirements</a>
+        <a href="../presentations/index.html">Presentation decks</a>
+        <a href="https://github.com/kimmywork/skills">GitHub</a>
+      </div>
+      <p class="footer-meta">Design is a skill in the <code>kimmywork/skills</code> bundle. This page is the web case: semantic HTML, visible focus, 44px controls, light/dark themes, and no horizontal scroll.</p>
+    </div>
+    <div class="footer-meta">
+      <span>Eight cases. Six surface classes. One system of evidence.</span>
+    </div>
   </div>
+</footer>
 
-  <footer>
-    <span>Each case is one self-contained HTML file — no builds; webfonts degrade to system faces offline.</span>
-    <span><a href="https://github.com/kimmywork/skills">kimmywork/skills</a> · <code>design/skills/design</code></span>
-  </footer>
-</div>
 <script>
 (function(){
   "use strict";
+  var root = document.documentElement;
+  var themeBtn = document.getElementById("themeBtn");
+  var themeIcon = document.getElementById("themeIcon");
+  var themeLabel = document.getElementById("themeLabel");
+  var stored = null;
+  try { stored = localStorage.getItem("design-theme"); } catch (e) {}
+  var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  var initial = stored || (prefersDark ? "dark" : "light");
+
+  function setTheme(theme){
+    root.setAttribute("data-theme", theme);
+    var dark = theme === "dark";
+    themeBtn.setAttribute("aria-pressed", String(dark));
+    themeIcon.textContent = dark ? "☀" : "☾";
+    themeLabel.textContent = dark ? "Switch to light theme" : "Switch to dark theme";
+    try { localStorage.setItem("design-theme", theme); } catch (e) {}
+  }
+  setTheme(initial);
+  themeBtn.addEventListener("click", function(){
+    setTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark");
+  });
+
   var btn = document.getElementById("copyBtn");
   var cmd = document.getElementById("installCmd");
   function fallback(text, done){
@@ -254,7 +807,12 @@
     var text = cmd.textContent.trim();
     function done(){
       btn.textContent = "Copied";
-      setTimeout(function(){ btn.textContent = "Copy"; }, 1600);
+      var status = document.getElementById("copyStatus");
+      if (status) status.textContent = "Install command copied.";
+      setTimeout(function(){
+        btn.textContent = "Copy";
+        if (status) status.textContent = "";
+      }, 1600);
     }
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(done, function(){ fallback(text, done); });

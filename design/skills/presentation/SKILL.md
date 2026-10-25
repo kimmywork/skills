@@ -23,9 +23,10 @@ A presentation is an argument an audience can follow and act on. It can be live,
 6. **Design the language.** Read `references/narrative-and-language.md`. Spoken and written registers differ: speak in short sentences with repetition and signposts; write with topic sentences, precision, and transitions; slide copy is an assertion, not prose. Use classical rhetoric as a discipline — invent, arrange, style, rehearse, deliver — not as decoration.
 7. **Control structure and time.** Read `references/delivery-and-time.md`. For live: opening, body, close, appendix; a time budget; a change of mode every few minutes; a must-cut list; a Q&A buffer. For written: BLUF, a stand-alone summary, numbered findings, and an appendix.
 8. **Design the surface.** Read `references/visual-and-accessibility.md`. Use the design system or visual language that fits this topic, setting, audience, and medium; if none exists, use `references/minimal-visual-system.md` as an adaptable example, not a fixed template. One idea per slide or section; a type scale for the back of the room or the reading distance; honest charts; a grid that survives grayscale.
-9. **Rehearse or read back.** For live, run it timed, record it, and cut. For written, read the summary alone and the headings alone; if the argument is not there, rewrite.
-10. **Make it accessible.** Read `references/visual-and-accessibility.md`. Alt text, reading order, captions or transcript, color never alone, reduced motion, plain language, and a handout that works without the speaker.
-11. **Verify and export.** Render every slide or page, check at presentation size and in grayscale, confirm the artifact opens offline, and confirm the source and the artifact agree.
+9. **Produce the deck.** Read `references/deck-production.md` when producing an HTML deck. Build a skeleton and one sample slide before batch writing; keep slide data in the markup; generate the TOC, page numbers, notes, and total time from it; run a batch contact-sheet QA and fix only changed slides plus their neighbors.
+10. **Rehearse or read back.** For live, run it timed, record it, and cut. For written, read the summary alone and the headings alone; if the argument is not there, rewrite.
+11. **Make it accessible.** Read `references/visual-and-accessibility.md`. Alt text, reading order, captions or transcript, color never alone, reduced motion, plain language, and a handout that works without the speaker.
+12. **Verify and export.** Render every slide or page, check at presentation size and in grayscale, confirm the artifact opens offline, and confirm the source and the artifact agree.
 
 ## Formats
 
@@ -34,6 +35,7 @@ Read `references/format-playbooks.md` before you design: sharing session, demo, 
 ## References
 
 - `references/narrative-and-language.md` — story, structure, registers, rhetoric, editing.
+- `references/deck-production.md` — HTML deck pipeline, slide data, QA, assets, facts.
 - `references/delivery-and-time.md` — live timing, Q&A, rehearsal, written pacing, hybrid.
 - `references/format-playbooks.md` — sharing session, demo, panel, workshop, pitch, readout.
 - `references/visual-and-accessibility.md` — projection, print, data, accessibility.

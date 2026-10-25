@@ -29,7 +29,7 @@ Pick the mode first; it changes the evidence and the output, not the standards.
 2. Read every surface supplement in scope (see References) and `references/checklist.md`. Both are binding: the supplement adds the medium's constraints, the checklist is the coverage and verification sweep.
 3. Lay foundations in order: information architecture and key flows → color → typography → copy → layout → components → states → motion → accessibility → platform context.
 4. Cover empty, loading, error, partial, and over-full states; touch, keyboard, IME, safe areas, back, orientation, and font scaling.
-5. Write the specification and the showcase together; the spec is the source of truth, the showcase proves it.
+5. Write the specification and the showcase together; the spec is the source of truth, the showcase proves it. Read `references/visual-production.md` before laying out diagrams or image rows.
 6. Verify by measurement: contrast, token drift, interactions, whole scenes; use the checklist's verification section.
 7. Author the drift check and ratchet configuration as part of the deliverable; do not install it into CI or fix existing violations unless the user also asks for implementation. Prove every rule with a mutation self-test.
 8. Hand over what you could not determine as an explicit "to confirm" list.
@@ -65,13 +65,14 @@ Pick the mode first; it changes the evidence and the output, not the standards.
 
 ## References
 
-Required reads: `references/design-philosophy.md` and `references/design-methods.md` at framing; `references/checklist.md` and every surface supplement in scope in System mode; `references/review.md` and `references/accessibility.md` in Review mode; `references/guard-rules.md` when leaving guards.
+Required reads: `references/design-philosophy.md` and `references/design-methods.md` at framing; `references/checklist.md`, `references/visual-production.md` for diagrams or image rows, and every surface supplement in scope in System mode; `references/review.md` and `references/accessibility.md` in Review mode; `references/guard-rules.md` when leaving guards.
 
 - `references/design-philosophy.md` — stance, lenses, principles, tension pairs.
 - `references/design-methods.md` — method selection, classic methods, decision records.
 - `references/accessibility.md` — build rules and review hints.
 - `references/review.md` — dimensions, severity, evidence, report and register templates.
 - `references/guard-rules.md` — drift rules, ratchet, mutation self-test.
+- `references/visual-production.md` — SVG geometry, flex arithmetic, image treatment.
 - `references/checklist.md` — coverage sweep.
 - `references/terminal-surfaces.md` — terminal and CLI.
 - `references/mobile-app-surfaces.md` — mobile app.
